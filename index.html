@@ -1512,6 +1512,289 @@
       .card{padding:15px}
       .nav button{font-size:.66rem}
     }
+  
+    /* Diseño fluido: iPhone, iPad y escritorio */
+    .app{
+      width:100%;
+      max-width:none;
+      margin:0;
+      padding:
+        calc(10px + env(safe-area-inset-top))
+        max(8px, env(safe-area-inset-right))
+        calc(88px + env(safe-area-inset-bottom))
+        max(8px, env(safe-area-inset-left));
+    }
+
+    .topbar,
+    .screen{
+      width:100%;
+    }
+
+    .nav{
+      left:max(8px, env(safe-area-inset-left));
+      right:max(8px, env(safe-area-inset-right));
+      width:auto;
+      max-width:720px;
+      margin:0 auto;
+    }
+
+    @media (min-width:768px){
+      .app{
+        padding:
+          calc(20px + env(safe-area-inset-top))
+          max(22px, env(safe-area-inset-right))
+          calc(104px + env(safe-area-inset-bottom))
+          max(22px, env(safe-area-inset-left));
+      }
+
+      .topbar{
+        margin-bottom:18px;
+      }
+
+      .brand h1{
+        font-size:3rem;
+      }
+
+      .screen{
+        max-width:1180px;
+        margin:0 auto;
+      }
+
+      .hero{
+        padding:20px;
+      }
+
+      .metric-grid{
+        gap:10px;
+      }
+
+      .metric-card{
+        min-height:116px;
+        padding:14px;
+      }
+
+      .metric-value{
+        font-size:1.45rem;
+      }
+
+      .recovery-grid{
+        gap:10px;
+      }
+
+      .sleep-compact,
+      .hrv-compact-grid{
+        gap:8px;
+      }
+
+      .sleep-phase,
+      .hrv-compact-item{
+        padding:10px;
+      }
+
+      .activity-list{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:10px;
+      }
+
+      .activity-row{
+        min-height:92px;
+        padding:12px 14px;
+      }
+
+      .activity-name{
+        font-size:1rem;
+      }
+
+      .activity-key .key-value{
+        font-size:1.05rem;
+      }
+
+      .activity-detail > .card{
+        max-width:980px;
+        margin:0 auto;
+      }
+
+      .detail-grid{
+        grid-template-columns:repeat(5,minmax(0,1fr));
+        gap:8px;
+      }
+
+      .activity-map{
+        height:250px;
+      }
+
+      .metric-chart{
+        height:170px;
+      }
+
+      .calendar-toolbar{
+        margin-bottom:12px;
+      }
+
+      .week-calendar,
+      .month-weekdays{
+        gap:6px;
+      }
+
+      .day-card{
+        min-height:84px !important;
+        padding:8px !important;
+      }
+
+      .day-number{
+        font-size:.78rem;
+      }
+
+      .day-icons{
+        margin-top:7px;
+        font-size:1rem;
+        gap:4px;
+      }
+
+      .plan-form{
+        grid-template-columns:1.1fr .9fr 1.4fr .8fr .8fr auto;
+        gap:8px;
+      }
+
+      .plan-form input,
+      .plan-form select{
+        font-size:.74rem;
+        padding:10px;
+      }
+
+      .evolution-summary{
+        gap:10px;
+      }
+
+      .evolution-stat{
+        padding:13px;
+      }
+
+      .evolution-stat strong{
+        font-size:1.12rem;
+      }
+
+      .evolution-stat span{
+        font-size:.68rem;
+      }
+
+      .volume-chart{
+        height:280px;
+      }
+
+      .data-actions{
+        gap:10px;
+      }
+
+      .data-button{
+        padding:14px 12px;
+      }
+
+      .data-button b{
+        font-size:.84rem;
+      }
+
+      .data-button span{
+        font-size:.68rem;
+      }
+
+      .history-panel{
+        padding:14px;
+      }
+
+      .history-stats{
+        gap:8px;
+      }
+
+      .history-stat{
+        padding:10px;
+      }
+
+      .history-stat strong{
+        font-size:.9rem;
+      }
+
+      .history-stat span{
+        font-size:.6rem;
+      }
+    }
+
+    @media (min-width:1180px){
+      .screen{
+        max-width:1440px;
+      }
+
+      #screen-today{
+        display:none;
+      }
+
+      #screen-today.active{
+        display:grid;
+        grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);
+        gap:14px;
+        align-items:start;
+      }
+
+      #screen-today > .hero,
+      #screen-today > .metric-grid,
+      #screen-today > .section-title,
+      #screen-today > article,
+      #screen-today > .recovery-grid{
+        min-width:0;
+      }
+
+      #screen-today > .hero,
+      #screen-today > .metric-grid{
+        grid-column:1 / -1;
+      }
+
+      #screen-today > .section-title{
+        grid-column:1 / -1;
+      }
+
+      #screen-today .metric-grid{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+      }
+
+      .activity-list{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+
+      .detail-grid{
+        grid-template-columns:repeat(9,minmax(0,1fr));
+      }
+
+      .activity-detail > .card{
+        max-width:1280px;
+      }
+
+      .activity-visual{
+        display:inline-block;
+        vertical-align:top;
+        width:calc(50% - 5px);
+      }
+
+      .activity-visual + .activity-visual{
+        margin-left:6px;
+      }
+
+      .day-card{
+        min-height:104px !important;
+      }
+
+      .volume-chart{
+        height:340px;
+      }
+
+      .data-actions,
+      .history-panel,
+      #health-coverage,
+      #import-summary,
+      #import-log{
+        max-width:none;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -4672,7 +4955,7 @@ $("#evolution-sport").addEventListener("change", () => renderEvolution());
       const checkins = await getAllCheckins();
       const blob = new Blob([JSON.stringify({
         app: "TɅLOS",
-        version: "0.26",
+        version: "0.27",
         exportedAt: new Date().toISOString(),
         imports: exportable,
         checkins
@@ -4715,7 +4998,7 @@ $("#evolution-sport").addEventListener("change", () => renderEvolution());
         const innerFiles = await getZipEntries();
         const healthRecords = await getAllHealth();
         $("#import-log").textContent =
-          `Base de datos preparada.\nArchivos almacenados: ${records.length}\nArchivos internos extraídos: ${innerFiles.length}\nRegistros de salud interpretados: ${healthRecords.length}\nVersión: TɅLOS 0.26\nBase IndexedDB: talos-db-v26\nSueño y VFC: decodificación real activa`;
+          `Base de datos preparada.\nArchivos almacenados: ${records.length}\nArchivos internos extraídos: ${innerFiles.length}\nRegistros de salud interpretados: ${healthRecords.length}\nVersión: TɅLOS 0.27\nBase IndexedDB: talos-db-v26\nSueño y VFC: decodificación real activa`;
           await renderActivities();
         await renderHealthCoverage();
         await loadCheckinForm();
