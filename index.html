@@ -1199,10 +1199,17 @@
     }
 
     .history-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:9px;
-      margin-top:13px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:6px;
+      margin-top:0;
+    }
+
+    .history-actions .btn{
+      width:100%;
+      padding:8px 9px;
+      font-size:.64rem;
+      border-radius:11px;
     }
 
     .history-stats{
@@ -1892,10 +1899,12 @@
         </div>
         <input id="file-input" class="file-input" type="file" multiple accept=".zip,.fit,.tcx,.csv,application/zip,text/csv,application/xml" />
         <input id="history-file-input" class="file-input" type="file" multiple webkitdirectory directory />
+        <input id="history-zip-input" class="file-input" type="file" accept=".zip,application/zip" />
 
         <div class="history-panel">
           <div class="history-actions">
-            <button id="pick-history-folder" class="btn" type="button">Seleccionar carpeta</button>
+            <button id="pick-history-zip" class="btn" type="button">Seleccionar ZIP</button>
+            <button id="pick-history-folder" class="btn secondary" type="button">Seleccionar carpeta</button>
           </div>
                   <div id="import-progress" class="import-progress">
           <div class="progress-head">
@@ -1942,7 +1951,7 @@
   </div>
 
   <script>
-    const DB_NAME = "talos-db-v25";
+    const DB_NAME = "talos-db-v26";
     const DB_VERSION = 5;
     const STORE_IMPORTS = "imports";
     const STORE_ACTIVITIES = "activities";
@@ -4235,7 +4244,11 @@
 
       showSummary(summary);
       setProgress(0, compatible.length, historical ? "Preparando histórico…" : "Preparando importación…");
-      log(`${historical ? "Importación histórica" : "Importación"} iniciada: ${compatible.length} archivo(s) compatibles.`);
+      const isHistoricalZip = historical &&
+        compatible.length === 1 &&
+        String(compatible[0].name || "").toLowerCase().endsWith(".zip");
+
+      log(`${historical ? (isHistoricalZip ? "Importación de ZIP histórico" : "Importación histórica") : "Importación"} iniciada: ${compatible.length} archivo(s) compatibles.`);
 
       for (let start = 0; start < compatible.length; start += batchSize) {
         const batch = compatible.slice(start, start + batchSize);
@@ -4273,7 +4286,13 @@
         await waitForUI();
       }
 
-      setProgress(compatible.length, compatible.length, historical ? "Histórico importado" : "Importación completada");
+      setProgress(
+        compatible.length,
+        compatible.length,
+        historical
+          ? (isHistoricalZip ? "ZIP histórico importado" : "Histórico importado")
+          : "Importación completada"
+      );
       log(`Informe final: ${summary.added} nuevos, ${summary.duplicates} duplicados y ${summary.errors} errores.`);
 
       await renderActivities();
@@ -4520,6 +4539,34 @@
       }
     }
 
+    $("#pick-history-zip").addEventListener("click", async () => {
+      try {
+        await dbReady;
+        $("#history-zip-input").click();
+      } catch (error) {
+        log(`❌ La base de datos no está disponible: ${error.message || error}`);
+      }
+    });
+
+    $("#history-zip-input").addEventListener("change", async event => {
+      const files = [...event.target.files].filter(file =>
+        String(file.name || "").toLowerCase().endsWith(".zip")
+      );
+
+      if (!files.length) {
+        log("⚠️ Selecciona un archivo ZIP válido de Garmin.");
+        event.target.value = "";
+        return;
+      }
+
+      const summary = await importFilesInBatches(files, {
+        historical:true,
+        batchSize:1
+      });
+      await refreshHistoryStats(summary);
+      event.target.value = "";
+    });
+
     $("#pick-history-folder").addEventListener("click", async () => {
       try {
         await dbReady;
@@ -4625,7 +4672,7 @@ $("#evolution-sport").addEventListener("change", () => renderEvolution());
       const checkins = await getAllCheckins();
       const blob = new Blob([JSON.stringify({
         app: "TɅLOS",
-        version: "0.25",
+        version: "0.26",
         exportedAt: new Date().toISOString(),
         imports: exportable,
         checkins
@@ -4668,7 +4715,7 @@ $("#evolution-sport").addEventListener("change", () => renderEvolution());
         const innerFiles = await getZipEntries();
         const healthRecords = await getAllHealth();
         $("#import-log").textContent =
-          `Base de datos preparada.\nArchivos almacenados: ${records.length}\nArchivos internos extraídos: ${innerFiles.length}\nRegistros de salud interpretados: ${healthRecords.length}\nVersión: TɅLOS 0.25\nBase IndexedDB: talos-db-v25\nSueño y VFC: decodificación real activa`;
+          `Base de datos preparada.\nArchivos almacenados: ${records.length}\nArchivos internos extraídos: ${innerFiles.length}\nRegistros de salud interpretados: ${healthRecords.length}\nVersión: TɅLOS 0.26\nBase IndexedDB: talos-db-v26\nSueño y VFC: decodificación real activa`;
           await renderActivities();
         await renderHealthCoverage();
         await loadCheckinForm();
