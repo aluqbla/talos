@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <meta name="theme-color" content="#05070a">
+  <meta name="theme-color" content="#000000">
   <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -17,7 +17,7 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #05070a;
+      --bg: #000;
       --panel: rgba(22, 27, 35, .74);
       --panel-strong: rgba(30, 36, 47, .92);
       --glass: rgba(255, 255, 255, .075);
@@ -43,10 +43,7 @@
       margin: 0;
       min-height: 100%;
       overflow-x: hidden;
-      background:
-        radial-gradient(circle at 10% -8%, rgba(37, 137, 255, .18), transparent 34%),
-        radial-gradient(circle at 105% 18%, rgba(140, 92, 246, .12), transparent 30%),
-        var(--bg);
+      background: var(--bg);
       color: var(--text);
       font-family: var(--font);
       font-size: 14px;
@@ -70,20 +67,29 @@
       position: sticky;
       top: 0;
       z-index: 30;
-      display: flex;
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) 42px;
       align-items: center;
-      justify-content: space-between;
       gap: 14px;
-      min-height: calc(58px + var(--safe-top));
+      min-height: calc(72px + var(--safe-top));
       padding: var(--safe-top) 2px 10px;
-      background: linear-gradient(to bottom, rgba(5, 7, 10, .96) 66%, rgba(5, 7, 10, 0));
+      background: linear-gradient(to bottom, #000 72%, rgba(0, 0, 0, 0));
       backdrop-filter: blur(18px) saturate(150%);
       -webkit-backdrop-filter: blur(18px) saturate(150%);
     }
 
-    .brand { display: flex; align-items: baseline; gap: 9px; min-width: 0; }
-    .brand-mark { margin: 0; font-size: 27px; font-weight: 780; letter-spacing: -.055em; }
-    .brand-view { color: var(--muted); font-size: 13px; font-weight: 650; }
+    .topbar-spacer { width: 42px; height: 42px; }
+    .brand { display: grid; justify-items: center; min-width: 0; text-align: center; }
+    .brand-mark {
+      margin: 0;
+      width: min(228px, 100%);
+      height: 35px;
+      color: #f6f7f9;
+      line-height: 0;
+      filter: drop-shadow(0 0 9px rgba(255, 255, 255, .16));
+    }
+    .brand-mark svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .brand-view { margin-top: 5px; color: var(--muted); font-size: 9px; font-weight: 720; letter-spacing: .14em; text-transform: uppercase; }
 
     .icon-button, .primary-button, .secondary-button, .danger-button {
       border: 0;
@@ -186,6 +192,37 @@
     .data-row strong { text-align: right; font-variant-numeric: tabular-nums; }
     .data-row small { color: var(--muted); font-weight: 550; }
 
+    .today-day-nav {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr) 40px;
+      align-items: center;
+      gap: 10px;
+      margin: 5px 2px 10px;
+    }
+    .today-day-nav-copy { min-width: 0; text-align: center; }
+    .today-day-nav-copy span { display: block; color: var(--muted); font-size: 9px; font-weight: 740; letter-spacing: .11em; text-transform: uppercase; }
+    .today-day-nav-copy strong { display: block; margin-top: 2px; overflow: hidden; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+    .day-nav-button {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--text);
+      background: rgba(255, 255, 255, .055);
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .day-nav-button:disabled { opacity: .16; cursor: default; }
+    .quality-excellent { color: #74e69a; }
+    .quality-good { color: #8bc8ff; }
+    .quality-fair { color: #ffd17a; }
+    .quality-poor { color: #ff9792; }
+
     .form-card { grid-column: 1 / -1; padding: 16px; }
     .form-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .form-summary h3 { margin: 0; font-size: 18px; }
@@ -227,12 +264,12 @@
     }
     .activity-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 14px; background: rgba(90, 174, 255, .12); font-size: 20px; }
     .activity-copy { min-width: 0; padding: 0 9px; }
-    .activity-copy strong { display: block; overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
-    .activity-copy span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
-    .activity-stats { display: flex; gap: 13px; text-align: right; }
+    .activity-copy strong { display: block; overflow: hidden; margin-top: 3px; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+    .activity-copy span { display: block; color: var(--muted); font-size: 10px; text-transform: capitalize; }
+    .activity-stats { display: flex; gap: 18px; text-align: right; }
     .activity-stat span { display: block; color: var(--muted); font-size: 9px; text-transform: uppercase; }
-    .activity-stat strong { display: block; margin-top: 2px; font-size: 15px; font-variant-numeric: tabular-nums; }
-    .activity-stat small { margin-left: 2px; color: var(--secondary); font-size: 9px; font-weight: 650; white-space: nowrap; }
+    .activity-stat strong { display: block; margin-top: 1px; font-size: 24px; line-height: 1; font-variant-numeric: tabular-nums; }
+    .activity-stat small { display: block; margin-top: 3px; color: var(--secondary); font-size: 8px; font-weight: 650; white-space: nowrap; }
 
     .empty-state { padding: 36px 18px; text-align: center; }
     .empty-state .empty-icon { font-size: 34px; }
@@ -241,7 +278,9 @@
 
     .calendar-card { padding: 12px; }
     .calendar-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 3px 2px 11px; }
-    .calendar-toolbar h2 { margin: 0; font-size: 18px; text-transform: capitalize; }
+    .calendar-toolbar h2 { display: grid; justify-items: center; margin: 0; text-transform: capitalize; }
+    .calendar-year { color: var(--muted); font-size: 9px; font-weight: 720; letter-spacing: .12em; }
+    .calendar-month { margin-top: 1px; font-size: 19px; }
     .month-buttons { display: flex; gap: 6px; }
     .month-buttons button { width: 36px; min-height: 36px; border: 1px solid var(--line); border-radius: 12px; color: var(--text); background: var(--glass); }
     .weekdays, .month-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
@@ -270,8 +309,22 @@
     .day-item { overflow: hidden; padding: 3px 4px; border-radius: 7px; background: rgba(90, 174, 255, .11); color: #c9e8ff; font-size: 9px; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
     .day-item.done { color: #c8f6d6; background: rgba(70, 212, 122, .11); }
     .day-more { color: var(--muted); font-size: 9px; }
-    .day-health { display: flex; flex-wrap: wrap; gap: 2px 4px; margin-top: 4px; color: var(--muted); font-size: 8px; font-variant-numeric: tabular-nums; }
-    .day-health span { white-space: nowrap; }
+    .day-health { display: block; margin-top: 5px; font-variant-numeric: tabular-nums; }
+    .day-sleep {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 2px;
+      padding: 4px 2px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, .045);
+      font-size: clamp(9px, 1.4vw, 13px);
+      font-weight: 800;
+      letter-spacing: -.035em;
+      line-height: 1;
+      white-space: nowrap;
+    }
 
     .plan-day-detail { margin-top: 10px; padding: 14px; }
     .plan-day-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -377,8 +430,8 @@
     .interval-row { padding: 8px 9px; border-radius: 12px; background: rgba(255, 255, 255, .035); }
     .interval-copy { display: grid; grid-template-columns: 30px 1fr 1fr 1fr; gap: 8px; align-items: center; font-size: 10px; }
     .interval-copy span:not(:first-child) { text-align: right; }
-    .interval-track { height: 7px; margin-top: 6px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, .055); }
-    .interval-bar { height: 100%; min-width: 4px; border-radius: inherit; box-shadow: 0 0 10px rgba(90, 174, 255, .2); }
+    .interval-track { height: 12px; margin-top: 7px; overflow: hidden; border-radius: 4px; background: rgba(255, 255, 255, .045); }
+    .interval-bar { height: 100%; min-width: 5px; border-radius: 3px; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .2), 0 0 12px color-mix(in srgb, var(--bar-color) 24%, transparent); }
 
     .toast {
       position: fixed;
@@ -408,15 +461,16 @@
       .day-number { width: 20px; height: 20px; }
       .day-item { padding: 3px; font-size: 0; }
       .day-item::first-letter { font-size: 12px; }
-      .day-health { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px 2px; font-size: 7px; }
+      .day-sleep { font-size: 10px; }
       .day-health-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .activity-card { grid-template-columns: 39px minmax(0, 1fr) auto; padding-inline: 8px; }
-      .activity-stats { gap: 9px; }
-      .activity-stat strong { font-size: 14px; }
+      .activity-stats { gap: 11px; }
+      .activity-stat strong { font-size: 21px; }
     }
 
     @media (max-width: 420px) {
       .app { padding-inline: 10px; }
+      .brand-mark { width: min(210px, 100%); height: 33px; }
       .readiness-head { gap: 13px; }
       .score-ring { flex-basis: 82px; width: 82px; height: 82px; }
       .score-value { font-size: 26px; }
@@ -431,8 +485,19 @@
 <body>
   <div class="app">
     <header class="topbar">
+      <span class="topbar-spacer" aria-hidden="true"></span>
       <div class="brand">
-        <h1 class="brand-mark">TɅLOS</h1>
+        <h1 class="brand-mark" aria-label="TALOS">
+          <svg viewBox="0 0 314 48" role="img" aria-hidden="true" focusable="false">
+            <g fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 7h42M28 7v34"/>
+              <path d="M67 41 91 6l24 35"/>
+              <path d="M140 7v34h39"/>
+              <rect x="201" y="7" width="48" height="34" rx="9"/>
+              <path d="M306 7h-32c-7 0-11 3-11 9s4 8 11 8h21c8 0 12 3 12 9s-5 8-12 8h-33"/>
+            </g>
+          </svg>
+        </h1>
         <span class="brand-view" id="viewTitle">Hoy</span>
       </div>
       <button class="icon-button" id="syncTopButton" type="button" aria-label="Actualizar TɅLOS" title="Actualizar">
@@ -514,7 +579,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.5.0";
+    const APP_VERSION = "0.7.0";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -530,7 +595,7 @@
     const VIEW_LABELS = { today: "Hoy", activities: "Actividades", plan: "Plan", manage: "Gestión" };
     const TIME_ZONE = "Europe/Madrid";
     const DAY_MS = 86400000;
-    const STREAM_CACHE_VERSION = 2;
+    const STREAM_CACHE_VERSION = 3;
 
     const state = {
       activities: [],
@@ -542,6 +607,7 @@
       hasToken: false,
       syncing: false,
       activeView: "today",
+      selectedTodayDate: null,
       monthCursor: new Date(),
       selectedPlanDate: null,
       dataDbName: null,
@@ -579,6 +645,11 @@
       const date = dateFromKey(value) || (value ? new Date(value) : null);
       if (!date || Number.isNaN(date.getTime())) return "—";
       return new Intl.DateTimeFormat("es-ES", options).format(date);
+    }
+
+    function formatFullDate(value) {
+      const text = formatDate(value, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+      return text === "—" ? text : text.charAt(0).toUpperCase() + text.slice(1);
     }
 
     function formatNumber(value, digits = 0) {
@@ -845,12 +916,6 @@
       return Math.round(valid.reduce((sum, part) => sum + clamp(part.score, 0, 100) * part.weight, 0) / totalWeight);
     }
 
-    function latestAvailableWellness() {
-      const current = todayKey();
-      const eligible = state.wellness.filter(item => item.date <= current);
-      return eligible.at(-1) || null;
-    }
-
     function calculateReadiness(current) {
       if (!current) return { score: null, label: "Sin datos", color: "var(--muted)", reasons: [] };
       const previous = state.wellness.filter(item => item.date < current.date).slice(-28);
@@ -871,7 +936,7 @@
         loadScore = ratio <= .8 ? 90 : ratio <= 1.15 ? 76 : ratio <= 1.45 ? 56 : ratio <= 1.8 ? 38 : 22;
       }
       let subjectiveScore = null;
-      const subjective = state.subjective;
+      const subjective = current.date === todayKey() ? state.subjective : null;
       if (subjective && [subjective.energy, subjective.legs, subjective.discomfort].some(value => Number(value) > 0)) {
         const energy = Number(subjective.energy) || 3;
         const legs = Number(subjective.legs) || 3;
@@ -910,11 +975,29 @@
     }
 
     function qualityLabel(value) {
-      return ({ excellent: "Excelente", good: "Buena", fair: "Aceptable", poor: "Deficiente" })[value] || "—";
+      return ({ excellent: "Excelente", good: "Bueno", fair: "Regular", poor: "Malo" })[value] || "Sin datos";
+    }
+
+    function qualityClass(value) {
+      return ({ excellent: "quality-excellent", good: "quality-good", fair: "quality-fair", poor: "quality-poor" })[value] || "";
+    }
+
+    function recentDayKeys(total = 7) {
+      const today = dateFromKey(todayKey());
+      return Array.from({ length: total }, (_, offset) => {
+        const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() - offset, 12);
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      });
     }
 
     function renderToday() {
-      const current = latestAvailableWellness();
+      const dayKeys = recentDayKeys(7);
+      const currentDate = dayKeys.includes(state.selectedTodayDate) ? state.selectedTodayDate : dayKeys[0];
+      const selectedIndex = dayKeys.indexOf(currentDate);
+      const wellness = state.wellness.find(item => item.date === currentDate);
+      const current = wellness || { date: currentDate, recovery: {}, load: {}, body: {} };
+      const isToday = selectedIndex === 0;
+      state.selectedTodayDate = currentDate;
       const readiness = calculateReadiness(current);
       const form = calculateForm(current);
       const recovery = current?.recovery || {};
@@ -922,23 +1005,34 @@
       const body = current?.body || {};
       const hrvRecent = median(state.wellness.filter(item => item.date <= (current?.date || todayKey())).slice(-7).map(item => item.recovery?.hrvRmssdMs));
       const scoreText = readiness.score === null ? "—" : readiness.score;
-      const dateText = current
-        ? `${current.date === todayKey() ? "Hoy" : "Sin datos aún de hoy · últimos del"} ${formatDate(current.date, { day: "numeric", month: "short" })}`
-        : "Sincroniza para comenzar";
       const reasons = readiness.reasons.length ? readiness.reasons.map(reason => `<span class="reason-chip ${reason.good ? "good" : "warn"}">${escapeHtml(reason.text)}</span>`).join("") : '<span class="reason-chip">Sin información suficiente</span>';
       const subjective = state.subjective || {};
+      const feelingsMarkup = isToday ? `
+          <article class="card data-card form-card">
+            <div class="data-title"><h3>Cómo te encuentras hoy</h3><span>Opcional · guardado local</span></div>
+            <div class="feelings">
+              ${feelingSelect("energy", "⚡ Energía", subjective.energy, ["Sin registrar", "Muy baja", "Baja", "Normal", "Buena", "Muy buena"])}
+              ${feelingSelect("legs", "🦵 Piernas", subjective.legs, ["Sin registrar", "Muy cargadas", "Cargadas", "Normales", "Sueltas", "Muy sueltas"])}
+              ${feelingSelect("discomfort", "🩹 Molestias", subjective.discomfort, ["Sin registrar", "Ninguna", "Leve", "Moderada", "Alta", "Limitante"])}
+            </div>
+          </article>` : "";
 
       $("#todayContent").innerHTML = `
+        <div class="today-day-nav" aria-label="Navegar por los últimos siete días">
+          <button class="day-nav-button" type="button" data-today-index="${selectedIndex + 1}" aria-label="Ver el día anterior" ${selectedIndex >= dayKeys.length - 1 ? "disabled" : ""}>‹</button>
+          <div class="today-day-nav-copy"><span>${isToday ? "Hoy" : selectedIndex === 1 ? "Ayer" : `Hace ${selectedIndex} días`}</span><strong>${formatFullDate(currentDate)}</strong></div>
+          <button class="day-nav-button" type="button" data-today-index="${selectedIndex - 1}" aria-label="Ver el día siguiente" ${isToday ? "disabled" : ""}>›</button>
+        </div>
         <div class="grid today-grid">
           <article class="card readiness-card">
             <div class="readiness-head">
               <div class="score-ring" style="--score:${readiness.score || 0};--score-color:${readiness.color}"><span class="score-value">${scoreText}</span></div>
-              <div class="score-copy"><p class="eyebrow">Disponibilidad de hoy</p><h2>${escapeHtml(readiness.label)}</h2><p>${escapeHtml(dateText)}</p></div>
+              <div class="score-copy"><p class="eyebrow">Disponibilidad del día</p><h2>${escapeHtml(readiness.label)}</h2><p>${wellness ? "Datos sincronizados" : "Sin datos sincronizados para este día"}</p></div>
             </div>
             <div class="reason-list">${reasons}</div>
             <div class="metric-strip">
-              <div class="mini-metric"><span>😴 Sueño</span><strong>${formatSleep(recovery.sleepSeconds)}</strong></div>
-              <div class="mini-metric"><span>💓 VFC</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"}</strong></div>
+              <div class="mini-metric"><span>💤 Sueño</span><strong>${formatSleep(recovery.sleepSeconds)}</strong></div>
+              <div class="mini-metric"><span>〰️ VFC</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"}</strong></div>
               <div class="mini-metric"><span>❤️ Reposo</span><strong>${isNumber(recovery.restingHeartRateBpm) ? `${formatNumber(recovery.restingHeartRateBpm)} ppm` : "—"}</strong></div>
               <div class="mini-metric"><span>👟 Pasos</span><strong>${isNumber(body.steps) ? formatNumber(body.steps) : "—"}</strong></div>
             </div>
@@ -950,7 +1044,7 @@
               <div class="data-row"><span>🌙 Media nocturna</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} <small>ms</small>` : "—"}</strong></div>
               <div class="data-row"><span>📅 Media de 7 días</span><strong>${isNumber(hrvRecent) ? `${formatNumber(hrvRecent)} <small>ms</small>` : "—"}</strong></div>
               <div class="data-row"><span>📊 Línea base de 28 días</span><strong>${isNumber(readiness.hrvBase) ? `${formatNumber(readiness.hrvBase)} <small>ms</small>` : "—"}</strong></div>
-              <div class="data-row"><span>🛌 Calidad del sueño</span><strong>${qualityLabel(recovery.sleepQualityLabel)}${isNumber(recovery.sleepScore) ? ` · ${formatNumber(recovery.sleepScore)}` : ""}</strong></div>
+              <div class="data-row"><span>💤 Calidad del sueño</span><strong>${qualityLabel(recovery.sleepQualityLabel)}${isNumber(recovery.sleepScore) ? ` · ${formatNumber(recovery.sleepScore)}` : ""}</strong></div>
             </div>
           </article>
 
@@ -964,17 +1058,14 @@
             </div>
           </article>
 
-          <article class="card data-card form-card">
-            <div class="data-title"><h3>Cómo te encuentras</h3><span>Opcional · guardado local</span></div>
-            <div class="feelings">
-              ${feelingSelect("energy", "⚡ Energía", subjective.energy, ["Sin registrar", "Muy baja", "Baja", "Normal", "Buena", "Muy buena"])}
-              ${feelingSelect("legs", "🦵 Piernas", subjective.legs, ["Sin registrar", "Muy cargadas", "Cargadas", "Normales", "Sueltas", "Muy sueltas"])}
-              ${feelingSelect("discomfort", "🩹 Molestias", subjective.discomfort, ["Sin registrar", "Ninguna", "Leve", "Moderada", "Alta", "Limitante"])}
-            </div>
-          </article>
+          ${feelingsMarkup}
         </div>`;
 
       $$('[data-feeling]', $("#todayContent")).forEach(select => select.addEventListener("change", saveSubjective));
+      $$('[data-today-index]', $("#todayContent")).forEach(button => button.addEventListener("click", () => {
+        state.selectedTodayDate = dayKeys[Number(button.dataset.todayIndex)];
+        renderToday();
+      }));
     }
 
     function feelingSelect(key, label, selected, options) {
@@ -1002,18 +1093,48 @@
       return "●";
     }
 
+    function isRunningActivity(activity) {
+      const value = `${activity?.type || ""} ${activity?.name || ""}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      return /(^|\s)(run|running|carrera)(\s|$)/.test(value) || /^trailrun/.test(value);
+    }
+
+    function activityDuration(activity) {
+      return isNumber(activity?.movingSec) ? activity.movingSec : activity?.elapsedSec;
+    }
+
+    function activityCardMetrics(activity) {
+      if (isRunningActivity(activity)) {
+        return [
+          ["Distancia", isNumber(activity.distanceM) ? formatNumber(activity.distanceM / 1000, 2) : "—", "km"],
+          ["Ritmo", formatPace(activity.movingPaceSecPerKm), isNumber(activity.movingPaceSecPerKm) ? "min/km" : ""]
+        ];
+      }
+      return [
+        ["Duración", formatDuration(activityDuration(activity)), ""],
+        ["FC media", formatNumber(activity.heartRate?.averageBpm), isNumber(activity.heartRate?.averageBpm) ? "ppm" : ""]
+      ];
+    }
+
+    function activityCompactSummary(activity) {
+      return isRunningActivity(activity)
+        ? `${formatDistance(activity.distanceM)} · ${formatPace(activity.movingPaceSecPerKm)} min/km`
+        : `${formatDuration(activityDuration(activity))} · ${isNumber(activity.heartRate?.averageBpm) ? `${formatNumber(activity.heartRate.averageBpm)} ppm` : "FC —"}`;
+    }
+
     function renderActivities() {
       const rows = [...state.activities].sort((a, b) => String(b.start?.local || "").localeCompare(String(a.start?.local || "")));
       $("#activityCount").textContent = rows.length ? `${rows.length} registradas` : "";
-      $("#activityList").innerHTML = rows.length ? rows.map(activity => `
+      $("#activityList").innerHTML = rows.length ? rows.map(activity => {
+        const metrics = activityCardMetrics(activity);
+        return `
         <button class="activity-card" type="button" data-activity-id="${escapeHtml(activity.id)}">
           <span class="activity-icon" aria-hidden="true">${activityIcon(activity.type, activity.name)}</span>
-          <span class="activity-copy"><strong>${escapeHtml(activity.name)}</strong><span>${formatDate(activityDateKey(activity), { weekday: "short", day: "numeric", month: "short", year: "numeric" })}</span></span>
+          <span class="activity-copy"><span>${formatDate(activityDateKey(activity), { weekday: "short", day: "numeric", month: "short", year: "numeric" })}</span><strong>${escapeHtml(activity.name)}</strong></span>
           <span class="activity-stats">
-            <span class="activity-stat"><span>Distancia</span><strong>${isNumber(activity.distanceM) ? `${formatNumber(activity.distanceM / 1000, 2)}<small>km</small>` : "—"}</strong></span>
-            <span class="activity-stat"><span>Ritmo</span><strong>${isNumber(activity.movingPaceSecPerKm) ? `${formatPace(activity.movingPaceSecPerKm)}<small>min/km</small>` : "—"}</strong></span>
+            ${metrics.map(([label, value, unit]) => `<span class="activity-stat"><span>${label}</span><strong>${value}${unit ? `<small>${unit}</small>` : ""}</strong></span>`).join("")}
           </span>
-        </button>`).join("") : emptyState("🏃🏻‍♂️", "Aún no hay actividades", "Configura la conexión y pulsa Actualizar para descargar tus entrenamientos de Intervals.icu.", true);
+        </button>`;
+      }).join("") : emptyState("🏃🏻‍♂️", "Aún no hay actividades", "Configura la conexión y pulsa Actualizar para descargar tus entrenamientos de Intervals.icu.", true);
       $$('[data-activity-id]', $("#activityList")).forEach(button => button.addEventListener("click", () => openActivity(button.dataset.activityId)));
     }
 
@@ -1030,7 +1151,9 @@
       const leading = (first.getDay() + 6) % 7;
       const monthPrefix = `${year}-${String(month + 1).padStart(2, "0")}`;
       if (!state.selectedPlanDate?.startsWith(monthPrefix)) state.selectedPlanDate = todayKey().startsWith(monthPrefix) ? todayKey() : `${monthPrefix}-01`;
-      $("#monthTitle").textContent = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(first);
+      const rawMonthName = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(first);
+      const monthName = rawMonthName.charAt(0).toUpperCase() + rawMonthName.slice(1);
+      $("#monthTitle").innerHTML = `<span class="calendar-year">${year}</span><span class="calendar-month">${escapeHtml(monthName)}</span>`;
       const byDay = new Map();
       const wellnessByDay = new Map(state.wellness.map(item => [item.date, item]));
       for (const activity of state.activities) {
@@ -1052,11 +1175,9 @@
         const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
         const items = byDay.get(key) || [];
         const wellness = wellnessByDay.get(key);
-        const health = [
-          isNumber(wellness?.recovery?.sleepSeconds) ? `<span>😴${formatCompactSleep(wellness.recovery.sleepSeconds)}</span>` : "",
-          isNumber(wellness?.recovery?.hrvRmssdMs) ? `<span>💓${formatNumber(wellness.recovery.hrvRmssdMs)}</span>` : "",
-          isNumber(wellness?.recovery?.restingHeartRateBpm) ? `<span>❤️${formatNumber(wellness.recovery.restingHeartRateBpm)}</span>` : ""
-        ].filter(Boolean).join("");
+        const health = isNumber(wellness?.recovery?.sleepSeconds)
+          ? `<span class="day-sleep ${qualityClass(wellness.recovery.sleepQualityLabel)}" title="Sueño ${qualityLabel(wellness.recovery.sleepQualityLabel).toLowerCase()}">💤${formatCompactSleep(wellness.recovery.sleepSeconds)}</span>`
+          : "";
         const visible = items.slice(0, 2).map(item => `<span class="day-item ${item.done ? "done" : ""}" title="${escapeHtml(item.name)}">${item.icon} ${escapeHtml(item.name)}</span>`).join("");
         cells.push(`<button class="day-cell ${key === todayKey() ? "today" : ""} ${key === state.selectedPlanDate ? "selected" : ""}" type="button" data-calendar-date="${key}" aria-label="Ver ${formatDate(key, { day: "numeric", month: "long", year: "numeric" })}"><span class="day-number">${day}</span><span class="day-items">${visible}${items.length > 2 ? `<span class="day-more">+${items.length - 2}</span>` : ""}</span>${health ? `<span class="day-health">${health}</span>` : ""}</button>`);
       }
@@ -1077,9 +1198,9 @@
       const activities = state.activities.filter(item => activityDateKey(item) === date);
       const planned = state.calendar.filter(item => String(item.startLocal || "").slice(0, 10) === date);
       const metrics = [
-        ["😴 Sueño", formatSleep(recovery.sleepSeconds)],
+        ["💤 Sueño", formatSleep(recovery.sleepSeconds)],
         ["⭐ Puntuación", isNumber(recovery.sleepScore) ? `${formatNumber(recovery.sleepScore)}/100` : "—"],
-        ["💓 VFC", isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"],
+        ["〰️ VFC", isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"],
         ["❤️ FC reposo", isNumber(recovery.restingHeartRateBpm) ? `${formatNumber(recovery.restingHeartRateBpm)} ppm` : "—"],
         ["👟 Pasos", isNumber(body.steps) ? formatNumber(body.steps) : "—"],
         ["📈 CTL / ATL", isNumber(load.ctl) && isNumber(load.atl) ? `${formatNumber(load.ctl, 1)} / ${formatNumber(load.atl, 1)}` : "—"]
@@ -1087,7 +1208,7 @@
       const activityMarkup = activities.map(activity => `
         <button class="plan-activity-button" type="button" data-plan-activity-id="${escapeHtml(activity.id)}">
           <span class="sport" aria-hidden="true">${activityIcon(activity.type, activity.name)}</span>
-          <span class="copy"><strong>${escapeHtml(activity.name)}</strong><span>${formatDistance(activity.distanceM)} · ${formatPace(activity.movingPaceSecPerKm)} min/km</span></span>
+          <span class="copy"><strong>${escapeHtml(activity.name)}</strong><span>${activityCompactSummary(activity)}</span></span>
           <span class="open" aria-hidden="true">›</span>
         </button>`).join("");
       const plannedMarkup = planned.map(event => `
@@ -1284,6 +1405,14 @@
       await syncNow({ manual: true });
     }
 
+    function intervalPaceColor(intensity) {
+      if (intensity >= .82) return "#e5574f";
+      if (intensity >= .62) return "#ee8446";
+      if (intensity >= .42) return "#e8b544";
+      if (intensity >= .22) return "#55aa9a";
+      return "#4c82bd";
+    }
+
     function activityDetailMarkup(activity) {
       const dynamics = activity.runningDynamics || {};
       const elevation = activity.elevation || {};
@@ -1292,40 +1421,62 @@
       const heart = activity.heartRate || {};
       const temperature = activity.temperature || {};
       const intervals = Array.isArray(activity.intervals) ? activity.intervals : [];
+      const running = isRunningActivity(activity);
+      const hasRoute = activity.streamTypes?.includes("latlng");
+      const duration = activityDuration(activity);
       const validPaces = intervals.map(interval => interval.paceSecPerKm).filter(value => isNumber(value) && value > 0);
       const fastestPace = validPaces.length ? Math.min(...validPaces) : null;
       const slowestPace = validPaces.length ? Math.max(...validPaces) : null;
-      const intervalMarkup = intervals.length ? `
+      const runningIntervals = running && intervals.length ? `
         <div class="section-heading"><h2>Vueltas e intervalos</h2><p>${intervals.length}</p></div>
         <div class="interval-list">${intervals.map((interval, index) => {
           const pace = interval.paceSecPerKm;
           const range = isNumber(fastestPace) && isNumber(slowestPace) ? slowestPace - fastestPace : 0;
           const intensity = isNumber(pace) && pace > 0 ? (range > 0 ? clamp((slowestPace - pace) / range, 0, 1) : .7) : 0;
-          const width = isNumber(pace) && pace > 0 ? 38 + intensity * 62 : 0;
-          const lightness = 70 - intensity * 20;
-          return `<div class="interval-row"><div class="interval-copy"><strong>${index + 1}</strong><span>${formatDistance(interval.distanceM)}</span><span>${formatPace(pace)} min/km</span><span>${isNumber(interval.heartRate?.averageBpm) ? `${formatNumber(interval.heartRate.averageBpm)} ppm` : "—"}</span></div><div class="interval-track" aria-label="Ritmo ${formatPace(pace)} minutos por kilómetro"><div class="interval-bar" style="width:${width.toFixed(1)}%;background:hsl(208 92% ${lightness.toFixed(1)}%)"></div></div></div>`;
+          const width = isNumber(pace) && pace > 0 ? 28 + intensity * 72 : 0;
+          const barColor = intervalPaceColor(intensity);
+          return `<div class="interval-row"><div class="interval-copy"><strong>${index + 1}</strong><span>${formatDistance(interval.distanceM)}</span><span>${formatPace(pace)} min/km</span><span>${isNumber(interval.heartRate?.averageBpm) ? `${formatNumber(interval.heartRate.averageBpm)} ppm` : "—"}</span></div><div class="interval-track" aria-label="Ritmo ${formatPace(pace)} minutos por kilómetro"><div class="interval-bar" style="--bar-color:${barColor};width:${width.toFixed(1)}%;background:${barColor}"></div></div></div>`;
         }).join("")}</div>` : "";
+      const otherIntervals = !running && intervals.length ? `
+        <div class="section-heading"><h2>Bloques e intervalos</h2><p>${intervals.length}</p></div>
+        <div class="interval-list">${intervals.map((interval, index) => `<div class="interval-row"><div class="interval-copy"><strong>${index + 1}</strong><span>${formatDuration(interval.movingSec ?? interval.elapsedSec)}</span><span>${isNumber(interval.heartRate?.averageBpm) ? `${formatNumber(interval.heartRate.averageBpm)} ppm` : "FC —"}</span><span>${isNumber(interval.distanceM) && interval.distanceM > 0 ? formatDistance(interval.distanceM) : escapeHtml(interval.label || interval.type || "Bloque")}</span></div></div>`).join("")}</div>` : "";
       const optionalDynamics = [
         isNumber(dynamics.groundContactTimeMs) ? `<div class="detail-item"><span>🦶 Contacto suelo</span><strong>${formatNumber(dynamics.groundContactTimeMs)} ms</strong></div>` : "",
         isNumber(dynamics.verticalOscillationCm) ? `<div class="detail-item"><span>↕️ Oscilación vertical</span><strong>${formatNumber(dynamics.verticalOscillationCm, 1)} cm</strong></div>` : ""
       ].filter(Boolean).join("");
-      return `
-        <div class="activity-hero">
+      const heroMarkup = running ? `
           <div class="hero-stat"><span>Distancia</span><strong>${isNumber(activity.distanceM) ? formatNumber(activity.distanceM / 1000, 2) : "—"} <small>km</small></strong></div>
           <div class="hero-stat"><span>Ritmo mov.</span><strong>${formatPace(activity.movingPaceSecPerKm)} <small>/km</small></strong></div>
-          <div class="hero-stat"><span>Tiempo</span><strong>${formatDuration(activity.movingSec)}</strong></div>
+          <div class="hero-stat"><span>Tiempo</span><strong>${formatDuration(duration)}</strong></div>` : `
+          <div class="hero-stat"><span>Duración</span><strong>${formatDuration(duration)}</strong></div>
+          <div class="hero-stat"><span>FC media</span><strong>${formatNumber(heart.averageBpm)} <small>ppm</small></strong></div>
+          <div class="hero-stat"><span>Calorías</span><strong>${formatNumber(activity.caloriesKcal)} <small>kcal</small></strong></div>`;
+      const runningDetails = [
+        `<div class="detail-item"><span>❤️ FC media / máxima</span><strong>${formatNumber(heart.averageBpm)} / ${formatNumber(heart.maxBpm)} ppm</strong></div>`,
+        isNumber(dynamics.averageCadenceSpm) ? `<div class="detail-item"><span>👟 Cadencia</span><strong>${formatNumber(dynamics.averageCadenceSpm)} spm</strong></div>` : "",
+        power.streamAvailable || power.available || isNumber(power.averageWatts) ? `<div class="detail-item"><span>⚡ Potencia</span><strong id="detailPower">${isNumber(power.averageWatts) ? `${formatNumber(power.averageWatts)} W` : "Cargando…"}</strong></div>` : "",
+        isNumber(load.trainingLoad) ? `<div class="detail-item"><span>📈 Carga</span><strong>${formatNumber(load.trainingLoad)}</strong></div>` : "",
+        isNumber(elevation.gainM) ? `<div class="detail-item"><span>⛰️ Ascenso corregido</span><strong>${formatNumber(elevation.gainM)} m</strong></div>` : "",
+        isNumber(temperature.averageC) ? `<div class="detail-item"><span>🌡️ Temperatura</span><strong>${formatNumber(temperature.averageC, 1)} °C</strong></div>` : "",
+        optionalDynamics
+      ].filter(Boolean).join("");
+      const otherDetails = [
+        isNumber(heart.maxBpm) ? `<div class="detail-item"><span>❤️ FC máxima</span><strong>${formatNumber(heart.maxBpm)} ppm</strong></div>` : "",
+        isNumber(load.trainingLoad) ? `<div class="detail-item"><span>📈 Carga</span><strong>${formatNumber(load.trainingLoad)}</strong></div>` : "",
+        isNumber(load.intensity) ? `<div class="detail-item"><span>⚡ Intensidad</span><strong>${formatNumber(load.intensity, 0)}</strong></div>` : "",
+        isNumber(activity.elapsedSec) && Math.abs(activity.elapsedSec - duration) > 1 ? `<div class="detail-item"><span>⏱️ Tiempo total</span><strong>${formatDuration(activity.elapsedSec)}</strong></div>` : "",
+        hasRoute && isNumber(activity.distanceM) ? `<div class="detail-item"><span>📍 Distancia</span><strong>${formatDistance(activity.distanceM)}</strong></div>` : "",
+        isNumber(elevation.gainM) ? `<div class="detail-item"><span>⛰️ Ascenso</span><strong>${formatNumber(elevation.gainM)} m</strong></div>` : "",
+        isNumber(temperature.averageC) ? `<div class="detail-item"><span>🌡️ Temperatura</span><strong>${formatNumber(temperature.averageC, 1)} °C</strong></div>` : "",
+        power.streamAvailable || isNumber(power.averageWatts) ? `<div class="detail-item"><span>⚡ Potencia</span><strong id="detailPower">${isNumber(power.averageWatts) ? `${formatNumber(power.averageWatts)} W` : "Cargando…"}</strong></div>` : ""
+      ].filter(Boolean).join("");
+      return `
+        <div class="activity-hero">
+          ${heroMarkup}
         </div>
-        <div class="route-wrap"><div id="routeMap"></div><div class="map-message" id="mapMessage">Preparando el recorrido…</div></div>
-        <div class="detail-grid">
-          <div class="detail-item"><span>❤️ FC media / máxima</span><strong>${formatNumber(heart.averageBpm)} / ${formatNumber(heart.maxBpm)} ppm</strong></div>
-          <div class="detail-item"><span>👟 Cadencia</span><strong>${isNumber(dynamics.averageCadenceSpm) ? `${formatNumber(dynamics.averageCadenceSpm)} spm` : "—"}</strong></div>
-          <div class="detail-item"><span>⚡ Potencia</span><strong id="detailPower">${isNumber(power.averageWatts) ? `${formatNumber(power.averageWatts)} W` : power.streamAvailable || power.available ? "Cargando…" : "—"}</strong></div>
-          <div class="detail-item"><span>📈 Carga</span><strong>${formatNumber(load.trainingLoad)}</strong></div>
-          <div class="detail-item"><span>⛰️ Ascenso corregido</span><strong>${isNumber(elevation.gainM) ? `${formatNumber(elevation.gainM)} m` : "—"}</strong></div>
-          <div class="detail-item"><span>🌡️ Temperatura</span><strong>${isNumber(temperature.averageC) ? `${formatNumber(temperature.averageC, 1)} °C` : "—"}</strong></div>
-          ${optionalDynamics}
-        </div>
-        ${intervalMarkup}
+        ${hasRoute ? '<div class="route-wrap"><div id="routeMap"></div><div class="map-message" id="mapMessage">Preparando el recorrido…</div></div>' : ""}
+        <div class="detail-grid">${running ? runningDetails : otherDetails}</div>
+        ${runningIntervals || otherIntervals}
         <div class="dialog-actions"><button class="secondary-button" type="button" data-download-fit="${escapeHtml(activity.id)}">Descargar FIT original</button></div>`;
     }
 
@@ -1342,14 +1493,30 @@
     function streamMap(rows) {
       const map = new Map();
       if (Array.isArray(rows)) {
-        for (const row of rows) if (row?.type && row.data !== undefined) map.set(String(row.type).toLowerCase(), row.data);
+        for (const row of rows) {
+          if (!row?.type || row.data === undefined) continue;
+          const type = String(row.type).toLowerCase();
+          if (type === "latlng" && Array.isArray(row.data) && Array.isArray(row.data2)) {
+            map.set(type, row.data.map((latitude, index) => [latitude, row.data2[index]]));
+          } else {
+            map.set(type, row.data);
+          }
+        }
       } else if (rows && typeof rows === "object") {
-        for (const [type, value] of Object.entries(rows)) map.set(type.toLowerCase(), value?.data ?? value);
+        for (const [type, value] of Object.entries(rows)) {
+          const key = type.toLowerCase();
+          if (key === "latlng" && Array.isArray(value?.data) && Array.isArray(value?.data2)) {
+            map.set(key, value.data.map((latitude, index) => [latitude, value.data2[index]]));
+          } else {
+            map.set(key, value?.data ?? value);
+          }
+        }
       }
       return map;
     }
 
     function validCoordinatePair(latitude, longitude) {
+      if (latitude === null || latitude === undefined || longitude === null || longitude === undefined || latitude === "" || longitude === "") return null;
       const lat = Number(latitude);
       const lng = Number(longitude);
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
@@ -1407,20 +1574,40 @@
         return single ? [single] : decodePolyline(trimmed);
       }
       if (!Array.isArray(data)) return [];
-      if (data.length >= 4 && data.every(value => Number.isFinite(Number(value)))) {
-        const pairs = [];
-        for (let index = 0; index + 1 < data.length; index += 2) {
-          const point = validCoordinatePair(data[index], data[index + 1]);
-          if (point) pairs.push(point);
-        }
-        return pairs;
-      }
       return data.map(coordinateFromValue).filter(Boolean);
+    }
+
+    function coordinateDistanceMeters(first, second) {
+      const radians = value => value * Math.PI / 180;
+      const latitudeDelta = radians(second[0] - first[0]);
+      const longitudeDelta = radians(second[1] - first[1]);
+      const firstLatitude = radians(first[0]);
+      const secondLatitude = radians(second[0]);
+      const haversine = Math.sin(latitudeDelta / 2) ** 2
+        + Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+      return 6371000 * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+    }
+
+    function splitRouteSegments(coordinates, maximumJumpMeters = 750) {
+      const segments = [];
+      let current = [];
+      for (const point of coordinates) {
+        if (current.length && coordinateDistanceMeters(current.at(-1), point) > maximumJumpMeters) {
+          if (current.length > 1) segments.push(current);
+          current = [];
+        }
+        current.push(point);
+      }
+      if (current.length > 1) segments.push(current);
+      return segments;
     }
 
     async function loadAndRenderStreams(activity) {
       const message = $("#mapMessage");
-      if (!activity.streamTypes?.includes("latlng")) {
+      const mapNode = $("#routeMap");
+      const powerNode = $("#detailPower");
+      if (!mapNode && !powerNode) return;
+      if (mapNode && !activity.streamTypes?.includes("latlng")) {
         if (message) message.textContent = "Esta actividad no contiene coordenadas GPS.";
         return;
       }
@@ -1437,10 +1624,8 @@
           await storePut(DATA_STORES.streams, cache);
         }
         const streams = streamMap(cache.streams);
-        const coordinates = extractCoordinates(streams.get("latlng"));
-        renderRouteMap(coordinates);
+        if (mapNode) renderRouteMap(extractCoordinates(streams.get("latlng")));
         const watts = (streams.get("watts") || []).filter(value => isNumber(value) && value > 0);
-        const powerNode = $("#detailPower");
         if (powerNode) powerNode.textContent = watts.length ? `${formatNumber(watts.reduce((sum, value) => sum + value, 0) / watts.length)} W` : "—";
       } catch (error) {
         if (message) message.textContent = error.message || String(error);
@@ -1449,11 +1634,12 @@
 
     function renderRouteMap(coordinates) {
       const message = $("#mapMessage");
-      if (!coordinates.length) {
+      const segments = splitRouteSegments(coordinates);
+      if (!segments.length) {
         if (message) message.textContent = "No se encontraron puntos válidos del recorrido.";
         return;
       }
-      if (!window.L) return renderFallbackRoute(coordinates);
+      if (!window.L) return renderFallbackRoute(segments);
       if (state.map) {
         state.map.remove();
         state.map = null;
@@ -1463,24 +1649,33 @@
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(state.map);
-      state.mapLayer = L.polyline(coordinates, { color: "#5aaeff", weight: 5, opacity: .96, lineCap: "round", lineJoin: "round" }).addTo(state.map);
-      L.circleMarker(coordinates[0], { radius: 6, color: "#c6f6d4", fillColor: "#46d47a", fillOpacity: 1, weight: 2 }).addTo(state.map).bindTooltip("Salida");
-      L.circleMarker(coordinates.at(-1), { radius: 6, color: "#ffd6d3", fillColor: "#ff6862", fillOpacity: 1, weight: 2 }).addTo(state.map).bindTooltip("Llegada");
+      state.mapLayer = L.polyline(segments, { color: "#d05f5f", weight: 5, opacity: .94, lineCap: "round", lineJoin: "round" }).addTo(state.map);
+      const firstPoint = segments[0][0];
+      const lastPoint = segments.at(-1).at(-1);
+      L.circleMarker(firstPoint, { radius: 6, color: "#c6f6d4", fillColor: "#46d47a", fillOpacity: 1, weight: 2 }).addTo(state.map).bindTooltip("Salida");
+      L.circleMarker(lastPoint, { radius: 6, color: "#ffd6d3", fillColor: "#ff6862", fillOpacity: 1, weight: 2 }).addTo(state.map).bindTooltip("Llegada");
       state.map.fitBounds(state.mapLayer.getBounds(), { padding: [24, 24] });
       if (message) message.remove();
       setTimeout(() => state.map?.invalidateSize(), 100);
     }
 
-    function renderFallbackRoute(coordinates) {
+    function renderFallbackRoute(segments) {
+      const coordinates = segments.flat();
       const latitudes = coordinates.map(point => point[0]);
       const longitudes = coordinates.map(point => point[1]);
       const minLat = Math.min(...latitudes), maxLat = Math.max(...latitudes), minLng = Math.min(...longitudes), maxLng = Math.max(...longitudes);
       const width = 600, height = 340, padding = 24;
       const scaleX = value => padding + ((value - minLng) / (maxLng - minLng || 1)) * (width - padding * 2);
       const scaleY = value => height - padding - ((value - minLat) / (maxLat - minLat || 1)) * (height - padding * 2);
-      const sampled = coordinates.filter((_, index) => index % Math.max(1, Math.floor(coordinates.length / 1200)) === 0);
-      const points = sampled.map(point => `${scaleX(point[1]).toFixed(1)},${scaleY(point[0]).toFixed(1)}`).join(" ");
-      $("#routeMap").innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="100%" height="100%" role="img" aria-label="Recorrido GPS"><defs><pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="rgba(255,255,255,.06)"/></pattern></defs><rect width="100%" height="100%" fill="#0a0e13"/><rect width="100%" height="100%" fill="url(#grid)"/><polyline points="${points}" fill="none" stroke="#5aaeff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${scaleX(coordinates[0][1])}" cy="${scaleY(coordinates[0][0])}" r="7" fill="#46d47a"/><circle cx="${scaleX(coordinates.at(-1)[1])}" cy="${scaleY(coordinates.at(-1)[0])}" r="7" fill="#ff6862"/></svg>`;
+      const polylines = segments.map(segment => {
+        const sampleEvery = Math.max(1, Math.floor(segment.length / 1200));
+        const sampled = segment.filter((_, index) => index % sampleEvery === 0 || index === segment.length - 1);
+        const points = sampled.map(point => `${scaleX(point[1]).toFixed(1)},${scaleY(point[0]).toFixed(1)}`).join(" ");
+        return `<polyline points="${points}" fill="none" stroke="#d05f5f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`;
+      }).join("");
+      const firstPoint = segments[0][0];
+      const lastPoint = segments.at(-1).at(-1);
+      $("#routeMap").innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="100%" height="100%" role="img" aria-label="Recorrido GPS"><defs><pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="rgba(255,255,255,.06)"/></pattern></defs><rect width="100%" height="100%" fill="#0a0e13"/><rect width="100%" height="100%" fill="url(#grid)"/>${polylines}<circle cx="${scaleX(firstPoint[1])}" cy="${scaleY(firstPoint[0])}" r="7" fill="#46d47a"/><circle cx="${scaleX(lastPoint[1])}" cy="${scaleY(lastPoint[0])}" r="7" fill="#ff6862"/></svg>`;
       $("#mapMessage")?.remove();
     }
 
