@@ -277,6 +277,19 @@
     .empty-state p { max-width: 450px; margin: 0 auto 16px; color: var(--muted); line-height: 1.45; }
 
     .calendar-card { padding: 12px; }
+    .planning-card { margin-bottom: 10px; padding: 14px; }
+    .planning-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .planning-head h2 { margin: 2px 0 0; font-size: 18px; letter-spacing: -.025em; }
+    .planning-head p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+    .planning-status { flex: 0 0 auto; padding: 6px 9px; border-radius: 999px; color: #c8f6d6; background: rgba(70, 212, 122, .11); font-size: 10px; font-weight: 760; }
+    .planning-status.waiting { color: #ffe0a6; background: rgba(255, 189, 74, .11); }
+    .planning-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+    .planning-metric { min-width: 0; padding: 10px; border-radius: 14px; background: rgba(255, 255, 255, .04); }
+    .planning-metric span { display: block; overflow: hidden; color: var(--muted); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+    .planning-metric strong { display: block; margin-top: 4px; overflow: hidden; font-size: 17px; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+    .planning-metric small { display: block; margin-top: 2px; overflow: hidden; color: var(--secondary); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+    .planning-reasons { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+    .planning-reason { padding: 5px 7px; border-radius: 999px; color: var(--secondary); background: rgba(255, 255, 255, .045); font-size: 9px; }
     .calendar-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 3px 2px 11px; }
     .calendar-toolbar h2 { display: grid; justify-items: center; margin: 0; text-transform: capitalize; }
     .calendar-year { color: var(--muted); font-size: 9px; font-weight: 720; letter-spacing: .12em; }
@@ -479,6 +492,7 @@
       .load-item strong { font-size: 16px; }
       .route-wrap { height: 235px; }
       .detail-grid { grid-template-columns: 1fr; }
+      .planning-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -516,6 +530,7 @@
       </section>
 
       <section class="view" id="view-plan" data-view="plan">
+        <div class="card planning-card" id="planningSummary"></div>
         <div class="card calendar-card">
           <div class="calendar-toolbar">
             <div class="month-buttons"><button type="button" id="prevMonth" aria-label="Mes anterior">‹</button></div>
@@ -579,7 +594,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.7.0";
+    const APP_VERSION = "0.8.0";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -974,6 +989,151 @@
       return { label, detail: `CTL ${change >= 0 ? "+" : ""}${formatNumber(change, 0)} % frente a ${formatDate(reference.date, { day: "numeric", month: "short" })}.` };
     }
 
+    function dateKeyFromDate(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    }
+
+    function addDaysToKey(value, amount) {
+      const date = dateFromKey(value);
+      if (!date) return null;
+      date.setDate(date.getDate() + amount);
+      return dateKeyFromDate(date);
+    }
+
+    function weekBounds(value) {
+      const date = dateFromKey(value) || dateFromKey(todayKey());
+      const mondayOffset = (date.getDay() + 6) % 7;
+      const start = new Date(date.getFullYear(), date.getMonth(), date.getDate() - mondayOffset, 12);
+      const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6, 12);
+      return { start: dateKeyFromDate(start), end: dateKeyFromDate(end) };
+    }
+
+    function average(values) {
+      const rows = values.filter(isNumber);
+      return rows.length ? rows.reduce((sum, value) => sum + value, 0) / rows.length : null;
+    }
+
+    function buildPlanningSnapshot(referenceDate = todayKey()) {
+      const reference = dateFromKey(referenceDate) ? String(referenceDate).slice(0, 10) : todayKey();
+      const oldest = addDaysToKey(reference, -41);
+      const activities = state.activities.filter(activity => {
+        const date = activityDateKey(activity);
+        return date >= oldest && date <= reference;
+      });
+      const wellness = state.wellness.filter(item => item.date >= oldest && item.date <= reference);
+      const latestWellness = wellness.at(-1) || null;
+      const readiness = calculateReadiness(latestWellness);
+      const windowSummary = days => {
+        const start = addDaysToKey(reference, -(days - 1));
+        const rows = activities.filter(activity => activityDateKey(activity) >= start);
+        const runs = rows.filter(isRunningActivity);
+        const runningDistanceM = runs.reduce((sum, activity) => sum + (isNumber(activity.distanceM) ? activity.distanceM : 0), 0);
+        const runningTimeSec = runs.reduce((sum, activity) => sum + (isNumber(activityDuration(activity)) ? activityDuration(activity) : 0), 0);
+        const loads = rows.map(activity => activity.load?.trainingLoad).filter(isNumber);
+        const weightedHeartRate = runs.reduce((result, activity) => {
+          const duration = activityDuration(activity);
+          const heartRate = activity.heartRate?.averageBpm;
+          return isNumber(duration) && isNumber(heartRate)
+            ? { total: result.total + heartRate * duration, seconds: result.seconds + duration }
+            : result;
+        }, { total: 0, seconds: 0 });
+        return {
+          days,
+          activityCount: rows.length,
+          runningCount: runs.length,
+          runningDistanceM,
+          runningTimeSec,
+          runningPaceSecPerKm: runningDistanceM > 0 ? runningTimeSec / (runningDistanceM / 1000) : null,
+          runningHeartRateBpm: weightedHeartRate.seconds ? weightedHeartRate.total / weightedHeartRate.seconds : null,
+          longestRunM: runs.reduce((maximum, activity) => Math.max(maximum, isNumber(activity.distanceM) ? activity.distanceM : 0), 0),
+          trainingLoad: loads.length ? loads.reduce((sum, value) => sum + value, 0) : null
+        };
+      };
+      const recoveryRows = wellness.map(item => item.recovery || {});
+      const metricDays = wellness.length;
+      const coverage = {
+        wellnessDays: metricDays,
+        hrvDays: recoveryRows.filter(item => isNumber(item.hrvRmssdMs)).length,
+        sleepDays: recoveryRows.filter(item => isNumber(item.sleepSeconds)).length,
+        restingHeartRateDays: recoveryRows.filter(item => isNumber(item.restingHeartRateBpm)).length
+      };
+      const coveredRatios = metricDays ? [coverage.hrvDays, coverage.sleepDays, coverage.restingHeartRateDays].map(count => count / metricDays) : [];
+      coverage.percent = coveredRatios.length ? Math.round(average(coveredRatios) * 100) : 0;
+      coverage.readyForPlanning = metricDays >= 14 && coverage.hrvDays >= 7 && activities.some(isRunningActivity);
+      const week = weekBounds(reference);
+      return {
+        schemaVersion: "talos-planning-snapshot-1",
+        generatedAt: new Date().toISOString(),
+        referenceDate: reference,
+        history: { oldest, newest: reference, days: 42 },
+        week,
+        readiness: {
+          score: readiness.score,
+          label: readiness.label,
+          reasons: readiness.reasons.map(reason => reason.text)
+        },
+        recovery: {
+          latestDate: latestWellness?.date || null,
+          hrvRmssdMs: latestWellness?.recovery?.hrvRmssdMs ?? null,
+          hrvBaselineMs: readiness.hrvBase,
+          restingHeartRateBpm: latestWellness?.recovery?.restingHeartRateBpm ?? null,
+          restingHeartRateBaselineBpm: readiness.restingBase,
+          sleepSeconds: latestWellness?.recovery?.sleepSeconds ?? null,
+          sleepScore: latestWellness?.recovery?.sleepScore ?? null,
+          sleepAverageSeconds: average(recoveryRows.slice(-7).map(item => item.sleepSeconds))
+        },
+        load: {
+          ctl: latestWellness?.load?.ctl ?? null,
+          atl: latestWellness?.load?.atl ?? null,
+          form: latestWellness?.load?.form ?? null,
+          rampRate: latestWellness?.load?.rampRate ?? null
+        },
+        training: {
+          last7Days: windowSummary(7),
+          last28Days: windowSummary(28),
+          last42Days: windowSummary(42)
+        },
+        dataQuality: coverage
+      };
+    }
+
+    function formatPlanningWeek(week) {
+      const start = dateFromKey(week.start);
+      const end = dateFromKey(week.end);
+      if (!start || !end) return "Semana actual";
+      if (start.getMonth() === end.getMonth()) {
+        return `Semana del ${start.getDate()} al ${end.getDate()} de ${new Intl.DateTimeFormat("es-ES", { month: "long" }).format(end)}`;
+      }
+      return `Semana del ${formatDate(week.start, { day: "numeric", month: "short" })} al ${formatDate(week.end, { day: "numeric", month: "short" })}`;
+    }
+
+    function renderPlanningSummary() {
+      const node = $("#planningSummary");
+      if (!node) return;
+      const snapshot = buildPlanningSnapshot();
+      const seven = snapshot.training.last7Days;
+      const twentyEight = snapshot.training.last28Days;
+      const weeklyAverageKm = twentyEight.runningDistanceM / 1000 / 4;
+      const ready = snapshot.dataQuality.readyForPlanning;
+      const reasons = [
+        ...snapshot.readiness.reasons.slice(0, 2),
+        `${snapshot.dataQuality.wellnessDays} días de salud`,
+        `${snapshot.training.last42Days.activityCount} actividades analizadas`
+      ];
+      node.innerHTML = `
+        <div class="planning-head">
+          <div><p class="eyebrow">Planificación semanal</p><h2>Base del plan semanal</h2><p>${escapeHtml(formatPlanningWeek(snapshot.week))}</p></div>
+          <span class="planning-status ${ready ? "" : "waiting"}">${ready ? "Datos listos" : "Reuniendo datos"}</span>
+        </div>
+        <div class="planning-metrics">
+          <div class="planning-metric"><span>Estado TɅLOS</span><strong>${isNumber(snapshot.readiness.score) ? snapshot.readiness.score : "—"}</strong><small>${escapeHtml(snapshot.readiness.label)}</small></div>
+          <div class="planning-metric"><span>Carrera · 7 días</span><strong>${formatNumber(seven.runningDistanceM / 1000, 1)} km</strong><small>${seven.runningCount} sesiones</small></div>
+          <div class="planning-metric"><span>Media · 4 semanas</span><strong>${formatNumber(weeklyAverageKm, 1)} km</strong><small>por semana</small></div>
+          <div class="planning-metric"><span>CTL / ATL</span><strong>${formatNumber(snapshot.load.ctl, 1)} / ${formatNumber(snapshot.load.atl, 1)}</strong><small>forma / fatiga</small></div>
+        </div>
+        <div class="planning-reasons">${reasons.map(reason => `<span class="planning-reason">${escapeHtml(reason)}</span>`).join("")}</div>`;
+    }
+
     function qualityLabel(value) {
       return ({ excellent: "Excelente", good: "Bueno", fair: "Regular", poor: "Malo" })[value] || "Sin datos";
     }
@@ -1143,6 +1303,7 @@
     }
 
     function renderPlan() {
+      renderPlanningSummary();
       const cursor = state.monthCursor;
       const year = cursor.getFullYear();
       const month = cursor.getMonth();
