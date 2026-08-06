@@ -290,6 +290,43 @@
     .planning-metric small { display: block; margin-top: 2px; overflow: hidden; color: var(--secondary); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
     .planning-reasons { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
     .planning-reason { padding: 5px 7px; border-radius: 999px; color: var(--secondary); background: rgba(255, 255, 255, .045); font-size: 9px; }
+    .planning-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; margin-top: 11px; }
+    .planning-actions button { min-height: 38px; }
+    .plan-draft-card { margin-bottom: 10px; padding: 14px; border-color: rgba(169, 140, 255, .3); }
+    .draft-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .draft-head h3 { margin: 2px 0 0; font-size: 18px; }
+    .draft-head p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .draft-total { flex: 0 0 auto; text-align: right; }
+    .draft-total strong, .draft-total span { display: block; }
+    .draft-total strong { font-size: 19px; }
+    .draft-total span { margin-top: 2px; color: var(--muted); font-size: 9px; }
+    .draft-days { display: grid; gap: 5px; margin-top: 11px; }
+    .draft-day { overflow: hidden; border: 1px solid rgba(255, 255, 255, .065); border-radius: 13px; background: rgba(255, 255, 255, .027); }
+    .draft-day summary { display: grid; grid-template-columns: 38px 25px minmax(0, 1fr) auto; align-items: center; gap: 7px; min-height: 48px; padding: 7px 9px; cursor: pointer; list-style: none; }
+    .draft-day summary::-webkit-details-marker { display: none; }
+    .draft-day-name { color: var(--muted); font-size: 9px; font-weight: 780; text-transform: uppercase; }
+    .draft-day-sport { font-size: 18px; }
+    .draft-day-copy { min-width: 0; }
+    .draft-day-copy strong, .draft-day-copy span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .draft-day-copy strong { font-size: 12px; }
+    .draft-day-copy span { margin-top: 2px; color: var(--muted); font-size: 9px; }
+    .draft-day-intensity { padding: 4px 6px; border-radius: 999px; color: var(--secondary); background: rgba(255, 255, 255, .05); font-size: 8px; font-weight: 720; text-transform: uppercase; }
+    .draft-day-intensity.hard { color: #ffc0bc; background: rgba(229, 87, 79, .13); }
+    .draft-day-intensity.moderate { color: #ffdc9a; background: rgba(232, 181, 68, .12); }
+    .draft-day-intensity.easy { color: #bfe8d9; background: rgba(85, 170, 154, .12); }
+    .draft-day-body { padding: 0 10px 10px 70px; }
+    .draft-day-body p { margin: 0; color: var(--secondary); font-size: 10px; line-height: 1.45; }
+    .draft-day-body p + p { margin-top: 6px; color: var(--muted); }
+    .draft-steps { margin: 8px 0 0; padding: 0; list-style: none; }
+    .draft-steps li { padding: 5px 0; border-top: 1px solid var(--line); color: var(--secondary); font-size: 9px; line-height: 1.35; }
+    .draft-steps strong { color: var(--text); }
+    .draft-notes { display: grid; gap: 5px; margin-top: 9px; }
+    .draft-note { padding: 7px 9px; border-radius: 11px; color: var(--secondary); background: rgba(255, 189, 74, .075); font-size: 9px; line-height: 1.4; }
+    .planned-session { border: 1px solid var(--line); border-radius: 14px; background: rgba(169, 140, 255, .055); }
+    .planned-session + .planned-session { margin-top: 6px; }
+    .planned-session summary { list-style: none; cursor: pointer; }
+    .planned-session summary::-webkit-details-marker { display: none; }
+    .planned-session-body { padding: 0 10px 10px 44px; color: var(--secondary); font-size: 10px; line-height: 1.45; }
     .calendar-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 3px 2px 11px; }
     .calendar-toolbar h2 { display: grid; justify-items: center; margin: 0; text-transform: capitalize; }
     .calendar-year { color: var(--muted); font-size: 9px; font-weight: 720; letter-spacing: .12em; }
@@ -421,6 +458,27 @@
       color: var(--text);
       font-size: 16px;
     }
+    .plan-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px; }
+    .plan-field { min-width: 0; }
+    .plan-field select, .plan-field textarea {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0 13px;
+      background: rgba(5, 8, 12, .62);
+      color: var(--text);
+      font: inherit;
+      font-size: 16px;
+    }
+    .plan-field textarea { min-height: 88px; padding-block: 11px; resize: vertical; }
+    .availability-fieldset { margin: 14px 0 0; padding: 0; border: 0; }
+    .availability-fieldset legend { margin-bottom: 7px; color: var(--secondary); font-size: 12px; }
+    .availability-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+    .availability-days label { margin: 0; cursor: pointer; }
+    .availability-days input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .availability-days span { display: grid; place-items: center; min-height: 38px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); background: rgba(255, 255, 255, .035); font-size: 12px; font-weight: 780; }
+    .availability-days input:checked + span { border-color: rgba(90, 174, 255, .55); color: var(--text); background: rgba(90, 174, 255, .13); }
     .dialog-note { margin: 10px 1px 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
     .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 
@@ -493,6 +551,8 @@
       .route-wrap { height: 235px; }
       .detail-grid { grid-template-columns: 1fr; }
       .planning-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .plan-form-grid { grid-template-columns: 1fr; }
+      .draft-day-body { padding-left: 10px; }
     }
   </style>
 </head>
@@ -531,6 +591,7 @@
 
       <section class="view" id="view-plan" data-view="plan">
         <div class="card planning-card" id="planningSummary"></div>
+        <div id="planDraft"></div>
         <div class="card calendar-card">
           <div class="calendar-toolbar">
             <div class="month-buttons"><button type="button" id="prevMonth" aria-label="Mes anterior">‹</button></div>
@@ -586,6 +647,68 @@
     </div>
   </dialog>
 
+  <dialog id="planSettingsDialog">
+    <div class="dialog-shell">
+      <div class="dialog-header"><h2>Configurar plan semanal</h2><button class="icon-button" type="button" data-close-dialog="planSettingsDialog" aria-label="Cerrar">✕</button></div>
+      <form class="dialog-content plan-form" id="planSettingsForm">
+        <div class="plan-form-grid">
+          <div class="plan-field">
+            <label for="planGoal">Objetivo actual</label>
+            <select id="planGoal" required>
+              <option value="">Selecciona un objetivo</option>
+              <option value="base">Base y regularidad</option>
+              <option value="5k">5 kilómetros</option>
+              <option value="10k">10 kilómetros</option>
+              <option value="half_marathon">Media maratón</option>
+              <option value="marathon">Maratón</option>
+            </select>
+          </div>
+          <div class="plan-field">
+            <label for="planTargetDate">Fecha objetivo · opcional</label>
+            <input id="planTargetDate" type="date">
+          </div>
+          <div class="plan-field">
+            <label for="planLongRunDay">Día de tirada larga</label>
+            <select id="planLongRunDay" required>
+              <option value="">Selecciona un día</option>
+              <option value="monday">Lunes</option><option value="tuesday">Martes</option><option value="wednesday">Miércoles</option><option value="thursday">Jueves</option><option value="friday">Viernes</option><option value="saturday">Sábado</option><option value="sunday">Domingo</option>
+            </select>
+          </div>
+          <div class="plan-field">
+            <label for="planMaxMinutes">Tiempo máximo entre semana</label>
+            <select id="planMaxMinutes" required>
+              <option value="30">30 minutos</option><option value="45">45 minutos</option><option value="60">60 minutos</option><option value="75">75 minutos</option><option value="90">90 minutos</option><option value="120">120 minutos</option>
+            </select>
+          </div>
+          <div class="plan-field">
+            <label for="planStrengthDays">Sesiones de fuerza</label>
+            <select id="planStrengthDays" required>
+              <option value="0">Ninguna</option><option value="1">Una por semana</option><option value="2">Dos por semana</option>
+            </select>
+          </div>
+        </div>
+        <fieldset class="availability-fieldset">
+          <legend>Días disponibles para entrenar</legend>
+          <div class="availability-days">
+            <label><input type="checkbox" name="availableDay" value="monday"><span>L</span></label>
+            <label><input type="checkbox" name="availableDay" value="tuesday"><span>M</span></label>
+            <label><input type="checkbox" name="availableDay" value="wednesday"><span>X</span></label>
+            <label><input type="checkbox" name="availableDay" value="thursday"><span>J</span></label>
+            <label><input type="checkbox" name="availableDay" value="friday"><span>V</span></label>
+            <label><input type="checkbox" name="availableDay" value="saturday"><span>S</span></label>
+            <label><input type="checkbox" name="availableDay" value="sunday"><span>D</span></label>
+          </div>
+        </fieldset>
+        <div class="plan-field">
+          <label for="planNotes">Disponibilidad, molestias o contexto adicional · opcional</label>
+          <textarea id="planNotes" maxlength="600" rows="4" placeholder="Ej.: esta semana sólo puedo correr por la tarde; prefiero evitar cuestas…"></textarea>
+        </div>
+        <p class="dialog-note">La configuración y los planes se guardan en IndexedDB. El plan generado será siempre un borrador y necesitará tu aprobación antes de incorporarse al calendario.</p>
+        <div class="dialog-actions"><button class="secondary-button" type="button" data-close-dialog="planSettingsDialog">Cancelar</button><button class="primary-button" type="submit">Guardar y generar</button></div>
+      </form>
+    </div>
+  </dialog>
+
   <input class="hidden" id="importInput" type="file" accept="application/json,.json">
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -594,7 +717,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.8.0";
+    const APP_VERSION = "0.9.0";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -605,7 +728,8 @@
       calendar: "syncCalendar",
       streams: "activityStreams",
       settings: "appSettings",
-      subjective: "dailySubjective"
+      subjective: "dailySubjective",
+      plans: "weeklyPlans"
     };
     const VIEW_LABELS = { today: "Hoy", activities: "Actividades", plan: "Plan", manage: "Gestión" };
     const TIME_ZONE = "Europe/Madrid";
@@ -616,11 +740,14 @@
       activities: [],
       wellness: [],
       calendar: [],
+      plans: [],
+      planPreferences: null,
       subjective: null,
       lastSyncAt: null,
       workerUrl: DEFAULT_WORKER_URL,
       hasToken: false,
       syncing: false,
+      generatingPlan: false,
       activeView: "today",
       selectedTodayDate: null,
       monthCursor: new Date(),
@@ -757,7 +884,8 @@
         [DATA_STORES.calendar, "dedupeKey"],
         [DATA_STORES.streams, "id"],
         [DATA_STORES.settings, "key"],
-        [DATA_STORES.subjective, "date"]
+        [DATA_STORES.subjective, "date"],
+        [DATA_STORES.plans, "weekStart"]
       ];
       for (const [name, keyPath] of definitions) {
         if (!db.objectStoreNames.contains(name)) db.createObjectStore(name, { keyPath });
@@ -824,6 +952,13 @@
       await transactionDone(transaction);
     }
 
+    async function storeDelete(storeName, key) {
+      const db = await ensureDataDb();
+      const transaction = db.transaction(storeName, "readwrite");
+      transaction.objectStore(storeName).delete(key);
+      await transactionDone(transaction);
+    }
+
     async function storePutMany(storeName, values) {
       if (!values.length) return;
       const db = await ensureDataDb();
@@ -879,17 +1014,21 @@
     }
 
     async function loadLocalData() {
-      const [activities, wellness, calendar, lastSyncAt, workerUrl, subjective] = await Promise.all([
+      const [activities, wellness, calendar, plans, lastSyncAt, workerUrl, subjective, planPreferences] = await Promise.all([
         storeGetAll(DATA_STORES.activities),
         storeGetAll(DATA_STORES.wellness),
         storeGetAll(DATA_STORES.calendar),
+        storeGetAll(DATA_STORES.plans),
         settingGet("lastSyncAt"),
         connectionGet("workerUrl").catch(() => null),
-        storeGet(DATA_STORES.subjective, todayKey())
+        storeGet(DATA_STORES.subjective, todayKey()),
+        settingGet("planPreferences")
       ]);
       state.activities = activities.map(normalizeActivity).filter(Boolean).sort((a, b) => String(a.start?.local || "").localeCompare(String(b.start?.local || "")));
       state.wellness = wellness.map(normalizeWellness).filter(Boolean).sort((a, b) => a.date.localeCompare(b.date));
       state.calendar = calendar.sort((a, b) => String(a.startLocal || "").localeCompare(String(b.startLocal || "")));
+      state.plans = plans.sort((a, b) => String(a.weekStart || "").localeCompare(String(b.weekStart || "")));
+      state.planPreferences = planPreferences && typeof planPreferences === "object" ? planPreferences : null;
       state.lastSyncAt = lastSyncAt;
       state.workerUrl = normalizeWorkerUrl(workerUrl || DEFAULT_WORKER_URL);
       state.hasToken = Boolean(await connectionGet("accessToken").catch(() => ""));
@@ -1008,6 +1147,11 @@
       return { start: dateKeyFromDate(start), end: dateKeyFromDate(end) };
     }
 
+    function nextWeekBounds(value) {
+      const current = weekBounds(value);
+      return { start: addDaysToKey(current.start, 7), end: addDaysToKey(current.end, 7) };
+    }
+
     function average(values) {
       const rows = values.filter(isNumber);
       return rows.length ? rows.reduce((sum, value) => sum + value, 0) / rows.length : null;
@@ -1060,7 +1204,7 @@
       const coveredRatios = metricDays ? [coverage.hrvDays, coverage.sleepDays, coverage.restingHeartRateDays].map(count => count / metricDays) : [];
       coverage.percent = coveredRatios.length ? Math.round(average(coveredRatios) * 100) : 0;
       coverage.readyForPlanning = metricDays >= 14 && coverage.hrvDays >= 7 && activities.some(isRunningActivity);
-      const week = weekBounds(reference);
+      const week = nextWeekBounds(reference);
       return {
         schemaVersion: "talos-planning-snapshot-1",
         generatedAt: new Date().toISOString(),
@@ -1111,10 +1255,12 @@
       const node = $("#planningSummary");
       if (!node) return;
       const snapshot = buildPlanningSnapshot();
+      const record = state.plans.find(item => item.weekStart === snapshot.week.start);
       const seven = snapshot.training.last7Days;
       const twentyEight = snapshot.training.last28Days;
       const weeklyAverageKm = twentyEight.runningDistanceM / 1000 / 4;
       const ready = snapshot.dataQuality.readyForPlanning;
+      const status = state.generatingPlan ? "Generando…" : record?.draft ? "Borrador listo" : record?.accepted ? "Plan guardado" : state.planPreferences ? "IA preparada" : ready ? "Configura el plan" : "Reuniendo datos";
       const reasons = [
         ...snapshot.readiness.reasons.slice(0, 2),
         `${snapshot.dataQuality.wellnessDays} días de salud`,
@@ -1123,7 +1269,7 @@
       node.innerHTML = `
         <div class="planning-head">
           <div><p class="eyebrow">Planificación semanal</p><h2>Base del plan semanal</h2><p>${escapeHtml(formatPlanningWeek(snapshot.week))}</p></div>
-          <span class="planning-status ${ready ? "" : "waiting"}">${ready ? "Datos listos" : "Reuniendo datos"}</span>
+          <span class="planning-status ${ready && !state.generatingPlan ? "" : "waiting"}">${status}</span>
         </div>
         <div class="planning-metrics">
           <div class="planning-metric"><span>Estado TɅLOS</span><strong>${isNumber(snapshot.readiness.score) ? snapshot.readiness.score : "—"}</strong><small>${escapeHtml(snapshot.readiness.label)}</small></div>
@@ -1131,7 +1277,168 @@
           <div class="planning-metric"><span>Media · 4 semanas</span><strong>${formatNumber(weeklyAverageKm, 1)} km</strong><small>por semana</small></div>
           <div class="planning-metric"><span>CTL / ATL</span><strong>${formatNumber(snapshot.load.ctl, 1)} / ${formatNumber(snapshot.load.atl, 1)}</strong><small>forma / fatiga</small></div>
         </div>
-        <div class="planning-reasons">${reasons.map(reason => `<span class="planning-reason">${escapeHtml(reason)}</span>`).join("")}</div>`;
+        <div class="planning-reasons">${reasons.map(reason => `<span class="planning-reason">${escapeHtml(reason)}</span>`).join("")}</div>
+        <div class="planning-actions">
+          <button class="secondary-button" type="button" data-plan-configure>Configurar</button>
+          ${ready && state.planPreferences && !record?.draft ? `<button class="primary-button" type="button" data-plan-generate ${state.generatingPlan ? "disabled" : ""}>${record?.accepted ? "Regenerar" : "Generar semana"}</button>` : ""}
+        </div>`;
+      $("[data-plan-configure]", node)?.addEventListener("click", openPlanSettingsDialog);
+      $("[data-plan-generate]", node)?.addEventListener("click", generateWeeklyPlan);
+    }
+
+    function planSportIcon(sport, title = "") {
+      if (sport === "rest") return "🛋️";
+      return activityIcon(sport, title);
+    }
+
+    function planDayMetric(day) {
+      const parts = [];
+      if (isNumber(day.durationMin) && day.durationMin > 0) parts.push(`${formatNumber(day.durationMin)} min`);
+      if (isNumber(day.distanceKm) && day.distanceKm > 0) parts.push(`${formatNumber(day.distanceKm, 1)} km`);
+      return parts.join(" · ") || "Descanso";
+    }
+
+    function renderPlanDraft(weekStart) {
+      const node = $("#planDraft");
+      if (!node) return;
+      const record = state.plans.find(item => item.weekStart === weekStart);
+      const draft = record?.draft;
+      if (!draft?.plan) {
+        node.innerHTML = "";
+        return;
+      }
+      const plan = draft.plan;
+      const days = Array.isArray(plan.days) ? plan.days : [];
+      const notes = [...(plan.adjustments || []), ...(plan.cautions || [])];
+      node.innerHTML = `
+        <article class="card plan-draft-card">
+          <div class="draft-head">
+            <div><p class="eyebrow">Borrador generado por IA</p><h3>${escapeHtml(plan.objective || "Plan semanal")}</h3><p>${escapeHtml(plan.summary || "Revisa cada día antes de aceptar el plan.")}</p></div>
+            <div class="draft-total"><strong>${formatNumber(plan.totals?.distanceKm ?? plan.volumeTargetKm, 1)} km</strong><span>${formatNumber(plan.totals?.durationMin)} min</span></div>
+          </div>
+          <div class="draft-days">${days.map(day => `
+            <details class="draft-day">
+              <summary>
+                <span class="draft-day-name">${formatDate(day.date, { weekday: "short", day: "numeric" })}</span>
+                <span class="draft-day-sport">${planSportIcon(day.sport, day.title)}</span>
+                <span class="draft-day-copy"><strong>${escapeHtml(day.title)}</strong><span>${escapeHtml(planDayMetric(day))}</span></span>
+                <span class="draft-day-intensity ${escapeHtml(day.intensity)}">${escapeHtml(day.intensity)}</span>
+              </summary>
+              <div class="draft-day-body"><p>${escapeHtml(day.description)}</p><p>${escapeHtml(day.rationale)}</p>${day.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${step.target ? ` · ${escapeHtml(step.target)}` : ""}</li>`).join("")}</ol>` : ""}</div>
+            </details>`).join("")}</div>
+          ${notes.length ? `<div class="draft-notes">${notes.map(note => `<div class="draft-note">${escapeHtml(note)}</div>`).join("")}</div>` : ""}
+          <div class="dialog-actions"><button class="secondary-button" type="button" data-plan-discard>Descartar</button><button class="secondary-button" type="button" data-plan-adjust>Ajustar configuración</button><button class="primary-button" type="button" data-plan-accept>Aceptar plan</button></div>
+        </article>`;
+      $("[data-plan-discard]", node)?.addEventListener("click", () => discardDraftPlan(weekStart));
+      $("[data-plan-adjust]", node)?.addEventListener("click", openPlanSettingsDialog);
+      $("[data-plan-accept]", node)?.addEventListener("click", () => acceptDraftPlan(weekStart));
+    }
+
+    async function openPlanSettingsDialog() {
+      const preferences = state.planPreferences || {};
+      $("#planSettingsForm").reset();
+      $("#planGoal").value = preferences.goal || "";
+      $("#planTargetDate").value = preferences.targetDate || "";
+      $("#planLongRunDay").value = preferences.longRunDay || "";
+      $("#planMaxMinutes").value = String(preferences.maxWeekdayMinutes || 60);
+      $("#planStrengthDays").value = String(preferences.strengthDays ?? 0);
+      $("#planNotes").value = preferences.notes || "";
+      $$('input[name="availableDay"]', $("#planSettingsForm")).forEach(input => { input.checked = preferences.availableDays?.includes(input.value) || false; });
+      openDialog($("#planSettingsDialog"));
+    }
+
+    async function savePlanPreferences(event) {
+      event.preventDefault();
+      const availableDays = $$('input[name="availableDay"]:checked', event.currentTarget).map(input => input.value);
+      const preferences = {
+        goal: $("#planGoal").value,
+        targetDate: $("#planTargetDate").value || null,
+        availableDays,
+        longRunDay: $("#planLongRunDay").value,
+        maxWeekdayMinutes: Number($("#planMaxMinutes").value),
+        strengthDays: Number($("#planStrengthDays").value),
+        notes: $("#planNotes").value.trim().slice(0, 600)
+      };
+      if (!preferences.goal || availableDays.length < 2) return showToast("Selecciona un objetivo y al menos dos días disponibles.", true);
+      if (!preferences.longRunDay || !availableDays.includes(preferences.longRunDay)) return showToast("La tirada larga debe coincidir con un día disponible.", true);
+      if (availableDays.length < preferences.strengthDays + 1) return showToast("Añade suficientes días para la tirada larga y las sesiones de fuerza.", true);
+      if (preferences.targetDate && preferences.targetDate <= todayKey()) return showToast("La fecha objetivo debe ser posterior a hoy.", true);
+      await settingSet("planPreferences", preferences);
+      state.planPreferences = preferences;
+      closeDialog($("#planSettingsDialog"));
+      renderPlan();
+      await generateWeeklyPlan();
+    }
+
+    async function generateWeeklyPlan() {
+      if (state.generatingPlan) return;
+      if (!state.planPreferences) return openPlanSettingsDialog();
+      if (!state.hasToken) return openConnectionDialog();
+      const snapshot = buildPlanningSnapshot();
+      if (!snapshot.dataQuality.readyForPlanning) return showToast("Aún no hay datos suficientes para generar una semana fiable.", true);
+      state.generatingPlan = true;
+      renderPlan();
+      showToast("TɅLOS está preparando la próxima semana…");
+      try {
+        const token = await connectionGet("accessToken");
+        const response = await fetch(`${state.workerUrl}/plan/generate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Talos-Access": token },
+          body: JSON.stringify({ snapshot, preferences: state.planPreferences })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.ok) throw new Error(payload.error || "No se pudo generar el plan semanal.");
+        const existing = state.plans.find(item => item.weekStart === payload.plan.weekStart);
+        const record = {
+          weekStart: payload.plan.weekStart,
+          weekEnd: payload.plan.weekEnd,
+          accepted: existing?.accepted || null,
+          draft: {
+            plan: payload.plan,
+            generatedAt: payload.generatedAt,
+            provider: payload.provider,
+            model: payload.model,
+            usage: payload.usage,
+            preferences: structuredClone(state.planPreferences)
+          }
+        };
+        await storePut(DATA_STORES.plans, record);
+        state.plans = [...state.plans.filter(item => item.weekStart !== record.weekStart), record].sort((a, b) => a.weekStart.localeCompare(b.weekStart));
+        renderPlan();
+        $("#planDraft")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        showToast("Borrador semanal preparado. Revísalo antes de aceptarlo.");
+      } catch (error) {
+        showToast(error.message || String(error), true);
+      } finally {
+        state.generatingPlan = false;
+        renderPlan();
+      }
+    }
+
+    async function acceptDraftPlan(weekStart) {
+      const record = state.plans.find(item => item.weekStart === weekStart);
+      if (!record?.draft) return;
+      record.accepted = { ...record.draft, acceptedAt: new Date().toISOString() };
+      record.draft = null;
+      await storePut(DATA_STORES.plans, record);
+      state.monthCursor = dateFromKey(record.weekStart) || state.monthCursor;
+      state.selectedPlanDate = record.weekStart;
+      renderPlan();
+      showToast("Plan aceptado y añadido al calendario local.");
+    }
+
+    async function discardDraftPlan(weekStart) {
+      const record = state.plans.find(item => item.weekStart === weekStart);
+      if (!record) return;
+      if (record.accepted) {
+        record.draft = null;
+        await storePut(DATA_STORES.plans, record);
+      } else {
+        await storeDelete(DATA_STORES.plans, weekStart);
+        state.plans = state.plans.filter(item => item.weekStart !== weekStart);
+      }
+      renderPlan();
+      showToast("Borrador descartado.");
     }
 
     function qualityLabel(value) {
@@ -1304,6 +1611,7 @@
 
     function renderPlan() {
       renderPlanningSummary();
+      renderPlanDraft(buildPlanningSnapshot().week.start);
       const cursor = state.monthCursor;
       const year = cursor.getFullYear();
       const month = cursor.getMonth();
@@ -1330,6 +1638,20 @@
         const icon = activityIcon(`${event.type || ""} ${event.category || ""}`, event.name);
         const completed = (byDay.get(key) || []).some(item => item.done);
         byDay.get(key).unshift({ icon, name: event.name || event.type || "Entrenamiento", done: completed });
+      }
+      for (const record of state.plans) {
+        for (const day of record.accepted?.plan?.days || []) {
+          const key = day.date;
+          if (!key) continue;
+          if (!byDay.has(key)) byDay.set(key, []);
+          const completed = byDay.get(key).some(item => item.done);
+          byDay.get(key).unshift({
+            icon: planSportIcon(day.sport, day.title),
+            name: day.title || "Entrenamiento TɅLOS",
+            done: completed,
+            localPlan: true
+          });
+        }
       }
       const cells = Array.from({ length: leading }, () => '<div class="day-cell blank"></div>');
       for (let day = 1; day <= days; day += 1) {
@@ -1358,6 +1680,7 @@
       const body = wellness?.body || {};
       const activities = state.activities.filter(item => activityDateKey(item) === date);
       const planned = state.calendar.filter(item => String(item.startLocal || "").slice(0, 10) === date);
+      const localPlanned = state.plans.flatMap(record => record.accepted?.plan?.days || []).filter(day => day.date === date);
       const metrics = [
         ["💤 Sueño", formatSleep(recovery.sleepSeconds)],
         ["⭐ Puntuación", isNumber(recovery.sleepScore) ? `${formatNumber(recovery.sleepScore)}/100` : "—"],
@@ -1378,18 +1701,32 @@
           <span class="copy"><strong>${escapeHtml(event.name || event.type || "Entrenamiento")}</strong><span>${isNumber(event.distanceM) ? formatDistance(event.distanceM) : "Planificado"}${isNumber(event.movingTimeSec) ? ` · ${formatDuration(event.movingTimeSec)}` : ""}</span></span>
           <span class="open" aria-hidden="true">${activities.length ? "✓" : ""}</span>
         </div>`).join("");
+      const localPlannedMarkup = localPlanned.map(day => `
+        <details class="planned-session">
+          <summary class="plan-activity-button">
+            <span class="sport" aria-hidden="true">${planSportIcon(day.sport, day.title)}</span>
+            <span class="copy"><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><span>${escapeHtml(planDayMetric(day))} · ${escapeHtml(day.intensity || "easy")}</span></span>
+            <span class="open" aria-hidden="true">›</span>
+          </summary>
+          <div class="planned-session-body">
+            ${day.description ? `<p>${escapeHtml(day.description)}</p>` : ""}
+            ${day.rationale ? `<p>${escapeHtml(day.rationale)}</p>` : ""}
+            ${day.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${step.target ? ` · ${escapeHtml(step.target)}` : ""}</li>`).join("")}</ol>` : ""}
+          </div>
+        </details>`).join("");
       $("#planDayDetail").innerHTML = `
         <article class="card plan-day-detail">
           <div class="plan-day-head"><div><p>Detalle del día</p><h3>${formatDate(date, { weekday: "long", day: "numeric", month: "long" })}</h3></div>${date === todayKey() ? '<span class="status-pill">Hoy</span>' : ""}</div>
           <div class="day-health-grid">${metrics.map(([label, value]) => `<div class="day-health-metric"><span>${label}</span><strong>${value}</strong></div>`).join("")}</div>
           ${activities.length ? `<div class="plan-day-section"><h4>Actividad realizada</h4>${activityMarkup}</div>` : '<p class="plan-empty">No hay actividad registrada este día.</p>'}
-          ${planned.length ? `<div class="plan-day-section"><h4>Entrenamiento previsto</h4>${plannedMarkup}</div>` : ""}
+          ${planned.length || localPlanned.length ? `<div class="plan-day-section"><h4>Entrenamiento previsto</h4>${localPlannedMarkup}${plannedMarkup}</div>` : ""}
         </article>`;
       $$('[data-plan-activity-id]', $("#planDayDetail")).forEach(button => button.addEventListener("click", () => openActivity(button.dataset.planActivityId)));
     }
 
     function renderManage() {
       const lastSync = state.lastSyncAt ? new Intl.DateTimeFormat("es-ES", { dateStyle: "medium", timeStyle: "short" }).format(new Date(state.lastSyncAt)) : "Nunca";
+      const acceptedPlanCount = state.plans.reduce((total, record) => total + (record.accepted?.plan?.days || []).filter(day => day.sport !== "rest").length, 0);
       $("#appVersionLabel").textContent = `TɅLOS ${APP_VERSION}`;
       $("#manageContent").innerHTML = `
         <article class="card manage-card">
@@ -1400,7 +1737,7 @@
         <article class="card manage-card">
           <h3>Base de datos</h3>
           <p>Los datos permanecen en IndexedDB. La copia JSON permite trasladarlos entre dispositivos.</p>
-          <div class="manage-stats"><div class="manage-stat"><strong>${state.activities.length}</strong><span>ACTIVIDADES</span></div><div class="manage-stat"><strong>${state.wellness.length}</strong><span>DÍAS</span></div><div class="manage-stat"><strong>${state.calendar.length}</strong><span>PLANES</span></div></div>
+          <div class="manage-stats"><div class="manage-stat"><strong>${state.activities.length}</strong><span>ACTIVIDADES</span></div><div class="manage-stat"><strong>${state.wellness.length}</strong><span>DÍAS</span></div><div class="manage-stat"><strong>${state.calendar.length + acceptedPlanCount}</strong><span>PLANES</span></div></div>
           <div class="button-row"><button class="secondary-button" type="button" data-export>Exportar JSON</button><button class="secondary-button" type="button" data-import>Importar JSON</button><button class="secondary-button" type="button" data-rebuild>Reconstruir desde Intervals</button></div>
         </article>
         <article class="card manage-card">
@@ -1410,7 +1747,7 @@
         </article>
         <article class="card manage-card">
           <h3>Restablecer datos sincronizados</h3>
-          <p>Elimina actividades, bienestar, calendario y mapas de este dispositivo. La conexión privada se conserva.</p>
+          <p>Elimina actividades, bienestar, calendario, planes de TɅLOS y mapas de este dispositivo. La conexión privada se conserva.</p>
           <div class="button-row"><button class="danger-button" type="button" data-clear>Vaciar datos locales</button></div>
         </article>`;
       $("[data-manage-sync]").addEventListener("click", () => syncNow({ manual: true }));
@@ -1865,14 +2202,15 @@
     }
 
     async function exportBackup() {
-      const [streams, subjective, settings] = await Promise.all([storeGetAll(DATA_STORES.streams), storeGetAll(DATA_STORES.subjective), storeGetAll(DATA_STORES.settings)]);
+      const [streams, subjective, settings, plans] = await Promise.all([storeGetAll(DATA_STORES.streams), storeGetAll(DATA_STORES.subjective), storeGetAll(DATA_STORES.settings), storeGetAll(DATA_STORES.plans)]);
       const payload = {
-        talosBackupVersion: 1,
+        talosBackupVersion: 2,
         appVersion: APP_VERSION,
         exportedAt: new Date().toISOString(),
         activities: state.activities,
         wellness: state.wellness,
         calendar: state.calendar,
+        plans,
         streams,
         subjective,
         settings: settings.filter(item => item.key !== "accessToken")
@@ -1889,6 +2227,7 @@
             storePutMany(DATA_STORES.activities, (payload.activities || []).map(normalizeActivity).filter(Boolean)),
             storePutMany(DATA_STORES.wellness, (payload.wellness || []).map(normalizeWellness).filter(Boolean)),
             storePutMany(DATA_STORES.calendar, (payload.calendar || []).filter(item => item?.dedupeKey)),
+            storePutMany(DATA_STORES.plans, (payload.plans || []).filter(item => item?.weekStart)),
             storePutMany(DATA_STORES.streams, (payload.streams || []).filter(item => item?.id)),
             storePutMany(DATA_STORES.subjective, (payload.subjective || []).filter(item => item?.date))
           ]);
@@ -1907,8 +2246,8 @@
     }
 
     async function clearSyncedData() {
-      if (!confirm("¿Vaciar las actividades, el bienestar, el calendario y los mapas guardados en este dispositivo?")) return;
-      await storeClear([DATA_STORES.activities, DATA_STORES.wellness, DATA_STORES.calendar, DATA_STORES.streams, DATA_STORES.subjective, DATA_STORES.settings]);
+      if (!confirm("¿Vaciar las actividades, el bienestar, el calendario, los planes de TɅLOS y los mapas guardados en este dispositivo?")) return;
+      await storeClear([DATA_STORES.activities, DATA_STORES.wellness, DATA_STORES.calendar, DATA_STORES.plans, DATA_STORES.streams, DATA_STORES.subjective, DATA_STORES.settings]);
       await loadLocalData();
       renderAll();
       showToast("Datos locales eliminados. La conexión privada se conserva.");
@@ -1918,6 +2257,7 @@
       $$(".nav-button").forEach(button => button.addEventListener("click", () => setView(button.dataset.target)));
       $("#syncTopButton").addEventListener("click", () => syncNow({ manual: true }));
       $("#connectionForm").addEventListener("submit", saveConnection);
+      $("#planSettingsForm").addEventListener("submit", savePlanPreferences);
       $$('[data-close-dialog]').forEach(button => button.addEventListener("click", () => closeDialog($(`#${button.dataset.closeDialog}`))));
       $("#activityDialog").addEventListener("close", () => {
         if (state.map) { state.map.remove(); state.map = null; }
