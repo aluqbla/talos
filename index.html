@@ -423,6 +423,30 @@
     .manage-card { padding: 16px; }
     .manage-card h3 { margin: 0 0 5px; font-size: 16px; }
     .manage-card p { margin: 0 0 14px; color: var(--muted); line-height: 1.4; }
+    .shoe-list { display: grid; gap: 8px; margin-top: 12px; }
+    .shoe-card { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 11px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.035); }
+    .shoe-card strong, .shoe-card span { display: block; }
+    .shoe-card strong { font-size: 12px; }
+    .shoe-card .shoe-meta { margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.35; }
+    .shoe-km { text-align: right; min-width: 76px; }
+    .shoe-km strong { font-size: 15px; font-variant-numeric: tabular-nums; }
+    .shoe-km span { margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .shoe-progress { grid-column: 1 / -1; height: 5px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.07); }
+    .shoe-progress > span { height: 100%; border-radius: inherit; background: var(--blue); }
+    .shoe-progress.warn > span { background: var(--amber); }
+    .shoe-progress.over > span { background: var(--red); }
+    .shoe-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
+    .shoe-actions button { min-height: 31px; padding: 0 10px; font-size: 10px; }
+    .shoe-plan-tip { margin-top: 7px; padding: 7px 9px; border-radius: 11px; color: #cde8ff; background: rgba(90,174,255,.08); font-size: 10px; line-height: 1.35; }
+    .shoe-assignment { margin-top: 14px; padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.03); }
+    .shoe-assignment label { display: block; margin-bottom: 6px; color: var(--secondary); font-size: 11px; font-weight: 700; }
+    .shoe-assignment select { width: 100%; min-height: 42px; }
+    .shoe-assignment p { margin: 7px 0 0; color: var(--muted); font-size: 10px; line-height: 1.4; }
+    .shoe-assignment .button-row { margin-top: 8px; }
+    .shoe-use-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; margin-top: 7px; }
+    .shoe-use-grid label { display: flex; align-items: center; gap: 7px; min-height: 36px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 11px; color: var(--secondary); font-size: 11px; }
+    .shoe-use-grid input { width: auto; min-height: 0; }
+
     .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
     .connection-dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--muted); }
     .connection-dot.ok { background: var(--green); box-shadow: 0 0 11px rgba(70, 212, 122, .6); }
@@ -792,6 +816,44 @@
     </div>
   </dialog>
 
+
+  <dialog id="shoeDialog">
+    <div class="dialog-shell">
+      <div class="dialog-header"><h2 id="shoeDialogTitle">Zapatilla</h2><button class="icon-button" type="button" data-close-dialog="shoeDialog" aria-label="Cerrar">✕</button></div>
+      <form class="dialog-content plan-form" id="shoeForm">
+        <input id="shoeId" type="hidden">
+        <div class="plan-form-grid">
+          <div class="plan-field"><label for="shoeName">Nombre</label><input id="shoeName" type="text" maxlength="80" required></div>
+          <div class="plan-field"><label for="shoeCategory">Uso principal</label><select id="shoeCategory" required>
+            <option value="daily">Rodaje diario</option><option value="quality">Calidad</option><option value="race">Competición</option><option value="trail">Trail</option>
+          </select></div>
+          <div class="plan-field"><label for="shoeBaselineKm">Kilómetros actuales / base</label><input id="shoeBaselineKm" type="number" min="0" max="5000" step="0.1" required></div>
+          <div class="plan-field"><label for="shoeMaxKm">Referencia de vida útil</label><input id="shoeMaxKm" type="number" min="50" max="3000" step="10" required></div>
+          <div class="plan-field"><label for="shoeFirstUse">Primer uso · opcional</label><input id="shoeFirstUse" type="date"></div>
+          <div class="plan-field"><label for="shoeStatus">Estado</label><select id="shoeStatus"><option value="active">Activa</option><option value="retired">Retirada</option></select></div>
+        </div>
+        <fieldset class="availability-fieldset">
+          <legend>Entrenamientos recomendados</legend>
+          <div class="shoe-use-grid">
+            <label><input type="checkbox" name="shoeUse" value="recovery">Recuperación</label>
+            <label><input type="checkbox" name="shoeUse" value="easy">Rodaje suave</label>
+            <label><input type="checkbox" name="shoeUse" value="long">Tirada larga</label>
+            <label><input type="checkbox" name="shoeUse" value="steady">Sostenido</label>
+            <label><input type="checkbox" name="shoeUse" value="tempo">Tempo</label>
+            <label><input type="checkbox" name="shoeUse" value="threshold">Umbral</label>
+            <label><input type="checkbox" name="shoeUse" value="intervals">Intervalos</label>
+            <label><input type="checkbox" name="shoeUse" value="hills">Cuestas</label>
+            <label><input type="checkbox" name="shoeUse" value="race">Competición</label>
+            <label><input type="checkbox" name="shoeUse" value="trail">Trail</label>
+          </div>
+        </fieldset>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px"><input id="shoeRecommend" type="checkbox" style="width:auto;min-height:0"> Disponible para recomendaciones automáticas</label>
+        <p class="dialog-note">Si cambias los kilómetros base, TɅLOS tomará el valor introducido como nuevo punto de referencia desde hoy para evitar duplicar el histórico.</p>
+        <div class="dialog-actions"><button class="secondary-button" type="button" data-close-dialog="shoeDialog">Cancelar</button><button class="primary-button" type="submit">Guardar zapatilla</button></div>
+      </form>
+    </div>
+  </dialog>
+
   <input class="hidden" id="importInput" type="file" accept="application/json,.json">
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -800,7 +862,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.19.0";
+    const APP_VERSION = "0.21.0";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -814,7 +876,9 @@
       subjective: "dailySubjective",
       plans: "weeklyPlans",
       analyses: "activityAnalyses",
-      weeklyReviews: "weeklyReviews"
+      weeklyReviews: "weeklyReviews",
+      shoes: "runningShoes",
+      shoeAssignments: "activityShoeAssignments"
     };
     const VIEW_LABELS = { today: "Hoy", activities: "Actividades", plan: "Plan", manage: "Gestión" };
     const TIME_ZONE = "Europe/Madrid";
@@ -828,6 +892,8 @@
       plans: [],
       analyses: [],
       weeklyReviews: [],
+      shoes: [],
+      shoeAssignments: [],
       planPreferences: null,
       subjective: null,
       lastSyncAt: null,
@@ -981,7 +1047,9 @@
         [DATA_STORES.subjective, "date"],
         [DATA_STORES.plans, "weekStart"],
         [DATA_STORES.analyses, "activityId"],
-        [DATA_STORES.weeklyReviews, "weekStart"]
+        [DATA_STORES.weeklyReviews, "weekStart"],
+        [DATA_STORES.shoes, "id"],
+        [DATA_STORES.shoeAssignments, "activityId"]
       ];
       for (const [name, keyPath] of definitions) {
         if (!db.objectStoreNames.contains(name)) db.createObjectStore(name, { keyPath });
@@ -1118,14 +1186,211 @@
       return item;
     }
 
+
+    const DEFAULT_SHOES_2026 = [
+      { id: "shoe-supernova-rise-3", name: "adidas Supernova Rise 3", category: "daily", uses: ["recovery","easy","long","steady"], baselineKm: 0, baselineActivities: 0, maxKm: 800, firstUse: "2026-08-06", baselineAt: "2026-08-07T23:44:00.000Z", status: "active", recommend: true },
+      { id: "shoe-terrex-agravic-3", name: "adidas Terrex Agravic 3", category: "trail", uses: ["trail","hills","easy","long"], baselineKm: 302.6, baselineActivities: 25, maxKm: 800, firstUse: "2026-02-24", baselineAt: "2026-08-07T23:44:00.000Z", status: "active", recommend: true },
+      { id: "shoe-adios-pro-4", name: "adidas Adizero Adios Pro 4", category: "race", uses: ["race","intervals","threshold","tempo"], baselineKm: 103.9, baselineActivities: 7, maxKm: 400, firstUse: "2026-01-18", baselineAt: "2026-08-07T23:44:00.000Z", status: "active", recommend: true },
+      { id: "shoe-supernova-rise", name: "adidas Supernova Rise", category: "daily", uses: ["recovery","easy","long"], baselineKm: 838.9, baselineActivities: 84, maxKm: 800, firstUse: "2024-08-12", baselineAt: "2026-08-07T23:44:00.000Z", status: "active", recommend: false },
+      { id: "shoe-boston-12", name: "adidas Adizero Boston 12", category: "quality", uses: ["steady","tempo","threshold","intervals","hills"], baselineKm: 769.2, baselineActivities: 71, maxKm: 800, firstUse: "2024-05-20", baselineAt: "2026-08-07T23:44:00.000Z", status: "active", recommend: true }
+    ];
+
+    function normalizeShoe(shoe) {
+      const source = shoe && typeof shoe === "object" ? structuredClone(shoe) : {};
+      if (!source.id || !source.name) return null;
+      source.id = String(source.id);
+      source.name = String(source.name).slice(0, 80);
+      source.category = ["daily","quality","race","trail"].includes(source.category) ? source.category : "daily";
+      source.uses = Array.isArray(source.uses) ? [...new Set(source.uses.filter(value => ["recovery","easy","long","steady","tempo","threshold","intervals","hills","race","trail"].includes(value)))] : [];
+      source.baselineKm = isNumber(Number(source.baselineKm)) ? Math.max(0, Number(source.baselineKm)) : 0;
+      source.baselineActivities = Number.isFinite(Number(source.baselineActivities)) ? Math.max(0, Math.round(Number(source.baselineActivities))) : 0;
+      source.maxKm = isNumber(Number(source.maxKm)) ? Math.max(50, Number(source.maxKm)) : 800;
+      source.firstUse = /^\d{4}-\d{2}-\d{2}$/.test(source.firstUse || "") ? source.firstUse : null;
+      source.baselineAt = source.baselineAt && Number.isFinite(Date.parse(source.baselineAt)) ? source.baselineAt : new Date().toISOString();
+      source.status = source.status === "retired" ? "retired" : "active";
+      source.recommend = source.recommend !== false;
+      return source;
+    }
+
+    function shoeAssignment(activityId) {
+      return state.shoeAssignments.find(item => item.activityId === String(activityId)) || null;
+    }
+
+    function assignmentAfterBaseline(assignment, shoe) {
+      const activity = state.activities.find(item => item.id === assignment.activityId);
+      if (!activity) return false;
+      const activityUtc = activity.start?.utc ? Date.parse(activity.start.utc) : NaN;
+      const baselineUtc = Date.parse(shoe.baselineAt);
+      if (Number.isFinite(activityUtc) && Number.isFinite(baselineUtc)) return activityUtc > baselineUtc;
+      return activityDateKey(activity) > String(shoe.baselineAt || "").slice(0,10);
+    }
+
+    function shoeLinkedActivities(shoeId) {
+      return state.shoeAssignments.filter(item => item.shoeId === shoeId).map(item => state.activities.find(activity => activity.id === item.activityId)).filter(Boolean);
+    }
+
+    function shoeAddedKm(shoe) {
+      return state.shoeAssignments
+        .filter(item => item.shoeId === shoe.id && assignmentAfterBaseline(item, shoe))
+        .reduce((sum, assignment) => {
+          const activity = state.activities.find(item => item.id === assignment.activityId);
+          return sum + (isNumber(activity?.distanceM) ? activity.distanceM / 1000 : 0);
+        }, 0);
+    }
+
+    function shoeTotalKm(shoe) {
+      return Math.round((shoe.baselineKm + shoeAddedKm(shoe)) * 10) / 10;
+    }
+
+    function shoeAddedActivities(shoe) {
+      return state.shoeAssignments.filter(item => item.shoeId === shoe.id && assignmentAfterBaseline(item, shoe)).length;
+    }
+
+    function shoeTotalActivities(shoe) {
+      return shoe.baselineActivities + shoeAddedActivities(shoe);
+    }
+
+    function shoeWear(shoe) {
+      const total = shoeTotalKm(shoe);
+      const ratio = shoe.maxKm > 0 ? total / shoe.maxKm : 0;
+      return {
+        total,
+        ratio,
+        label: ratio >= 1 ? "Referencia superada" : ratio >= .9 ? "Cerca de la referencia" : ratio >= .75 ? "Uso avanzado" : "En buen rango",
+        className: ratio >= 1 ? "over" : ratio >= .9 ? "warn" : ""
+      };
+    }
+
+    function normalizedGearName(value) {
+      return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    }
+
+    function externalGearLabels(activity) {
+      return (Array.isArray(activity?.gear) ? activity.gear : []).map(item => item?.name || item?.label || item?.id).filter(Boolean).map(String);
+    }
+
+    function findShoeByExternalGear(activity) {
+      const labels = externalGearLabels(activity).map(normalizedGearName).filter(Boolean);
+      if (!labels.length) return null;
+      return state.shoes.find(shoe => {
+        const name = normalizedGearName(shoe.name);
+        return labels.some(label => label === name || label.includes(name) || name.includes(label));
+      }) || null;
+    }
+
+    async function autoAssignExternalGear(activities = state.activities) {
+      if (!state.shoes.length) return 0;
+      const existing = new Set(state.shoeAssignments.map(item => item.activityId));
+      const rows = [];
+      for (const activity of activities) {
+        if (!isRunningActivity(activity) || existing.has(activity.id)) continue;
+        const shoe = findShoeByExternalGear(activity);
+        if (!shoe) continue;
+        rows.push({ activityId: String(activity.id), shoeId: shoe.id, source: "intervals", updatedAt: new Date().toISOString() });
+        existing.add(String(activity.id));
+      }
+      if (rows.length) {
+        await storePutMany(DATA_STORES.shoeAssignments, rows);
+        state.shoeAssignments = [...state.shoeAssignments.filter(item => !rows.some(row => row.activityId === item.activityId)), ...rows];
+      }
+      return rows.length;
+    }
+
+    function desiredShoeUse(day) {
+      const text = `${day?.title || ""} ${day?.description || ""}`.toLowerCase();
+      if (/trail|sender|montaña|montana/.test(text)) return { use: "trail", category: "trail" };
+      if (/competici|carrera objetivo|race/.test(text)) return { use: "race", category: "race" };
+      const type = day?.sessionType || "easy";
+      if (type === "hills") return { use: "hills", category: "quality" };
+      if (["intervals","threshold","tempo","steady"].includes(type)) return { use: type, category: "quality" };
+      if (type === "long") return { use: "long", category: "daily" };
+      if (type === "recovery") return { use: "recovery", category: "daily" };
+      return { use: "easy", category: "daily" };
+    }
+
+    function recentShoeUseCount(shoeId, beforeDate) {
+      const oldest = addDaysToKey(beforeDate || todayKey(), -7);
+      return state.shoeAssignments.filter(item => {
+        if (item.shoeId !== shoeId) return false;
+        const activity = state.activities.find(row => row.id === item.activityId);
+        const date = activityDateKey(activity);
+        return date >= oldest && date <= (beforeDate || todayKey());
+      }).length;
+    }
+
+    function recommendedShoeForDay(day) {
+      if (!day || day.sport !== "run") return null;
+      const desired = desiredShoeUse(day);
+      const candidates = state.shoes.filter(shoe => shoe.status === "active" && shoe.recommend);
+      if (!candidates.length) return null;
+      const ranked = candidates.map(shoe => {
+        const wear = shoeWear(shoe);
+        let score = 0;
+        if (shoe.uses.includes(desired.use)) score += 10;
+        if (shoe.category === desired.category) score += 6;
+        if (desired.category === "daily" && shoe.category === "quality") score -= 3;
+        if (desired.category !== "race" && shoe.category === "race") score -= 3;
+        if (desired.category === "trail" && shoe.category !== "trail") score -= 8;
+        if (desired.category !== "trail" && shoe.category === "trail") score -= 4;
+        if (wear.ratio >= 1) score -= 40;
+        else if (wear.ratio >= .95) score -= 5;
+        else if (wear.ratio >= .9) score -= 2;
+        score -= Math.min(2, recentShoeUseCount(shoe.id, day.date) * .5);
+        return { shoe, score, wear };
+      }).sort((a,b) => b.score - a.score || a.wear.ratio - b.wear.ratio);
+      const best = ranked[0];
+      return best && best.score > -10 ? { ...best, desired } : null;
+    }
+
+    function plannedDayForDate(date) {
+      return state.plans.flatMap(record => record.accepted?.plan?.days || []).find(day => day.date === date && day.sport === "run") || null;
+    }
+
+    function recommendedShoeForActivity(activity) {
+      const planned = plannedDayForActivity(activity) || plannedDayForDate(activityDateKey(activity));
+      return planned ? recommendedShoeForDay(planned) : null;
+    }
+
+    function shoeRecommendationLine(day) {
+      const rec = recommendedShoeForDay(day);
+      if (!rec) return "";
+      return `👟 ${rec.shoe.name} · ${formatNumber(rec.wear.total,1)} km`;
+    }
+
+    function shoeRecommendationMarkup(day) {
+      const rec = recommendedShoeForDay(day);
+      if (!rec) return "";
+      const useLabel = ({ recovery:"recuperación", easy:"rodaje suave", long:"tirada larga", steady:"rodaje sostenido", tempo:"tempo", threshold:"umbral", intervals:"intervalos", hills:"cuestas", race:"competición", trail:"trail" })[rec.desired.use] || rec.desired.use;
+      return `<div class="shoe-plan-tip">👟 <strong>${escapeHtml(rec.shoe.name)}</strong> · recomendada para ${escapeHtml(useLabel)} · ${formatNumber(rec.wear.total,1)} km acumulados${rec.wear.ratio >= .9 ? ` · ${escapeHtml(rec.wear.label.toLowerCase())}` : ""}</div>`;
+    }
+
+    function shoeCategoryLabel(value) {
+      return ({ daily:"Rodaje diario", quality:"Calidad", race:"Competición", trail:"Trail" })[value] || value;
+    }
+
+    function shoeSourceLabel(value) {
+      return ({ manual:"manual", intervals:"Intervals.icu", plan:"plan TɅLOS" })[value] || value || "";
+    }
+
+    async function ensureInitialShoeInventory() {
+      const initialized = await settingGet("shoeInventoryInitialized");
+      if (initialized || state.shoes.length) return;
+      const rows = DEFAULT_SHOES_2026.map(normalizeShoe).filter(Boolean);
+      await storePutMany(DATA_STORES.shoes, rows);
+      await settingSet("shoeInventoryInitialized", true);
+      state.shoes = rows;
+    }
+
     async function loadLocalData() {
-      const [activities, wellness, calendar, plans, analyses, weeklyReviews, lastSyncAt, workerUrl, subjective, planPreferences] = await Promise.all([
+      const [activities, wellness, calendar, plans, analyses, weeklyReviews, shoes, shoeAssignments, lastSyncAt, workerUrl, subjective, planPreferences] = await Promise.all([
         storeGetAll(DATA_STORES.activities),
         storeGetAll(DATA_STORES.wellness),
         storeGetAll(DATA_STORES.calendar),
         storeGetAll(DATA_STORES.plans),
         storeGetAll(DATA_STORES.analyses),
         storeGetAll(DATA_STORES.weeklyReviews),
+        storeGetAll(DATA_STORES.shoes),
+        storeGetAll(DATA_STORES.shoeAssignments),
         settingGet("lastSyncAt"),
         connectionGet("workerUrl").catch(() => null),
         storeGet(DATA_STORES.subjective, todayKey()),
@@ -1137,6 +1402,10 @@
       state.plans = plans.sort((a, b) => String(a.weekStart || "").localeCompare(String(b.weekStart || "")));
       state.analyses = analyses;
       state.weeklyReviews = weeklyReviews.sort((a, b) => String(a.weekStart || "").localeCompare(String(b.weekStart || "")));
+      state.shoes = shoes.map(normalizeShoe).filter(Boolean).sort((a,b) => a.name.localeCompare(b.name));
+      state.shoeAssignments = shoeAssignments.filter(item => item?.activityId && item?.shoeId);
+      await ensureInitialShoeInventory();
+      await autoAssignExternalGear(state.activities);
       state.planPreferences = planPreferences && typeof planPreferences === "object" ? planPreferences : null;
       state.lastSyncAt = lastSyncAt;
       state.workerUrl = normalizeWorkerUrl(workerUrl || DEFAULT_WORKER_URL);
@@ -1165,6 +1434,7 @@
       await storePutMany(DATA_STORES.activities, activities);
       await storePutMany(DATA_STORES.wellness, wellness);
       await storePutMany(DATA_STORES.calendar, calendar);
+      await autoAssignExternalGear(activities);
       const syncAt = payload.nextSync?.lastSuccessfulSyncAt || null;
       if (syncAt) await settingSet("lastSyncAt", syncAt);
       await settingSet("lastWorkerVersion", payload.workerVersion || null);
@@ -2150,10 +2420,10 @@
               <summary>
                 <span class="draft-day-name">${formatDate(day.date, { weekday: "short", day: "numeric" })}</span>
                 <span class="draft-day-sport">${planSportIcon(day.sport, day.title)}</span>
-                <span class="draft-day-copy"><strong>${escapeHtml(day.title)}</strong><span>${escapeHtml(planDayMetric(day))}</span></span>
+                <span class="draft-day-copy"><strong>${escapeHtml(day.title)}</strong><span>${escapeHtml(planDayMetric(day))}${shoeRecommendationLine(day) ? ` · ${escapeHtml(shoeRecommendationLine(day))}` : ""}</span></span>
                 <span class="draft-day-intensity ${escapeHtml(day.intensity)}">${escapeHtml(day.intensity)}</span>
               </summary>
-              <div class="draft-day-body"><p>${escapeHtml(day.description)}</p><p>${escapeHtml(day.rationale)}</p>${day.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${planStepTarget(step) ? ` · ${escapeHtml(planStepTarget(step))}` : ""}</li>`).join("")}</ol>` : ""}</div>
+              <div class="draft-day-body"><p>${escapeHtml(day.description)}</p><p>${escapeHtml(day.rationale)}</p>${shoeRecommendationMarkup(day)}${day.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${planStepTarget(step) ? ` · ${escapeHtml(planStepTarget(step))}` : ""}</li>`).join("")}</ol>` : ""}</div>
             </details>`).join("")}</div>
           ${notes.length ? `<div class="draft-notes">${notes.map(note => `<div class="draft-note">${escapeHtml(note)}</div>`).join("")}</div>` : ""}
           ${isNumber(draft.usage?.estimatedCostCents) ? `<p class="draft-ai-meta">${engineLabel} · coste estimado ${formatAiCost(draft.usage.estimatedCostCents)}</p>` : ""}
@@ -2661,12 +2931,13 @@
         <details class="planned-session">
           <summary class="plan-activity-button">
             <span class="sport" aria-hidden="true">${planSportIcon(day.sport, day.title)}</span>
-            <span class="copy"><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><span>${escapeHtml(planDayMetric(day))} · ${escapeHtml(day.intensity || "easy")}${matched ? " · realizado" : ""}</span></span>
+            <span class="copy"><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><span>${escapeHtml(planDayMetric(day))} · ${escapeHtml(day.intensity || "easy")}${shoeRecommendationLine(day) ? ` · ${escapeHtml(shoeRecommendationLine(day))}` : ""}${matched ? " · realizado" : ""}</span></span>
             <span class="open" aria-hidden="true">${matched ? "✓" : "›"}</span>
           </summary>
           <div class="planned-session-body">
             ${day.description ? `<p>${escapeHtml(day.description)}</p>` : ""}
             ${day.rationale ? `<p>${escapeHtml(day.rationale)}</p>` : ""}
+            ${shoeRecommendationMarkup(day)}
             ${day.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${planStepTarget(step) ? ` · ${escapeHtml(planStepTarget(step))}` : ""}</li>`).join("")}</ol>` : ""}
           </div>
         </details>`;
@@ -2679,6 +2950,99 @@
           ${planned.length || localPlanned.length ? `<div class="plan-day-section"><h4>Entrenamiento previsto</h4>${localPlannedMarkup}${plannedMarkup}</div>` : ""}
         </article>`;
       $$('[data-plan-activity-id]', $("#planDayDetail")).forEach(button => button.addEventListener("click", () => openActivity(button.dataset.planActivityId)));
+    }
+
+
+    function openShoeDialog(shoeId = null) {
+      const shoe = shoeId ? state.shoes.find(item => item.id === shoeId) : null;
+      $("#shoeDialogTitle").textContent = shoe ? "Editar zapatilla" : "Añadir zapatilla";
+      $("#shoeId").value = shoe?.id || "";
+      $("#shoeName").value = shoe?.name || "";
+      $("#shoeCategory").value = shoe?.category || "daily";
+      $("#shoeBaselineKm").value = shoe ? shoe.baselineKm : 0;
+      $("#shoeMaxKm").value = shoe?.maxKm || 800;
+      $("#shoeFirstUse").value = shoe?.firstUse || "";
+      $("#shoeStatus").value = shoe?.status || "active";
+      $("#shoeRecommend").checked = shoe?.recommend !== false;
+      $$('input[name="shoeUse"]', $("#shoeForm")).forEach(input => { input.checked = Boolean(shoe?.uses?.includes(input.value)); });
+      openDialog($("#shoeDialog"));
+    }
+
+    async function saveShoe(event) {
+      event.preventDefault();
+      const previous = state.shoes.find(item => item.id === $("#shoeId").value) || null;
+      const name = $("#shoeName").value.trim();
+      if (!name) return showToast("Escribe el nombre de la zapatilla.", true);
+      const baselineKm = Number($("#shoeBaselineKm").value);
+      const maxKm = Number($("#shoeMaxKm").value);
+      if (!Number.isFinite(baselineKm) || baselineKm < 0 || !Number.isFinite(maxKm) || maxKm < 50) return showToast("Revisa los kilómetros introducidos.", true);
+      const uses = $$('input[name="shoeUse"]:checked', $("#shoeForm")).map(input => input.value);
+      const id = previous?.id || `shoe-${Date.now().toString(36)}`;
+      const baselineChanged = !previous || Math.abs((previous.baselineKm || 0) - baselineKm) > .05;
+      const shoe = normalizeShoe({
+        id,
+        name,
+        category: $("#shoeCategory").value,
+        uses,
+        baselineKm,
+        baselineActivities: previous?.baselineActivities || 0,
+        maxKm,
+        firstUse: $("#shoeFirstUse").value || null,
+        baselineAt: baselineChanged ? new Date().toISOString() : previous?.baselineAt,
+        status: $("#shoeStatus").value,
+        recommend: $("#shoeRecommend").checked
+      });
+      await storePut(DATA_STORES.shoes, shoe);
+      await settingSet("shoeInventoryInitialized", true);
+      state.shoes = [...state.shoes.filter(item => item.id !== shoe.id), shoe].sort((a,b) => a.name.localeCompare(b.name));
+      closeDialog($("#shoeDialog"));
+      renderPlan();
+      renderManage();
+      showToast("Zapatilla guardada.");
+    }
+
+    async function saveActivityShoe(activity, shoeId, source = "manual") {
+      const activityId = String(activity.id);
+      if (!shoeId) {
+        await storeDelete(DATA_STORES.shoeAssignments, activityId);
+        state.shoeAssignments = state.shoeAssignments.filter(item => item.activityId !== activityId);
+      } else {
+        const record = { activityId, shoeId, source, updatedAt: new Date().toISOString() };
+        await storePut(DATA_STORES.shoeAssignments, record);
+        state.shoeAssignments = [...state.shoeAssignments.filter(item => item.activityId !== activityId), record];
+      }
+      if (state.map) { state.map.remove(); state.map = null; }
+      $("#activityDialogContent").innerHTML = activityDetailMarkup(activity);
+      bindActivityDialogActions(activity);
+      await loadAndRenderStreams(activity).catch(() => {});
+      renderPlan();
+      showToast(shoeId ? "Zapatilla asignada a la actividad." : "Asignación de zapatilla eliminada.");
+    }
+
+    function shoeAssignmentMarkup(activity) {
+      if (!isRunningActivity(activity)) return "";
+      const assignment = shoeAssignment(activity.id);
+      const assignedShoe = assignment ? state.shoes.find(item => item.id === assignment.shoeId) : null;
+      const external = externalGearLabels(activity);
+      const rec = recommendedShoeForActivity(activity);
+      const options = state.shoes
+        .slice()
+        .sort((a,b) => (a.status === "retired") - (b.status === "retired") || a.name.localeCompare(b.name))
+        .map(shoe => `<option value="${escapeHtml(shoe.id)}" ${assignment?.shoeId === shoe.id ? "selected" : ""}>${escapeHtml(shoe.name)} · ${formatNumber(shoeTotalKm(shoe),1)} km${shoe.status === "retired" ? " · retirada" : ""}</option>`)
+        .join("");
+      const notes = [];
+      if (assignedShoe) notes.push(`Asignación ${shoeSourceLabel(assignment.source)}.`);
+      if (external.length) notes.push(`Intervals.icu informa: ${external.join(", ")}.`);
+      if (!assignment && rec) notes.push(`Sugerencia TɅLOS: ${rec.shoe.name}.`);
+      notes.push("Una actividad anterior al kilometraje base queda vinculada, pero no vuelve a sumar kilómetros.");
+      return `<div class="shoe-assignment">
+        <label for="activityShoeSelect">👟 Zapatillas utilizadas</label>
+        <select id="activityShoeSelect" data-activity-shoe>
+          <option value="">Sin asignar</option>${options}
+        </select>
+        <p>${escapeHtml(notes.join(" "))}</p>
+        ${!assignment && rec ? `<div class="button-row"><button class="secondary-button" type="button" data-assign-recommended-shoe="${escapeHtml(rec.shoe.id)}">Asignar recomendada</button></div>` : ""}
+      </div>`;
     }
 
     function renderManage() {
@@ -2697,6 +3061,26 @@
           <div class="manage-stats"><div class="manage-stat"><strong>${state.activities.length}</strong><span>ACTIVIDADES</span></div><div class="manage-stat"><strong>${state.wellness.length}</strong><span>DÍAS</span></div><div class="manage-stat"><strong>${state.calendar.length + acceptedPlanCount}</strong><span>PLANES</span></div></div>
           <div class="button-row"><button class="secondary-button" type="button" data-export>Exportar JSON</button><button class="secondary-button" type="button" data-import>Importar JSON</button><button class="secondary-button" type="button" data-rebuild>Reconstruir desde Intervals</button></div>
         </article>
+        <article class="card manage-card" style="grid-column:1/-1">
+          <h3>👟 Zapatillas de correr</h3>
+          <p>El kilometraje base procede de Garmin. Las actividades históricas pueden vincularse sin duplicar kilómetros; desde el punto de partida, TɅLOS suma automáticamente las nuevas actividades asignadas.</p>
+          <div class="manage-stats">
+            <div class="manage-stat"><strong>${state.shoes.filter(shoe => shoe.status === "active").length}</strong><span>ACTIVAS</span></div>
+            <div class="manage-stat"><strong>${formatNumber(state.shoes.reduce((sum,shoe) => sum + shoeTotalKm(shoe),0),1)}</strong><span>KM REGISTRADOS</span></div>
+            <div class="manage-stat"><strong>${state.shoeAssignments.length}</strong><span>ACTIVIDADES VINCULADAS</span></div>
+          </div>
+          <div class="shoe-list">${state.shoes.map(shoe => {
+            const wear = shoeWear(shoe);
+            const pct = Math.min(100, Math.max(0, wear.ratio * 100));
+            return `<div class="shoe-card">
+              <div><strong>${escapeHtml(shoe.name)}</strong><span class="shoe-meta">${escapeHtml(shoeCategoryLabel(shoe.category))} · ${shoeTotalActivities(shoe)} actividades · ${shoe.status === "retired" ? "retirada" : shoe.recommend ? "recomendable" : "sin recomendación automática"}</span></div>
+              <div class="shoe-km"><strong>${formatNumber(wear.total,1)} km</strong><span>de ${formatNumber(shoe.maxKm,0)} km · ${escapeHtml(wear.label)}</span></div>
+              <div class="shoe-progress ${wear.className}"><span style="width:${pct}%"></span></div>
+              <div class="shoe-actions"><button class="secondary-button" type="button" data-edit-shoe="${escapeHtml(shoe.id)}">Editar</button></div>
+            </div>`;
+          }).join("")}</div>
+          <div class="button-row"><button class="primary-button" type="button" data-add-shoe>+ Añadir zapatilla</button></div>
+        </article>
         <article class="card manage-card">
           <h3>Arquitectura activa</h3>
           <p>Intervals.icu para sincronización, streams para el detalle y FIT como respaldo. Base local: ${escapeHtml(state.dataDbName || DATA_DB_DEFAULT)}.</p>
@@ -2704,7 +3088,7 @@
         </article>
         <article class="card manage-card">
           <h3>Restablecer datos sincronizados</h3>
-          <p>Elimina actividades, bienestar, calendario, planes de TɅLOS y mapas de este dispositivo. La conexión privada se conserva.</p>
+          <p>Elimina actividades, bienestar, calendario, planes de TɅLOS, asignaciones de zapatillas y mapas. El inventario de zapatillas y la conexión privada se conservan.</p>
           <div class="button-row"><button class="danger-button" type="button" data-clear>Vaciar datos locales</button></div>
         </article>`;
       $("[data-manage-sync]").addEventListener("click", () => syncNow({ manual: true }));
@@ -2712,6 +3096,8 @@
       $("[data-export]").addEventListener("click", exportBackup);
       $("[data-import]").addEventListener("click", () => $("#importInput").click());
       $("[data-rebuild]").addEventListener("click", rebuildFromIntervals);
+      $("[data-add-shoe]")?.addEventListener("click", () => openShoeDialog());
+      $$("[data-edit-shoe]").forEach(button => button.addEventListener("click", () => openShoeDialog(button.dataset.editShoe)));
       $("[data-download-worker]").addEventListener("click", () => window.open(state.workerUrl, "_blank", "noopener"));
       $("[data-clear]").addEventListener("click", clearSyncedData);
     }
@@ -3163,6 +3549,7 @@
         ${hasRoute ? '<div class="route-wrap"><div id="routeMap"></div><div class="map-message" id="mapMessage">Preparando el recorrido…</div></div>' : ""}
         <div class="detail-grid">${running ? runningDetails : otherDetails}</div>
         ${runningIntervals || otherIntervals || detailsPending}
+        ${shoeAssignmentMarkup(activity)}
         <div class="activity-analysis" id="activityAnalysisPanel">${activityAnalysisMarkup(activity)}</div>
         <div class="dialog-actions"><button class="secondary-button" type="button" data-download-fit="${escapeHtml(activity.id)}">Descargar FIT original</button></div>`;
     }
@@ -3170,6 +3557,8 @@
     function bindActivityDialogActions(activity) {
       $("[data-download-fit]", $("#activityDialogContent"))?.addEventListener("click", () => downloadOriginalFit(activity));
       $("[data-analyze-activity]", $("#activityDialogContent"))?.addEventListener("click", () => analyzeActivity(activity));
+      $("[data-activity-shoe]", $("#activityDialogContent"))?.addEventListener("change", event => saveActivityShoe(activity, event.target.value, "manual"));
+      $("[data-assign-recommended-shoe]", $("#activityDialogContent"))?.addEventListener("click", event => saveActivityShoe(activity, event.currentTarget.dataset.assignRecommendedShoe, "plan"));
     }
 
     async function fetchActivityDetails(activity) {
@@ -3184,6 +3573,7 @@
       const detailed = normalizeActivity(payload.activity);
       await storePut(DATA_STORES.activities, detailed);
       state.activities = state.activities.map(item => item.id === detailed.id ? detailed : item);
+      await autoAssignExternalGear([detailed]);
       return detailed;
     }
 
@@ -3421,9 +3811,9 @@
     }
 
     async function exportBackup() {
-      const [streams, subjective, settings, plans, analyses, weeklyReviews] = await Promise.all([storeGetAll(DATA_STORES.streams), storeGetAll(DATA_STORES.subjective), storeGetAll(DATA_STORES.settings), storeGetAll(DATA_STORES.plans), storeGetAll(DATA_STORES.analyses), storeGetAll(DATA_STORES.weeklyReviews)]);
+      const [streams, subjective, settings, plans, analyses, weeklyReviews, shoes, shoeAssignments] = await Promise.all([storeGetAll(DATA_STORES.streams), storeGetAll(DATA_STORES.subjective), storeGetAll(DATA_STORES.settings), storeGetAll(DATA_STORES.plans), storeGetAll(DATA_STORES.analyses), storeGetAll(DATA_STORES.weeklyReviews), storeGetAll(DATA_STORES.shoes), storeGetAll(DATA_STORES.shoeAssignments)]);
       const payload = {
-        talosBackupVersion: 3,
+        talosBackupVersion: 4,
         appVersion: APP_VERSION,
         exportedAt: new Date().toISOString(),
         activities: state.activities,
@@ -3432,6 +3822,8 @@
         plans,
         analyses,
         weeklyReviews,
+        shoes,
+        shoeAssignments,
         streams,
         subjective,
         settings: settings.filter(item => item.key !== "accessToken")
@@ -3451,6 +3843,8 @@
             storePutMany(DATA_STORES.plans, (payload.plans || []).filter(item => item?.weekStart)),
             storePutMany(DATA_STORES.analyses, (payload.analyses || []).filter(item => item?.activityId)),
             storePutMany(DATA_STORES.weeklyReviews, (payload.weeklyReviews || []).filter(item => item?.weekStart)),
+            storePutMany(DATA_STORES.shoes, (payload.shoes || []).map(normalizeShoe).filter(Boolean)),
+            storePutMany(DATA_STORES.shoeAssignments, (payload.shoeAssignments || []).filter(item => item?.activityId && item?.shoeId)),
             storePutMany(DATA_STORES.streams, (payload.streams || []).filter(item => item?.id)),
             storePutMany(DATA_STORES.subjective, (payload.subjective || []).filter(item => item?.date))
           ]);
@@ -3471,7 +3865,7 @@
 
     async function clearSyncedData() {
       if (!confirm("¿Vaciar las actividades, el bienestar, el calendario, los planes de TɅLOS y los mapas guardados en este dispositivo?")) return;
-      await storeClear([DATA_STORES.activities, DATA_STORES.wellness, DATA_STORES.calendar, DATA_STORES.plans, DATA_STORES.analyses, DATA_STORES.streams, DATA_STORES.subjective, DATA_STORES.settings]);
+      await storeClear([DATA_STORES.activities, DATA_STORES.wellness, DATA_STORES.calendar, DATA_STORES.plans, DATA_STORES.analyses, DATA_STORES.weeklyReviews, DATA_STORES.shoeAssignments, DATA_STORES.streams, DATA_STORES.subjective, DATA_STORES.settings]);
       await loadLocalData();
       renderAll();
       showToast("Datos locales eliminados. La conexión privada se conserva.");
@@ -3482,6 +3876,7 @@
       $("#syncTopButton").addEventListener("click", () => syncNow({ manual: true }));
       $("#connectionForm").addEventListener("submit", saveConnection);
       $("#planSettingsForm").addEventListener("submit", savePlanPreferences);
+      $("#shoeForm").addEventListener("submit", saveShoe);
       $$('[data-close-dialog]').forEach(button => button.addEventListener("click", () => closeDialog($(`#${button.dataset.closeDialog}`))));
       $("#activityDialog").addEventListener("close", () => {
         if (state.map) { state.map.remove(); state.map = null; }
