@@ -311,7 +311,8 @@
     .planning-metric small { display: block; margin-top: 2px; overflow: hidden; color: var(--secondary); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
     .planning-reasons { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
     .planning-reason { padding: 5px 7px; border-radius: 999px; color: var(--secondary); background: rgba(255, 255, 255, .045); font-size: 9px; }
-    .planning-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; margin-top: 11px; }
+    .planning-weekly-memory{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px;padding:11px 12px;border:1px solid rgba(107,171,255,.16);border-radius:14px;background:rgba(79,133,214,.08);font-size:12px;color:#9ea8b8}.planning-weekly-memory strong{color:#eef3fb;font-size:13px}.planning-weekly-memory span{text-align:right}.planning-forecast{display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center;margin-top:10px;padding:12px;border:1px solid rgba(114,224,174,.18);border-radius:14px;background:rgba(56,171,119,.07)}.planning-forecast strong{font-size:13px;color:#effbf5}.planning-forecast .forecast-time{font-size:18px;font-weight:800;color:#effbf5;text-align:right}.planning-forecast small{color:#8f9bad;line-height:1.35}.planning-forecast .forecast-status{text-align:right;color:#86d9ad;font-size:11px;font-weight:700}
+        .planning-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; margin-top: 11px; }
     .planning-actions button { min-height: 38px; }
     .plan-draft-card { margin-bottom: 10px; padding: 14px; border-color: rgba(169, 140, 255, .3); }
     .draft-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -738,6 +739,18 @@
             <input id="planTargetDate" type="date">
           </div>
           <div class="plan-field">
+            <label for="planTargetTime">Tiempo objetivo · opcional</label>
+            <input id="planTargetTime" type="text" inputmode="numeric" placeholder="p. ej. 1:24:30" maxlength="8">
+          </div>
+          <div class="plan-field">
+            <label for="planPriority">Prioridad de la carrera</label>
+            <select id="planPriority" required>
+              <option value="A">A · objetivo principal</option>
+              <option value="B">B · importante</option>
+              <option value="C">C · secundaria / entrenamiento</option>
+            </select>
+          </div>
+          <div class="plan-field">
             <label for="planLongRunDay">Día de tirada larga</label>
             <select id="planLongRunDay" required>
               <option value="">Selecciona un día</option>
@@ -787,7 +800,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.14.0";
+    const APP_VERSION = "0.19.0";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -800,7 +813,8 @@
       settings: "appSettings",
       subjective: "dailySubjective",
       plans: "weeklyPlans",
-      analyses: "activityAnalyses"
+      analyses: "activityAnalyses",
+      weeklyReviews: "weeklyReviews"
     };
     const VIEW_LABELS = { today: "Hoy", activities: "Actividades", plan: "Plan", manage: "Gestión" };
     const TIME_ZONE = "Europe/Madrid";
@@ -813,6 +827,7 @@
       calendar: [],
       plans: [],
       analyses: [],
+      weeklyReviews: [],
       planPreferences: null,
       subjective: null,
       lastSyncAt: null,
@@ -820,6 +835,7 @@
       hasToken: false,
       syncing: false,
       generatingPlan: false,
+      adaptingPlan: false,
       activeView: "today",
       selectedTodayDate: null,
       monthCursor: new Date(),
@@ -964,7 +980,8 @@
         [DATA_STORES.settings, "key"],
         [DATA_STORES.subjective, "date"],
         [DATA_STORES.plans, "weekStart"],
-        [DATA_STORES.analyses, "activityId"]
+        [DATA_STORES.analyses, "activityId"],
+        [DATA_STORES.weeklyReviews, "weekStart"]
       ];
       for (const [name, keyPath] of definitions) {
         if (!db.objectStoreNames.contains(name)) db.createObjectStore(name, { keyPath });
@@ -1102,12 +1119,13 @@
     }
 
     async function loadLocalData() {
-      const [activities, wellness, calendar, plans, analyses, lastSyncAt, workerUrl, subjective, planPreferences] = await Promise.all([
+      const [activities, wellness, calendar, plans, analyses, weeklyReviews, lastSyncAt, workerUrl, subjective, planPreferences] = await Promise.all([
         storeGetAll(DATA_STORES.activities),
         storeGetAll(DATA_STORES.wellness),
         storeGetAll(DATA_STORES.calendar),
         storeGetAll(DATA_STORES.plans),
         storeGetAll(DATA_STORES.analyses),
+        storeGetAll(DATA_STORES.weeklyReviews),
         settingGet("lastSyncAt"),
         connectionGet("workerUrl").catch(() => null),
         storeGet(DATA_STORES.subjective, todayKey()),
@@ -1117,6 +1135,8 @@
       state.wellness = wellness.map(normalizeWellness).filter(Boolean).sort((a, b) => a.date.localeCompare(b.date));
       state.calendar = calendar.sort((a, b) => String(a.startLocal || "").localeCompare(String(b.startLocal || "")));
       state.plans = plans.sort((a, b) => String(a.weekStart || "").localeCompare(String(b.weekStart || "")));
+      state.analyses = analyses;
+      state.weeklyReviews = weeklyReviews.sort((a, b) => String(a.weekStart || "").localeCompare(String(b.weekStart || "")));
       state.planPreferences = planPreferences && typeof planPreferences === "object" ? planPreferences : null;
       state.lastSyncAt = lastSyncAt;
       state.workerUrl = normalizeWorkerUrl(workerUrl || DEFAULT_WORKER_URL);
@@ -1304,7 +1324,7 @@
       return value <= 2 ? value * 100 : value;
     }
 
-    function trainingPhaseForGoal(goal, targetDate, referenceDate, rebuilding = false) {
+    function trainingPhaseForGoal(goal, targetDate, referenceDate, rebuilding = false, priority = "A") {
       if (rebuilding) return { phase: "rebuilding", weeksToGoal: null };
       if (goal === "base" || !targetDate || !dateFromKey(targetDate)) return { phase: "base", weeksToGoal: null };
       const days = daysBetweenKeys(referenceDate, targetDate);
@@ -1318,14 +1338,170 @@
         marathon: { taper: 21, specific: 63, development: 126 }
       };
       const rule = rules[goal] || rules["10k"];
-      if (days <= rule.taper) return { phase: "taper", weeksToGoal };
-      if (days <= rule.specific) return { phase: "specific", weeksToGoal };
-      if (days <= rule.development) return { phase: "development", weeksToGoal };
+      const priorityFactor = priority === "C" ? .45 : priority === "B" ? .75 : 1;
+      const taperDays = priority === "C" ? 0 : Math.max(5, Math.round(rule.taper * priorityFactor));
+      const specificDays = Math.max(21, Math.round(rule.specific * (priority === "C" ? .7 : priorityFactor)));
+      const developmentDays = Math.max(specificDays + 21, Math.round(rule.development * (priority === "C" ? .75 : priorityFactor)));
+      if (taperDays && days <= taperDays) return { phase: "taper", weeksToGoal };
+      if (days <= specificDays) return { phase: "specific", weeksToGoal };
+      if (days <= developmentDays) return { phase: "development", weeksToGoal };
       return { phase: "base", weeksToGoal };
+    }
+
+    function sessionTypeLabel(type) {
+      return ({
+        rest: "Descanso", recovery: "Recuperación", easy: "Rodaje suave", steady: "Rodaje sostenido",
+        long: "Tirada larga", tempo: "Tempo", threshold: "Umbral", intervals: "Intervalos",
+        hills: "Cuestas", strength: "Fuerza", walk: "Paseo", hike: "Senderismo", hiit: "HIIT"
+      })[type] || String(type || "Sesión");
     }
 
     function trainingPhaseLabel(phase) {
       return ({ rebuilding: "Reconstrucción", base: "Base", development: "Desarrollo", specific: "Específica", taper: "Puesta a punto", race_week: "Competición" })[phase] || "Base";
+    }
+
+    function goalDistanceKm(goal) {
+      return ({ "5k": 5, "10k": 10, half_marathon: 21.0975, marathon: 42.195 })[goal] || null;
+    }
+
+    function parseTargetTimeSeconds(value) {
+      const text = String(value || "").trim();
+      if (!text) return null;
+      if (!/^\d{1,2}:\d{2}(?::\d{2})?$/.test(text)) return null;
+      const parts = text.split(":").map(Number);
+      if (parts.some(part => !Number.isFinite(part))) return null;
+      if (parts.length === 2) {
+        const [minutes, seconds] = parts;
+        if (seconds >= 60 || minutes <= 0) return null;
+        return minutes * 60 + seconds;
+      }
+      const [hours, minutes, seconds] = parts;
+      if (minutes >= 60 || seconds >= 60 || hours < 0) return null;
+      return hours * 3600 + minutes * 60 + seconds;
+    }
+
+    function formatTargetTime(seconds) {
+      if (!isNumber(seconds) || seconds <= 0) return "";
+      const total = Math.round(seconds);
+      const hours = Math.floor(total / 3600);
+      const minutes = Math.floor((total % 3600) / 60);
+      const secs = total % 60;
+      return hours > 0 ? `${hours}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}` : `${minutes}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function raceTargetProfile(preferences = {}, performanceMemory = {}, referenceDate = todayKey()) {
+      const distanceKm = goalDistanceKm(preferences.goal);
+      const targetTimeSec = finiteOrNullClient(preferences.targetTimeSec);
+      const targetPaceSecPerKm = distanceKm && targetTimeSec ? targetTimeSec / distanceKm : null;
+      const anchor = performanceMemory.anchors?.[preferences.goal] || null;
+      const anchorAgeDays = anchor?.date ? daysBetweenKeys(anchor.date, referenceDate) : null;
+      const anchorPaceSecPerKm = anchor && isNumber(anchor.timeSec) && distanceKm ? anchor.timeSec / distanceKm : null;
+      const targetVsAnchorPercent = isNumber(targetPaceSecPerKm) && isNumber(anchorPaceSecPerKm) ? ((anchorPaceSecPerKm - targetPaceSecPerKm) / anchorPaceSecPerKm) * 100 : null;
+      const priority = ["A", "B", "C"].includes(preferences.priority) ? preferences.priority : "A";
+      const plausible = !isNumber(targetVsAnchorPercent) || anchorAgeDays > 365 || targetVsAnchorPercent <= 8;
+      return { distanceKm, targetTimeSec, targetPaceSecPerKm, priority, anchorPaceSecPerKm, anchorAgeDays, targetVsAnchorPercent, plausible };
+    }
+
+
+    function performanceDistanceKm(label) {
+      return ({ "5k": 5, "10k": 10, half_marathon: 21.0975, marathon: 42.195 })[label] || null;
+    }
+
+    function riegelEquivalentTime(timeSec, fromDistanceKm, toDistanceKm, exponent = 1.06) {
+      if (![timeSec, fromDistanceKm, toDistanceKm].every(value => isNumber(value) && value > 0)) return null;
+      return timeSec * Math.pow(toDistanceKm / fromDistanceKm, exponent);
+    }
+
+    function buildPerformanceForecast(performanceMemory = {}, preferences = {}, referenceDate = todayKey(), weeklyReviews = []) {
+      const goal = preferences.goal;
+      const targetDistanceKm = goalDistanceKm(goal);
+      if (!targetDistanceKm) return null;
+
+      const anchors = Object.values(performanceMemory.anchors || {}).filter(anchor => {
+        const distanceKm = performanceDistanceKm(anchor?.distance);
+        return distanceKm && isNumber(anchor?.timeSec) && anchor.timeSec > 0 && anchor?.date;
+      });
+      if (!anchors.length) return {
+        goal,
+        targetDistanceKm,
+        available: false,
+        confidence: "limited",
+        status: "Sin referencia suficiente",
+        anchorCount: 0
+      };
+
+      const estimates = anchors.map(anchor => {
+        const fromDistanceKm = performanceDistanceKm(anchor.distance);
+        const ageDays = Math.max(0, daysBetweenKeys(anchor.date, referenceDate));
+        let ageFactor = ageDays <= 30 ? 1 : ageDays <= 60 ? 1.005 : ageDays <= 90 ? 1.015 : ageDays <= 180 ? 1.03 : 1.06;
+        if (!anchor.race) ageFactor += .008;
+        const equivalent = riegelEquivalentTime(anchor.timeSec, fromDistanceKm, targetDistanceKm);
+        const weight = (anchor.race ? 1.2 : 1) / (1 + ageDays / 120);
+        return { anchor, ageDays, estimateSec: equivalent * ageFactor, weight };
+      }).filter(row => isNumber(row.estimateSec));
+
+      if (!estimates.length) return null;
+      const weighted = estimates.reduce((sum, row) => sum + row.estimateSec * row.weight, 0) / estimates.reduce((sum, row) => sum + row.weight, 0);
+      const residualFactor = isNumber(performanceMemory.residualFactor) ? clamp(performanceMemory.residualFactor, .65, 1) : .8;
+      const residualPenalty = (1 - residualFactor) * .08;
+
+      const reviews = (Array.isArray(weeklyReviews) ? weeklyReviews : []).filter(item => item?.weekEnd && item.weekEnd <= referenceDate).slice(-4);
+      const reviewScores = reviews.map(item => item.score).filter(isNumber);
+      const averageReviewScore = reviewScores.length ? average(reviewScores) : null;
+      const downWeeks = reviews.filter(item => item.recoveryTrend === "down").length;
+      const upWeeks = reviews.filter(item => item.recoveryTrend === "up").length;
+      let trendAdjustment = 0;
+      if (isNumber(averageReviewScore) && averageReviewScore >= 88 && upWeeks >= downWeeks) trendAdjustment -= .005;
+      if (isNumber(averageReviewScore) && averageReviewScore < 65) trendAdjustment += .015;
+      if (downWeeks >= 2 && downWeeks > upWeeks) trendAdjustment += .01;
+
+      const predictedTimeSec = Math.round(weighted * (1 + residualPenalty + trendAdjustment));
+      const freshestAge = Math.min(...estimates.map(row => row.ageDays));
+      const memoryStrength = performanceMemory.memoryStrength || "limited";
+      const confidence = memoryStrength === "strong" && estimates.length >= 2 && freshestAge <= 120 ? "high"
+        : memoryStrength !== "limited" && freshestAge <= 240 ? "medium" : "limited";
+      const uncertainty = confidence === "high" ? .025 : confidence === "medium" ? .045 : .07;
+      const rangeLowSec = Math.round(predictedTimeSec * (1 - uncertainty));
+      const rangeHighSec = Math.round(predictedTimeSec * (1 + uncertainty));
+      const predictedPaceSecPerKm = predictedTimeSec / targetDistanceKm;
+
+      const targetTimeSec = finiteOrNullClient(preferences.targetTimeSec);
+      const targetGapPercent = targetTimeSec ? ((predictedTimeSec - targetTimeSec) / predictedTimeSec) * 100 : null;
+      let status = "Referencia actual";
+      if (isNumber(targetGapPercent)) {
+        status = targetGapPercent < -2 ? "Objetivo conservador"
+          : targetGapPercent <= 2 ? "Objetivo en rango"
+          : targetGapPercent <= 5 ? "Objetivo exigente"
+          : "Objetivo ambicioso";
+      }
+
+      const sourceDistances = [...new Set(estimates.sort((a,b) => b.weight - a.weight).map(row => row.anchor.distance))].slice(0, 3);
+      return {
+        schemaVersion: 1,
+        goal,
+        targetDistanceKm,
+        available: true,
+        predictedTimeSec,
+        rangeLowSec,
+        rangeHighSec,
+        predictedPaceSecPerKm: Math.round(predictedPaceSecPerKm * 10) / 10,
+        targetTimeSec,
+        targetGapPercent: isNumber(targetGapPercent) ? Math.round(targetGapPercent * 10) / 10 : null,
+        confidence,
+        status,
+        anchorCount: estimates.length,
+        freshestAnchorAgeDays: freshestAge,
+        averageReviewScore: isNumber(averageReviewScore) ? Math.round(averageReviewScore) : null,
+        sourceDistances
+      };
+    }
+
+    function goalLabel(value) {
+      return ({ base: "base", "5k": "5 km", "10k": "10 km", half_marathon: "media maratón", marathon: "maratón" })[value] || "rendimiento";
+    }
+
+    function forecastConfidenceLabel(value) {
+      return ({ high: "alta", medium: "media", limited: "limitada" })[value] || "limitada";
     }
 
     function subjectivePlanningState(subjective = state.subjective || {}) {
@@ -1549,7 +1725,8 @@
       const prolongedBreak = isNumber(daysSinceLastRun) ? daysSinceLastRun > 42 : training.last28Days.runningCount === 0;
       const reducedContinuity = !prolongedBreak && (lowContinuity || (residualWeeklyKm > 0 && recentBaselineKm > 0 && recentBaselineKm < residualWeeklyKm * .68));
       const returnToTraining = prolongedBreak || (lowContinuity && residualWeeklyKm < 10 && !memoryStrong);
-      const phaseInfo = trainingPhaseForGoal(preferences.goal, preferences.targetDate, referenceDate, returnToTraining);
+      const phaseInfo = trainingPhaseForGoal(preferences.goal, preferences.targetDate, referenceDate, returnToTraining, preferences.priority || "A");
+      const raceTarget = raceTargetProfile(preferences, performanceMemory, referenceDate);
       const subjectiveRestriction = subjective?.restriction || "none";
       let maxRunDays = returnToTraining ? 2 : reducedContinuity ? 3 : clamp(Math.ceil((Math.max(baselineRunsPerWeek, training.last28Days.runningCount / 4) || 2) + 1), 3, 5);
       if (returnToTraining && training.last28Days.runningCount >= 2) maxRunDays = 3;
@@ -1585,12 +1762,23 @@
       const qualityAllowed = continuityReady && recoveryReady && phaseAllowsQuality && subjectiveRestriction === "none";
       const steadyAllowed = steadyContinuityReady && (!isNumber(readiness?.score) || readiness.score >= 50) && phaseAllowsSteady && !["high", "stop"].includes(subjectiveRestriction);
       const pace = planningPaceProfile(recentActivities, performanceMemory);
+      if (isNumber(raceTarget.targetPaceSecPerKm) && raceTarget.plausible && ["development", "specific"].includes(phaseInfo.phase)) {
+        const racePace = raceTarget.targetPaceSecPerKm;
+        if (preferences.goal === "5k" || preferences.goal === "10k") {
+          pace.qualityFastSecPerKm = Math.round(Math.max(180, Math.min(pace.qualityFastSecPerKm, racePace - (preferences.goal === "5k" ? 8 : 4))));
+          pace.qualitySlowSecPerKm = Math.round(Math.max(pace.qualityFastSecPerKm, Math.min(pace.qualitySlowSecPerKm, racePace + 8)));
+        } else if (preferences.goal === "half_marathon" || preferences.goal === "marathon") {
+          pace.steadyFastSecPerKm = Math.round(Math.max(180, Math.min(pace.steadyFastSecPerKm, racePace - 5)));
+          pace.steadySlowSecPerKm = Math.round(Math.max(pace.steadyFastSecPerKm, Math.min(pace.steadySlowSecPerKm, racePace + 12)));
+        }
+      }
       const reasonParts = [];
       if (returnToTraining) reasonParts.push("Pausa prolongada: reactivación progresiva sin borrar la capacidad histórica.");
       else if (reducedContinuity) reasonParts.push("Menor continuidad reciente, pero TɅLOS conserva la base residual de los últimos meses.");
       if (residualWeeklyKm > recentBaselineKm + 2) reasonParts.push(`Memoria deportiva: capacidad residual estimada ${formatNumber(residualWeeklyKm, 1)} km/sem.`);
       const tenK = performanceMemory.anchors?.["10k"];
       if (tenK && daysBetweenKeys(tenK.date, referenceDate) <= 365) reasonParts.push(`Referencia 10K: ${formatDuration(tenK.timeSec)} (${formatDate(tenK.date, { month: "short", year: "numeric" })}).`);
+      if (isNumber(raceTarget.targetPaceSecPerKm)) reasonParts.push(`Objetivo ${raceTarget.priority}: ${formatTargetTime(raceTarget.targetTimeSec)} · ${formatPace(raceTarget.targetPaceSecPerKm)}${raceTarget.plausible ? "" : "; se usa como aspiración, no como ritmo impuesto"}.`);
       if (subjectiveRestriction === "moderate") reasonParts.push("Sensaciones registradas aconsejan reducir el estímulo esta semana.");
       if (subjectiveRestriction === "high") reasonParts.push("Molestias o fatiga elevadas: semana deliberadamente conservadora.");
       if (!reasonParts.length) reasonParts.push("La carga reciente y la memoria deportiva permiten progresión controlada.");
@@ -1624,6 +1812,11 @@
         steadyPaceSlowSecPerKm: pace.steadySlowSecPerKm,
         qualityPaceFastSecPerKm: pace.qualityFastSecPerKm,
         qualityPaceSlowSecPerKm: pace.qualitySlowSecPerKm,
+        targetRacePaceSecPerKm: raceTarget.targetPaceSecPerKm,
+        targetTimeSec: raceTarget.targetTimeSec,
+        racePriority: raceTarget.priority,
+        targetPlausible: raceTarget.plausible,
+        targetVsAnchorPercent: raceTarget.targetVsAnchorPercent,
         reason: reasonParts.join(" ")
       };
     }
@@ -1632,6 +1825,114 @@
       if (value === null || value === undefined || value === "") return null;
       const number = Number(value);
       return Number.isFinite(number) ? number : null;
+    }
+
+    function weeklyReviewForWeek(weekStart) {
+      return state.weeklyReviews.find(item => item.weekStart === weekStart) || null;
+    }
+
+    function buildWeeklyReview(record) {
+      const plan = record?.accepted?.plan;
+      if (!plan?.weekStart || !plan?.weekEnd || !Array.isArray(plan.days)) return null;
+      const actuals = state.activities.filter(activity => {
+        const date = activityDateKey(activity);
+        return date >= plan.weekStart && date <= plan.weekEnd;
+      });
+      const plannedSessions = plan.days.filter(day => day.sport !== "rest");
+      const executionRows = plannedSessions.map(day => {
+        const sameDay = actuals.filter(activity => activityDateKey(activity) === day.date);
+        const matched = sameDay.find(activity => planActivityMatch(day, [activity])) || null;
+        return { day, matched };
+      });
+      const completed = executionRows.filter(row => row.matched).length;
+      const plannedKm = plannedSessions.filter(day => day.sport === "run").reduce((sum, day) => sum + (Number(day.distanceKm) || 0), 0);
+      const actualKm = actuals.filter(isRunningActivity).reduce((sum, activity) => sum + (isNumber(activity.distanceM) ? activity.distanceM / 1000 : 0), 0);
+      const plannedLoad = Number(plan.loadTarget) || null;
+      const actualLoads = actuals.map(activity => activity.load?.trainingLoad).filter(isNumber);
+      const actualLoad = actualLoads.length ? actualLoads.reduce((sum, value) => sum + value, 0) : null;
+      const runRows = actuals.filter(isRunningActivity);
+      const keySessions = executionRows.filter(row => ["long", "tempo", "threshold", "intervals", "hills", "steady"].includes(row.day.sessionType));
+      const keyCompleted = keySessions.filter(row => row.matched).length;
+      const wellness = state.wellness.filter(item => item.date >= plan.weekStart && item.date <= addDaysToKey(plan.weekEnd, 1));
+      const readinessScores = wellness.map(item => calculateReadiness(item).score).filter(isNumber);
+      const readinessStart = readinessScores[0] ?? null;
+      const readinessEnd = readinessScores.at(-1) ?? null;
+      const analyses = state.analyses.filter(item => item.activityDate >= plan.weekStart && item.activityDate <= plan.weekEnd);
+      const complianceValues = analyses.map(item => item.analysis?.compliancePercent).filter(isNumber);
+      const adherence = plannedSessions.length ? Math.round(completed / plannedSessions.length * 100) : 100;
+      const distanceRatio = plannedKm > 0 ? actualKm / plannedKm : null;
+      const loadRatio = plannedLoad && actualLoad !== null ? actualLoad / plannedLoad : null;
+      let trend = "stable";
+      if (isNumber(readinessStart) && isNumber(readinessEnd)) trend = readinessEnd <= readinessStart - 10 ? "down" : readinessEnd >= readinessStart + 10 ? "up" : "stable";
+      const flags = [];
+      if (adherence < 70) flags.push("cumplimiento bajo");
+      if (distanceRatio !== null && distanceRatio > 1.15) flags.push("volumen por encima del plan");
+      if (distanceRatio !== null && distanceRatio < .75) flags.push("volumen por debajo del plan");
+      if (loadRatio !== null && loadRatio > 1.2) flags.push("carga superior a la prevista");
+      if (trend === "down") flags.push("recuperación descendente");
+      const scoreParts = [adherence];
+      if (distanceRatio !== null) scoreParts.push(Math.max(0, 100 - Math.abs(1 - distanceRatio) * 100));
+      if (complianceValues.length) scoreParts.push(average(complianceValues));
+      const score = Math.round(clamp(average(scoreParts), 0, 100));
+      const summary = adherence >= 85 && !flags.length
+        ? "Semana bien ejecutada: continuidad y carga alineadas con lo previsto."
+        : adherence >= 70 && !flags.includes("recuperación descendente")
+          ? "Semana útil con pequeñas desviaciones que no comprometen la progresión."
+          : "Semana con desviaciones relevantes; conviene absorberlas antes de progresar la carga.";
+      return {
+        weekStart: plan.weekStart,
+        weekEnd: plan.weekEnd,
+        generatedAt: new Date().toISOString(),
+        score,
+        adherencePercent: adherence,
+        plannedSessions: plannedSessions.length,
+        completedSessions: completed,
+        keySessions: keySessions.length,
+        keySessionsCompleted: keyCompleted,
+        plannedDistanceKm: Math.round(plannedKm * 10) / 10,
+        actualDistanceKm: Math.round(actualKm * 10) / 10,
+        plannedLoad,
+        actualLoad: actualLoad === null ? null : Math.round(actualLoad),
+        readinessStart,
+        readinessEnd,
+        recoveryTrend: trend,
+        averageAnalysisCompliance: complianceValues.length ? Math.round(average(complianceValues)) : null,
+        flags: flags.slice(0, 4),
+        summary
+      };
+    }
+
+    async function refreshWeeklyReviews() {
+      const today = todayKey();
+      const eligible = state.plans.filter(record => record.accepted?.plan?.weekEnd && record.accepted.plan.weekEnd < today);
+      let changed = false;
+      for (const record of eligible) {
+        const review = buildWeeklyReview(record);
+        if (!review) continue;
+        const existing = weeklyReviewForWeek(review.weekStart);
+        const fingerprint = JSON.stringify([review.adherencePercent, review.actualDistanceKm, review.actualLoad, review.readinessEnd, review.averageAnalysisCompliance]);
+        const existingFingerprint = existing ? JSON.stringify([existing.adherencePercent, existing.actualDistanceKm, existing.actualLoad, existing.readinessEnd, existing.averageAnalysisCompliance]) : null;
+        if (fingerprint !== existingFingerprint) {
+          await storePut(DATA_STORES.weeklyReviews, review);
+          state.weeklyReviews = state.weeklyReviews.filter(item => item.weekStart !== review.weekStart).concat(review).sort((a,b) => a.weekStart.localeCompare(b.weekStart));
+          changed = true;
+        }
+      }
+      return changed;
+    }
+
+    function recentWeeklyReviewMemory(referenceDate, count = 8) {
+      return state.weeklyReviews
+        .filter(item => item.weekEnd <= referenceDate)
+        .sort((a, b) => a.weekStart.localeCompare(b.weekStart))
+        .slice(-count)
+        .map(item => ({
+          weekStart: item.weekStart, weekEnd: item.weekEnd, score: item.score,
+          adherencePercent: item.adherencePercent, plannedDistanceKm: item.plannedDistanceKm,
+          actualDistanceKm: item.actualDistanceKm, plannedLoad: item.plannedLoad, actualLoad: item.actualLoad,
+          recoveryTrend: item.recoveryTrend, keySessions: item.keySessions, keySessionsCompleted: item.keySessionsCompleted,
+          flags: item.flags || []
+        }));
     }
 
     function buildPlanningSnapshot(referenceDate = todayKey(), preferences = state.planPreferences || {}) {
@@ -1693,6 +1994,7 @@
         last90Days: windowSummary(90), last180Days: windowSummary(180), last365Days: windowSummary(365)
       };
       const performanceMemory = buildPerformanceMemory(allHistoricalActivities, reference);
+      const performanceForecast = buildPerformanceForecast(performanceMemory, preferences, reference, state.weeklyReviews);
       const execution = buildExecutionHistory(reference, 56);
       const recoveryRows = wellness.map(item => item.recovery || {});
       const metricDays = wellness.length;
@@ -1715,7 +2017,7 @@
       const subjective = subjectivePlanningState(reference === todayKey() ? state.subjective : null);
       const constraints = calculatePlanningConstraints(training, recentActivities, readiness, load, preferences, subjective, reference, performanceMemory, execution);
       return {
-        schemaVersion: "talos-planning-snapshot-2",
+        schemaVersion: "talos-planning-snapshot-3",
         generatedAt: new Date().toISOString(),
         referenceDate: reference,
         history: { oldest: activityOldest, newest: reference, days: 365 },
@@ -1735,7 +2037,9 @@
         load,
         training,
         performanceMemory,
+        performanceForecast,
         execution,
+        weeklyReviews: recentWeeklyReviewMemory(reference, 8),
         recentActivities,
         plannedHistory,
         constraints,
@@ -1757,7 +2061,11 @@
       const node = $("#planningSummary");
       if (!node) return;
       const snapshot = buildPlanningSnapshot();
+      const latestWeekly = state.weeklyReviews.filter(item => item.weekEnd < todayKey()).sort((a,b) => b.weekEnd.localeCompare(a.weekEnd))[0] || null;
       const record = state.plans.find(item => item.weekStart === snapshot.week.start);
+      const currentWeek = weekBounds(todayKey());
+      const currentRecord = state.plans.find(item => item.weekStart === currentWeek.start && item.accepted?.plan);
+      const canAdaptCurrentWeek = Boolean(currentRecord && todayKey() >= currentWeek.start && todayKey() < currentWeek.end && currentRecord.accepted.plan.days?.some(day => day.date > todayKey() && day.sport !== "rest"));
       const seven = snapshot.training.last7Days;
       const ready = snapshot.dataQuality.readyForPlanning;
       const status = state.generatingPlan ? "Generando…" : record?.draft ? "Borrador listo" : record?.accepted ? "Plan guardado" : state.planPreferences ? "Motor preparado" : ready ? "Configura el plan" : "Reuniendo datos";
@@ -1765,6 +2073,7 @@
         ...snapshot.readiness.reasons.slice(0, 2),
         `${snapshot.dataQuality.wellnessDays} días de salud · ${snapshot.dataQuality.activityHistoryDays} días de histórico deportivo`,
         `Memoria: ${formatNumber(snapshot.performanceMemory.residualWeeklyKm, 1)} km/sem residual · sesión base ≥ ${formatNumber(snapshot.constraints.minimumRunKm, 1)} km`,
+        snapshot.performanceForecast?.available ? `Pronóstico ${goalLabel(state.planPreferences?.goal || "")}: ${formatTargetTime(snapshot.performanceForecast.predictedTimeSec)} · confianza ${forecastConfidenceLabel(snapshot.performanceForecast.confidence)}` : "Pronóstico: aún sin referencias suficientes",
         `${trainingPhaseLabel(snapshot.constraints.trainingPhase)}${isNumber(snapshot.constraints.weeksToGoal) ? ` · ${formatNumber(snapshot.constraints.weeksToGoal, 1)} sem.` : ""}`,
         isNumber(snapshot.execution.sessionAdherencePercent) ? `Cumplimiento 56 d: ${formatNumber(snapshot.execution.sessionAdherencePercent)}%` : "Sin semanas previas suficientes para medir adherencia",
         snapshot.constraints.qualityAllowed ? "Calidad: máximo 1 sesión" : snapshot.constraints.steadyAllowed ? "Estímulo sostenido permitido" : "Sólo carrera fácil"
@@ -1781,11 +2090,18 @@
           <div class="planning-metric"><span>CTL / ATL</span><strong>${formatNumber(snapshot.load.ctl, 1)} / ${formatNumber(snapshot.load.atl, 1)}</strong><small>forma / fatiga</small></div>
         </div>
         <div class="planning-reasons">${reasons.map(reason => `<span class="planning-reason">${escapeHtml(reason)}</span>`).join("")}</div>
+        ${snapshot.performanceForecast?.available ? `<div class="planning-forecast">
+          <div><strong>🎯 Pronóstico ${escapeHtml(goalLabel(state.planPreferences?.goal || ""))}</strong><br><small>Rango ${escapeHtml(formatTargetTime(snapshot.performanceForecast.rangeLowSec))}–${escapeHtml(formatTargetTime(snapshot.performanceForecast.rangeHighSec))} · ritmo central ${escapeHtml(formatPace(snapshot.performanceForecast.predictedPaceSecPerKm))}/km · confianza ${escapeHtml(forecastConfidenceLabel(snapshot.performanceForecast.confidence))}. Estimación, no garantía.</small></div>
+          <div><div class="forecast-time">${escapeHtml(formatTargetTime(snapshot.performanceForecast.predictedTimeSec))}</div><div class="forecast-status">${escapeHtml(snapshot.performanceForecast.status || "Referencia actual")}${isNumber(snapshot.performanceForecast.targetGapPercent) ? ` · ${snapshot.performanceForecast.targetGapPercent > 0 ? "+" : ""}${formatNumber(snapshot.performanceForecast.targetGapPercent,1)}%` : ""}</div></div>
+        </div>` : ""}
+        ${latestWeekly ? `<div class="planning-weekly-memory"><strong>🧠 Última semana · ${latestWeekly.score}/100</strong><span>${latestWeekly.adherencePercent}% cumplimiento · ${formatNumber(latestWeekly.actualDistanceKm,1)}/${formatNumber(latestWeekly.plannedDistanceKm,1)} km${latestWeekly.flags?.length ? ` · ${escapeHtml(latestWeekly.flags[0])}` : ""}</span></div>` : ""}
         <div class="planning-actions">
           <button class="secondary-button" type="button" data-plan-configure>Configurar</button>
+          ${canAdaptCurrentWeek ? `<button class="secondary-button" type="button" data-plan-adapt ${state.adaptingPlan ? "disabled" : ""}>${state.adaptingPlan ? "Revisando…" : "Revisar semana actual"}</button>` : ""}
           ${ready && state.planPreferences && !record?.draft ? `<button class="primary-button" type="button" data-plan-generate ${state.generatingPlan ? "disabled" : ""}>${record?.accepted ? "Regenerar" : "Generar semana"}</button>` : ""}
         </div>`;
       $("[data-plan-configure]", node)?.addEventListener("click", openPlanSettingsDialog);
+      $("[data-plan-adapt]", node)?.addEventListener("click", adaptCurrentWeek);
       $("[data-plan-generate]", node)?.addEventListener("click", generateWeeklyPlan);
     }
 
@@ -1822,11 +2138,11 @@
       const plan = draft.plan;
       const days = Array.isArray(plan.days) ? plan.days : [];
       const notes = [...(plan.adjustments || []), ...(plan.cautions || [])];
-      const engineLabel = String(draft.model || "").startsWith("claude-") ? "Motor TɅLOS + Claude Haiku 4.5" : "Motor matemático TɅLOS";
+      const engineLabel = draft.adaptation ? "Motor adaptativo TɅLOS" : (String(draft.model || "").startsWith("claude-") ? "Motor TɅLOS + Claude Haiku 4.5" : "Motor matemático TɅLOS");
       node.innerHTML = `
         <article class="card plan-draft-card">
           <div class="draft-head">
-            <div><p class="eyebrow">Propuesta segura de TɅLOS</p><h3>${escapeHtml(plan.objective || "Plan semanal")}</h3><p>${escapeHtml(plan.summary || "Revisa cada día antes de aceptar el plan.")}</p></div>
+            <div><p class="eyebrow">${draft.adaptation ? "Adaptación controlada de la semana" : "Propuesta segura de TɅLOS"}</p><h3>${escapeHtml(plan.objective || "Plan semanal")}</h3><p>${escapeHtml(plan.summary || "Revisa cada día antes de aceptar el plan.")}</p></div>
             <div class="draft-total"><strong>${formatNumber(plan.totals?.distanceKm ?? plan.volumeTargetKm, 1)} km</strong><span>${formatNumber(plan.totals?.durationMin)} min</span></div>
           </div>
           <div class="draft-days">${days.map(day => `
@@ -1853,6 +2169,8 @@
       $("#planSettingsForm").reset();
       $("#planGoal").value = preferences.goal || "";
       $("#planTargetDate").value = preferences.targetDate || "";
+      $("#planTargetTime").value = preferences.targetTime || (isNumber(preferences.targetTimeSec) ? formatTargetTime(preferences.targetTimeSec) : "");
+      $("#planPriority").value = preferences.priority || "A";
       $("#planLongRunDay").value = preferences.longRunDay || "";
       $("#planMaxMinutes").value = String(preferences.maxWeekdayMinutes || 60);
       $("#planStrengthDays").value = String(preferences.strengthDays ?? 0);
@@ -1864,9 +2182,14 @@
     async function savePlanPreferences(event) {
       event.preventDefault();
       const availableDays = $$('input[name="availableDay"]:checked', event.currentTarget).map(input => input.value);
+      const targetTimeText = $("#planTargetTime").value.trim();
+      const parsedTargetTimeSec = parseTargetTimeSeconds(targetTimeText);
       const preferences = {
         goal: $("#planGoal").value,
         targetDate: $("#planTargetDate").value || null,
+        targetTime: targetTimeText || null,
+        targetTimeSec: parsedTargetTimeSec,
+        priority: $("#planPriority").value || "A",
         availableDays,
         longRunDay: $("#planLongRunDay").value,
         maxWeekdayMinutes: Number($("#planMaxMinutes").value),
@@ -1874,6 +2197,9 @@
         notes: $("#planNotes").value.trim().slice(0, 600)
       };
       if (!preferences.goal || availableDays.length < 2) return showToast("Selecciona un objetivo y al menos dos días disponibles.", true);
+      if (targetTimeText && parsedTargetTimeSec === null) return showToast("El tiempo objetivo debe tener formato mm:ss o h:mm:ss.", true);
+      if (preferences.goal === "base" && targetTimeText) return showToast("El tiempo objetivo sólo se usa con una distancia de competición.", true);
+      if (targetTimeText && !preferences.targetDate) return showToast("Añade una fecha objetivo para utilizar un tiempo objetivo.", true);
       if (!preferences.longRunDay || !availableDays.includes(preferences.longRunDay)) return showToast("La tirada larga debe coincidir con un día disponible.", true);
       if (availableDays.length < preferences.strengthDays + 1) return showToast("Añade suficientes días para la tirada larga y las sesiones de fuerza.", true);
       if (preferences.targetDate && preferences.targetDate <= todayKey()) return showToast("La fecha objetivo debe ser posterior a hoy.", true);
@@ -1926,6 +2252,57 @@
         showToast(error.message || String(error), true);
       } finally {
         state.generatingPlan = false;
+        renderPlan();
+      }
+    }
+
+    async function adaptCurrentWeek() {
+      if (state.adaptingPlan || state.generatingPlan) return;
+      if (!state.planPreferences) return openPlanSettingsDialog();
+      if (!state.hasToken) return openConnectionDialog();
+      const currentWeek = weekBounds(todayKey());
+      const record = state.plans.find(item => item.weekStart === currentWeek.start && item.accepted?.plan);
+      if (!record) return showToast("No hay un plan aceptado para la semana actual.", true);
+      if (todayKey() >= currentWeek.end) return showToast("La semana ya está finalizando; prepara la siguiente.", true);
+      const snapshot = buildPlanningSnapshot(todayKey(), state.planPreferences);
+      snapshot.week = { ...currentWeek };
+      snapshot.referenceDate = todayKey();
+      state.adaptingPlan = true;
+      renderPlan();
+      showToast("TɅLOS está reevaluando sólo lo que queda de esta semana…");
+      try {
+        const token = await connectionGet("accessToken");
+        const response = await fetch(`${state.workerUrl}/plan/adapt`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Talos-Access": token },
+          body: JSON.stringify({ snapshot, preferences: state.planPreferences, acceptedPlan: record.accepted.plan, asOfDate: todayKey() })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.ok || !payload.plan) throw new Error(payload.error || "No se pudo adaptar la semana actual.");
+        if (!payload.changed) {
+          showToast(payload.message || "El plan actual sigue siendo adecuado; no necesita cambios.");
+          return;
+        }
+        record.draft = {
+          plan: payload.plan,
+          generatedAt: payload.generatedAt || new Date().toISOString(),
+          provider: payload.provider || "talos-adaptive",
+          model: payload.model || "talos-adaptive-1",
+          reviewStatus: payload.reviewStatus || "local",
+          usage: payload.usage || null,
+          preferences: structuredClone(state.planPreferences),
+          adaptation: true,
+          adaptationReasons: payload.reasons || []
+        };
+        await storePut(DATA_STORES.plans, record);
+        state.plans = [...state.plans.filter(item => item.weekStart !== record.weekStart), record].sort((a, b) => a.weekStart.localeCompare(b.weekStart));
+        renderPlan();
+        $("#planDraft")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        showToast("Adaptación preparada. Revisa los cambios antes de aceptarlos.");
+      } catch (error) {
+        showToast(error.message || String(error), true);
+      } finally {
+        state.adaptingPlan = false;
         renderPlan();
       }
     }
@@ -2178,7 +2555,9 @@
 
     function renderPlan() {
       renderPlanningSummary();
-      renderPlanDraft(buildPlanningSnapshot().week.start);
+      const currentWeek = weekBounds(todayKey());
+      const currentDraft = state.plans.find(item => item.weekStart === currentWeek.start && item.draft);
+      renderPlanDraft(currentDraft ? currentWeek.start : buildPlanningSnapshot().week.start);
       const cursor = state.monthCursor;
       const year = cursor.getFullYear();
       const month = cursor.getMonth();
@@ -2455,6 +2834,7 @@
         }
         await storeDelete(DATA_STORES.settings, "rebuildCursor");
         await loadLocalData();
+        await refreshWeeklyReviews();
         renderAll();
         showToast(`Histórico reconstruido: ${state.activities.length} actividades y ${state.wellness.length} días guardados.`);
       } catch (error) {
@@ -2637,7 +3017,7 @@
       const record = activityAnalysisRecord(activity.id);
       const analysis = record?.analysis;
       if (!analysis) return `
-        <div class="activity-analysis-head"><strong>🧠 Análisis TɅLOS</strong><span class="analysis-badge">v0.14</span></div>
+        <div class="activity-analysis-head"><strong>🧠 Análisis TɅLOS</strong><span class="analysis-badge">v0.17</span></div>
         <p>Compara lo realizado con el plan, tu carga, recuperación y memoria deportiva.</p>
         <button class="secondary-button" type="button" data-analyze-activity="${escapeHtml(activity.id)}">Analizar sesión</button>`;
       const verdictLabel = ({ below_plan: "Por debajo", on_plan: "En objetivo", above_plan: "Carga superior", unplanned: "No prevista", caution: "Precaución" })[analysis.verdict] || "Analizada";
@@ -2647,6 +3027,7 @@
         <p>${escapeHtml(analysis.summary || "Sesión analizada.")}</p>
         <div class="analysis-points">${(analysis.observations || []).slice(0, 3).map(item => `<div class="analysis-point">• ${escapeHtml(item)}</div>`).join("")}</div>
         ${analysis.nextAction ? `<p class="analysis-next">Siguiente paso: ${escapeHtml(analysis.nextAction)}</p>` : ""}
+        ${isNumber(record?.usage?.estimatedCostCents) ? `<p class="draft-ai-meta">${escapeHtml(record.model || "Claude")} · ${record.usage.inputTokens ?? "—"} + ${record.usage.outputTokens ?? "—"} tokens · ${formatAiCost(record.usage.estimatedCostCents)}</p>` : ""}
         <button class="secondary-button" type="button" data-analyze-activity="${escapeHtml(activity.id)}">Reanalizar</button>`;
     }
 
@@ -3040,7 +3421,7 @@
     }
 
     async function exportBackup() {
-      const [streams, subjective, settings, plans, analyses] = await Promise.all([storeGetAll(DATA_STORES.streams), storeGetAll(DATA_STORES.subjective), storeGetAll(DATA_STORES.settings), storeGetAll(DATA_STORES.plans), storeGetAll(DATA_STORES.analyses)]);
+      const [streams, subjective, settings, plans, analyses, weeklyReviews] = await Promise.all([storeGetAll(DATA_STORES.streams), storeGetAll(DATA_STORES.subjective), storeGetAll(DATA_STORES.settings), storeGetAll(DATA_STORES.plans), storeGetAll(DATA_STORES.analyses), storeGetAll(DATA_STORES.weeklyReviews)]);
       const payload = {
         talosBackupVersion: 3,
         appVersion: APP_VERSION,
@@ -3050,6 +3431,7 @@
         calendar: state.calendar,
         plans,
         analyses,
+        weeklyReviews,
         streams,
         subjective,
         settings: settings.filter(item => item.key !== "accessToken")
@@ -3068,6 +3450,7 @@
             storePutMany(DATA_STORES.calendar, (payload.calendar || []).filter(item => item?.dedupeKey)),
             storePutMany(DATA_STORES.plans, (payload.plans || []).filter(item => item?.weekStart)),
             storePutMany(DATA_STORES.analyses, (payload.analyses || []).filter(item => item?.activityId)),
+            storePutMany(DATA_STORES.weeklyReviews, (payload.weeklyReviews || []).filter(item => item?.weekStart)),
             storePutMany(DATA_STORES.streams, (payload.streams || []).filter(item => item?.id)),
             storePutMany(DATA_STORES.subjective, (payload.subjective || []).filter(item => item?.date))
           ]);
@@ -3078,6 +3461,7 @@
           throw new Error("El archivo no es una copia de TɅLOS ni un talos-sync.json válido.");
         }
         await loadLocalData();
+        await refreshWeeklyReviews();
         renderAll();
         showToast("Datos importados correctamente.");
       } catch (error) {
@@ -3112,6 +3496,7 @@
       try {
         bindEvents();
         await loadLocalData();
+        await refreshWeeklyReviews();
         renderAll();
         if (state.hasToken) syncNow();
       } catch (error) {
