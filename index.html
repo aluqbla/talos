@@ -524,6 +524,15 @@
     .detail-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 9px 11px; border-radius: 14px; background: rgba(255, 255, 255, .04); }
     .detail-item span { color: var(--muted); font-size: 11px; }
     .detail-item strong { text-align: right; font-size: 13px; }
+    .activity-analysis { margin-top: 14px; padding: 13px; border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(145deg, rgba(90, 174, 255, .08), rgba(255, 255, 255, .025)); }
+    .activity-analysis-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+    .activity-analysis-head strong { font-size: 13px; }
+    .analysis-badge { padding: 4px 7px; border-radius: 999px; background: rgba(255,255,255,.07); color: var(--secondary); font-size: 10px; font-weight: 750; }
+    .activity-analysis p { margin: 0; color: var(--secondary); font-size: 12px; line-height: 1.48; }
+    .analysis-points { display: grid; gap: 5px; margin: 9px 0; }
+    .analysis-point { color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .analysis-next { margin-top: 8px !important; color: var(--text) !important; font-weight: 650; }
+    .activity-analysis .secondary-button { margin-top: 10px; }
     .interval-list { display: grid; gap: 8px; margin-top: 8px; }
     .interval-section { overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: rgba(255, 255, 255, .035); }
     .interval-section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
@@ -778,7 +787,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.13.0";
+    const APP_VERSION = "0.14.0";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -790,7 +799,8 @@
       streams: "activityStreams",
       settings: "appSettings",
       subjective: "dailySubjective",
-      plans: "weeklyPlans"
+      plans: "weeklyPlans",
+      analyses: "activityAnalyses"
     };
     const VIEW_LABELS = { today: "Hoy", activities: "Actividades", plan: "Plan", manage: "Gestión" };
     const TIME_ZONE = "Europe/Madrid";
@@ -802,6 +812,7 @@
       wellness: [],
       calendar: [],
       plans: [],
+      analyses: [],
       planPreferences: null,
       subjective: null,
       lastSyncAt: null,
@@ -952,7 +963,8 @@
         [DATA_STORES.streams, "id"],
         [DATA_STORES.settings, "key"],
         [DATA_STORES.subjective, "date"],
-        [DATA_STORES.plans, "weekStart"]
+        [DATA_STORES.plans, "weekStart"],
+        [DATA_STORES.analyses, "activityId"]
       ];
       for (const [name, keyPath] of definitions) {
         if (!db.objectStoreNames.contains(name)) db.createObjectStore(name, { keyPath });
@@ -1090,11 +1102,12 @@
     }
 
     async function loadLocalData() {
-      const [activities, wellness, calendar, plans, lastSyncAt, workerUrl, subjective, planPreferences] = await Promise.all([
+      const [activities, wellness, calendar, plans, analyses, lastSyncAt, workerUrl, subjective, planPreferences] = await Promise.all([
         storeGetAll(DATA_STORES.activities),
         storeGetAll(DATA_STORES.wellness),
         storeGetAll(DATA_STORES.calendar),
         storeGetAll(DATA_STORES.plans),
+        storeGetAll(DATA_STORES.analyses),
         settingGet("lastSyncAt"),
         connectionGet("workerUrl").catch(() => null),
         storeGet(DATA_STORES.subjective, todayKey()),
@@ -1325,7 +1338,112 @@
       return { date: subjective.date || todayKey(), energy, legs, discomfort, registered, restriction, updatedAt: subjective.updatedAt || null };
     }
 
-    function planningPaceProfile(recentActivities) {
+    function performanceDistanceLabel(distanceKm) {
+      if (!isNumber(distanceKm)) return null;
+      if (distanceKm >= 4.7 && distanceKm <= 5.35) return "5k";
+      if (distanceKm >= 9.5 && distanceKm <= 10.7) return "10k";
+      if (distanceKm >= 20.0 && distanceKm <= 22.2) return "half_marathon";
+      if (distanceKm >= 40.0 && distanceKm <= 44.5) return "marathon";
+      return null;
+    }
+
+    function residualFitnessFactor(daysSinceLastRun) {
+      if (!isNumber(daysSinceLastRun)) return .65;
+      if (daysSinceLastRun <= 7) return 1;
+      if (daysSinceLastRun <= 14) return .98;
+      if (daysSinceLastRun <= 21) return .95;
+      if (daysSinceLastRun <= 28) return .92;
+      if (daysSinceLastRun <= 42) return .87;
+      if (daysSinceLastRun <= 56) return .82;
+      if (daysSinceLastRun <= 84) return .74;
+      return .65;
+    }
+
+    function buildPerformanceMemory(allActivities, referenceDate) {
+      const oldest365 = addDaysToKey(referenceDate, -364);
+      const runs = allActivities
+        .filter(activity => isRunningActivity(activity) && activityDateKey(activity) >= oldest365 && activityDateKey(activity) <= referenceDate)
+        .sort((a, b) => activityDateKey(a).localeCompare(activityDateKey(b)));
+      const runRows = runs.map(activity => ({
+        activity,
+        date: activityDateKey(activity),
+        distanceKm: isNumber(activity.distanceM) ? activity.distanceM / 1000 : null,
+        durationSec: activityDuration(activity),
+        paceSecPerKm: activity.movingPaceSecPerKm,
+        race: Boolean(activity.flags?.race) || /race|carrera|10k|10 km|5k|5 km|media|half|marat/i.test(String(activity.name || ""))
+      })).filter(row => isNumber(row.distanceKm) && row.distanceKm > 0);
+
+      const weeklyDistances = Array.from({ length: 52 }, (_, index) => {
+        const end = addDaysToKey(referenceDate, -(index * 7));
+        const start = addDaysToKey(end, -6);
+        return runRows.filter(row => row.date >= start && row.date <= end).reduce((sum, row) => sum + row.distanceKm, 0);
+      });
+      const weekly90 = weeklyDistances.slice(0, 13);
+      const weekly180 = weeklyDistances.slice(0, 26);
+      const medianWeekly90Km = median(weekly90) || 0;
+      const medianWeekly180Km = median(weekly180) || 0;
+      let peakFourWeekWeeklyKm = 0;
+      for (let index = 0; index <= Math.max(0, weekly180.length - 4); index += 1) {
+        peakFourWeekWeeklyKm = Math.max(peakFourWeekWeeklyKm, weekly180.slice(index, index + 4).reduce((sum, km) => sum + km, 0) / 4);
+      }
+
+      const rows90 = runRows.filter(row => row.date >= addDaysToKey(referenceDate, -89));
+      const rows180 = runRows.filter(row => row.date >= addDaysToKey(referenceDate, -179));
+      const typicalRun90Km = median(rows90.map(row => row.distanceKm)) || 0;
+      const typicalRun180Km = median(rows180.map(row => row.distanceKm)) || typicalRun90Km || 0;
+      const longestRun180Km = rows180.reduce((maximum, row) => Math.max(maximum, row.distanceKm), 0);
+      const lastRunDate = runRows.at(-1)?.date || null;
+      const daysSinceLastRun = lastRunDate ? Math.max(0, daysBetweenKeys(lastRunDate, referenceDate)) : null;
+      const residualFactor = residualFitnessFactor(daysSinceLastRun);
+      const demonstratedWeeklyKm = Math.max(medianWeekly90Km, medianWeekly180Km, peakFourWeekWeeklyKm * .78);
+      const residualWeeklyKm = demonstratedWeeklyKm * residualFactor;
+
+      const anchors = {};
+      for (const row of runRows) {
+        const label = performanceDistanceLabel(row.distanceKm);
+        if (!label || !isNumber(row.durationSec) || row.durationSec <= 0) continue;
+        const nominalKm = ({ "5k": 5, "10k": 10, half_marathon: 21.0975, marathon: 42.195 })[label];
+        const normalizedTimeSec = row.durationSec * nominalKm / row.distanceKm;
+        if (!anchors[label] || normalizedTimeSec < anchors[label].timeSec) {
+          anchors[label] = {
+            distance: label,
+            date: row.date,
+            timeSec: Math.round(normalizedTimeSec),
+            paceSecPerKm: Math.round(normalizedTimeSec / nominalKm * 10) / 10,
+            observedDistanceKm: Math.round(row.distanceKm * 100) / 100,
+            race: row.race
+          };
+        }
+      }
+      const recentAnchor = Object.values(anchors).filter(anchor => daysBetweenKeys(anchor.date, referenceDate) <= 180).sort((a, b) => a.timeSec - b.timeSec)[0] || null;
+      const best10k = anchors["10k"] || null;
+      let minimumRunKm = Math.max(4.5, typicalRun90Km * .70, typicalRun180Km * .65);
+      if (best10k && daysBetweenKeys(best10k.date, referenceDate) <= 180 && best10k.timeSec <= 2400) minimumRunKm = Math.max(minimumRunKm, 6);
+      minimumRunKm = Math.round(clamp(minimumRunKm, 4.5, 8) * 2) / 2;
+      const memoryStrength = runRows.length >= 30 || demonstratedWeeklyKm >= 25 || Boolean(recentAnchor) ? "strong" : runRows.length >= 12 || demonstratedWeeklyKm >= 15 ? "moderate" : "limited";
+
+      return {
+        windowDays: 365,
+        runningCount365: runRows.length,
+        runningDistanceKm365: Math.round(runRows.reduce((sum, row) => sum + row.distanceKm, 0) * 10) / 10,
+        medianWeekly90Km: Math.round(medianWeekly90Km * 10) / 10,
+        medianWeekly180Km: Math.round(medianWeekly180Km * 10) / 10,
+        peakFourWeekWeeklyKm: Math.round(peakFourWeekWeeklyKm * 10) / 10,
+        demonstratedWeeklyKm: Math.round(demonstratedWeeklyKm * 10) / 10,
+        residualWeeklyKm: Math.round(residualWeeklyKm * 10) / 10,
+        residualFactor: Math.round(residualFactor * 100) / 100,
+        typicalRun90Km: Math.round(typicalRun90Km * 10) / 10,
+        typicalRun180Km: Math.round(typicalRun180Km * 10) / 10,
+        longestRun180Km: Math.round(longestRun180Km * 10) / 10,
+        minimumRunKm,
+        lastRunDate,
+        daysSinceLastRun,
+        memoryStrength,
+        anchors
+      };
+    }
+
+    function planningPaceProfile(recentActivities, performanceMemory = {}) {
       const runs = recentActivities.filter(item => item.sport === "run" && isNumber(item.paceSecPerKm) && item.paceSecPerKm > 0);
       const nonRace = runs.filter(item => !item.race);
       const source = nonRace.length ? nonRace : runs;
@@ -1341,21 +1459,24 @@
       const fasterReference = percentile(allPaces, .25);
       if (!isNumber(easyReference)) return {
         basis: "fallback",
-        easyFastSecPerKm: null,
-        easySlowSecPerKm: null,
-        longFastSecPerKm: null,
-        longSlowSecPerKm: null,
-        steadyFastSecPerKm: null,
-        steadySlowSecPerKm: null,
-        qualityFastSecPerKm: null,
-        qualitySlowSecPerKm: null
+        easyFastSecPerKm: null, easySlowSecPerKm: null,
+        longFastSecPerKm: null, longSlowSecPerKm: null,
+        steadyFastSecPerKm: null, steadySlowSecPerKm: null,
+        qualityFastSecPerKm: null, qualitySlowSecPerKm: null
       };
       const easyFast = Math.max(180, Math.round(easyReference - 10));
       const easySlow = Math.max(easyFast, Math.round(easyReference + 20));
-      const qualityFast = Math.max(180, Math.round(Math.max(easyFast - 40, isNumber(fasterReference) ? fasterReference - 5 : easyFast - 35)));
-      const qualitySlow = Math.max(qualityFast, Math.round(Math.max(easyFast - 20, isNumber(fasterReference) ? fasterReference + 10 : easyFast - 15)));
+      const tenKAnchor = performanceMemory?.anchors?.["10k"];
+      const fiveKAnchor = performanceMemory?.anchors?.["5k"];
+      const racePace = isNumber(tenKAnchor?.paceSecPerKm) ? tenKAnchor.paceSecPerKm : isNumber(fiveKAnchor?.paceSecPerKm) ? fiveKAnchor.paceSecPerKm + 8 : null;
+      const qualityFast = isNumber(racePace)
+        ? Math.max(180, Math.round(Math.min(easyFast - 30, racePace + 10)))
+        : Math.max(180, Math.round(Math.max(easyFast - 40, isNumber(fasterReference) ? fasterReference - 5 : easyFast - 35)));
+      const qualitySlow = isNumber(racePace)
+        ? Math.max(qualityFast, Math.round(Math.min(easyFast - 10, racePace + 25)))
+        : Math.max(qualityFast, Math.round(Math.max(easyFast - 20, isNumber(fasterReference) ? fasterReference + 10 : easyFast - 15)));
       return {
-        basis: easyCandidates.length >= 2 ? "easy-runs" : "conservative-percentile",
+        basis: easyCandidates.length >= 2 ? "easy-runs+performance-memory" : isNumber(racePace) ? "recent-runs+performance-anchor" : "conservative-percentile",
         easyFastSecPerKm: easyFast,
         easySlowSecPerKm: easySlow,
         longFastSecPerKm: easyFast + 10,
@@ -1367,64 +1488,133 @@
       };
     }
 
-    function calculatePlanningConstraints(training, recentActivities, readiness, load, preferences = {}, subjective = subjectivePlanningState(), referenceDate = todayKey()) {
-      const windows = [training.last7Days, training.last14Days, training.last28Days, training.last42Days, training.last60Days];
+    function buildExecutionHistory(referenceDate, days = 56) {
+      const oldest = addDaysToKey(referenceDate, -(days - 1));
+      const plannedDays = state.plans.flatMap(record => record.accepted?.plan?.days || [])
+        .filter(day => day.date >= oldest && day.date <= referenceDate && day.sport !== "rest");
+      const records = plannedDays.map(day => {
+        const actuals = state.activities.filter(activity => activityDateKey(activity) === day.date);
+        const activity = planActivityMatch(day, actuals);
+        if (!activity) return { date: day.date, sport: day.sport, sessionType: day.sessionType, plannedDistanceKm: day.distanceKm || 0, plannedDurationMin: day.durationMin || 0, completed: false, compliancePercent: 0 };
+        const actualDistanceKm = isNumber(activity.distanceM) ? activity.distanceM / 1000 : null;
+        const actualDurationMin = isNumber(activityDuration(activity)) ? activityDuration(activity) / 60 : null;
+        const scores = [];
+        if (day.distanceKm > 0 && isNumber(actualDistanceKm)) scores.push(clamp(100 - Math.abs(actualDistanceKm - day.distanceKm) / day.distanceKm * 100, 0, 100));
+        if (day.durationMin > 0 && isNumber(actualDurationMin)) scores.push(clamp(100 - Math.abs(actualDurationMin - day.durationMin) / day.durationMin * 100, 0, 100));
+        const compliancePercent = scores.length ? Math.round(average(scores)) : 100;
+        return {
+          date: day.date,
+          sport: day.sport,
+          sessionType: day.sessionType,
+          plannedDistanceKm: day.distanceKm || 0,
+          plannedDurationMin: day.durationMin || 0,
+          actualDistanceKm: isNumber(actualDistanceKm) ? Math.round(actualDistanceKm * 10) / 10 : null,
+          actualDurationMin: isNumber(actualDurationMin) ? Math.round(actualDurationMin) : null,
+          actualPaceSecPerKm: activity.movingPaceSecPerKm ?? null,
+          trainingLoad: activity.load?.trainingLoad ?? null,
+          completed: true,
+          compliancePercent
+        };
+      });
+      const completed = records.filter(item => item.completed);
+      const plannedKm = records.reduce((sum, item) => sum + (isNumber(item.plannedDistanceKm) ? item.plannedDistanceKm : 0), 0);
+      const actualKm = completed.reduce((sum, item) => sum + (isNumber(item.actualDistanceKm) ? item.actualDistanceKm : 0), 0);
+      return {
+        days,
+        plannedSessions: records.length,
+        completedSessions: completed.length,
+        sessionAdherencePercent: records.length ? Math.round(completed.length / records.length * 100) : null,
+        executionQualityPercent: completed.length ? Math.round(average(completed.map(item => item.compliancePercent))) : null,
+        plannedDistanceKm: Math.round(plannedKm * 10) / 10,
+        actualDistanceKm: Math.round(actualKm * 10) / 10,
+        records: records.slice(-40)
+      };
+    }
+
+    function calculatePlanningConstraints(training, recentActivities, readiness, load, preferences = {}, subjective = subjectivePlanningState(), referenceDate = todayKey(), performanceMemory = {}, execution = {}) {
+      const windows = [training.last14Days, training.last28Days, training.last42Days, training.last60Days];
       const usableWindows = windows.filter(window => isNumber(window?.coveragePercent) && window.coveragePercent >= 70);
       const weeklyDistanceSamples = usableWindows.map(window => (window.runningDistanceM / 1000) / (window.days / 7)).filter(isNumber);
       const weeklyRunSamples = usableWindows.map(window => window.runningCount / (window.days / 7)).filter(isNumber);
-      const baselineWeeklyDistanceKm = median(weeklyDistanceSamples) || 0;
+      const recentBaselineKm = median(weeklyDistanceSamples) || 0;
       const baselineRunsPerWeek = median(weeklyRunSamples) || 0;
+      const residualWeeklyKm = finiteOrNullClient(performanceMemory.residualWeeklyKm) ?? 0;
+      const effectiveBaselineKm = recentBaselineKm > 0 && residualWeeklyKm > 0 ? Math.max(recentBaselineKm, residualWeeklyKm * .82) : Math.max(recentBaselineKm, residualWeeklyKm);
       const recentLongestKm = Math.max(training.last28Days.longestRunM || 0, training.last60Days.longestRunM || 0) / 1000;
-      const ctlLow = isNumber(load?.ctl) && load.ctl < 18;
       const enough14 = training.last14Days.coveragePercent >= 70;
       const enough28 = training.last28Days.coveragePercent >= 70;
       const lowContinuity = (enough14 && training.last14Days.runningCount < 3) || (enough28 && training.last28Days.runningCount < 6);
-      const insufficientHistory = usableWindows.length < 2;
-      const returnToTraining = lowContinuity || (baselineWeeklyDistanceKm > 0 && baselineWeeklyDistanceKm < 15) || ctlLow;
+      const daysSinceLastRun = finiteOrNullClient(performanceMemory.daysSinceLastRun);
+      const memoryStrong = performanceMemory.memoryStrength === "strong";
+      const prolongedBreak = isNumber(daysSinceLastRun) ? daysSinceLastRun > 42 : training.last28Days.runningCount === 0;
+      const reducedContinuity = !prolongedBreak && (lowContinuity || (residualWeeklyKm > 0 && recentBaselineKm > 0 && recentBaselineKm < residualWeeklyKm * .68));
+      const returnToTraining = prolongedBreak || (lowContinuity && residualWeeklyKm < 10 && !memoryStrong);
       const phaseInfo = trainingPhaseForGoal(preferences.goal, preferences.targetDate, referenceDate, returnToTraining);
       const subjectiveRestriction = subjective?.restriction || "none";
-      let maxRunDays = returnToTraining
-        ? (enough28 && training.last28Days.runningCount >= 2 ? 3 : 2)
-        : clamp(Math.ceil((baselineRunsPerWeek || 2) + 1), 3, 5);
+      let maxRunDays = returnToTraining ? 2 : reducedContinuity ? 3 : clamp(Math.ceil((Math.max(baselineRunsPerWeek, training.last28Days.runningCount / 4) || 2) + 1), 3, 5);
+      if (returnToTraining && training.last28Days.runningCount >= 2) maxRunDays = 3;
       if (subjectiveRestriction === "high") maxRunDays = Math.min(maxRunDays, 2);
-      const availableSlots = Array.isArray(preferences.availableDays)
-        ? Math.max(1, preferences.availableDays.length - (Number(preferences.strengthDays) || 0))
-        : 7;
+      const availableSlots = Array.isArray(preferences.availableDays) ? Math.max(1, preferences.availableDays.length - (Number(preferences.strengthDays) || 0)) : 7;
       maxRunDays = Math.min(maxRunDays, availableSlots);
-      const continuityFloor = recentLongestKm > 0 ? Math.min(recentLongestKm * 1.5, returnToTraining ? 14 : 24) : 8;
-      const growthCeiling = baselineWeeklyDistanceKm > 0 ? baselineWeeklyDistanceKm * (returnToTraining ? 1.2 : 1.12) : continuityFloor;
-      let maxWeeklyDistanceKm = Math.round(clamp(Math.max(growthCeiling, continuityFloor), 8, returnToTraining ? 20 : 120) * 2) / 2;
-      if (subjectiveRestriction === "high") maxWeeklyDistanceKm = Math.round(maxWeeklyDistanceKm * .75 * 2) / 2;
-      else if (subjectiveRestriction === "moderate") maxWeeklyDistanceKm = Math.round(maxWeeklyDistanceKm * .9 * 2) / 2;
-      const maxLongRunKm = Math.round(clamp(Math.min(recentLongestKm > 0 ? recentLongestKm * 1.1 : maxWeeklyDistanceKm * .55, maxWeeklyDistanceKm * (returnToTraining ? .67 : .55)), 5, maxWeeklyDistanceKm) * 2) / 2;
-      const continuityReady = !returnToTraining && !insufficientHistory && training.last14Days.runningCount >= 3 && training.last28Days.runningCount >= 8;
+
+      let minimumRunKm = finiteOrNullClient(performanceMemory.minimumRunKm) ?? 4.5;
+      if (returnToTraining) minimumRunKm = Math.min(minimumRunKm, 4.5);
+      if (subjectiveRestriction === "moderate") minimumRunKm = Math.min(minimumRunKm, Math.max(4.5, minimumRunKm * .85));
+      if (subjectiveRestriction === "high") minimumRunKm = Math.min(minimumRunKm, 4.5);
+      if (phaseInfo.phase === "race_week") minimumRunKm = Math.min(minimumRunKm, 4);
+      minimumRunKm = Math.round(clamp(minimumRunKm, 3.5, 8) * 2) / 2;
+      const historicalLongestKm = finiteOrNullClient(performanceMemory.longestRun180Km) ?? 0;
+      const referenceLongestKm = Math.max(recentLongestKm, Math.min(historicalLongestKm * (performanceMemory.residualFactor || .8), historicalLongestKm));
+      const minimumLongRunKm = Math.round(clamp(Math.max(minimumRunKm, Math.min(referenceLongestKm * .72, minimumRunKm * 1.65)), minimumRunKm, 18) * 2) / 2;
+      const minimumWeeklyFloor = minimumRunKm * Math.max(1, maxRunDays - 1) + minimumLongRunKm;
+      const recentGrowth = recentBaselineKm > 0 ? recentBaselineKm * (reducedContinuity ? 1.22 : 1.14) : minimumWeeklyFloor;
+      const memoryCeiling = residualWeeklyKm > 0 ? residualWeeklyKm * (returnToTraining ? .72 : reducedContinuity ? .94 : 1.03) : 0;
+      let maxWeeklyDistanceKm = Math.round(clamp(Math.max(recentGrowth, memoryCeiling, minimumWeeklyFloor), minimumWeeklyFloor, returnToTraining ? 28 : 120) * 2) / 2;
+      if (isNumber(execution?.sessionAdherencePercent) && execution.sessionAdherencePercent < 55 && execution.plannedSessions >= 3) maxWeeklyDistanceKm = Math.round(Math.max(minimumWeeklyFloor, maxWeeklyDistanceKm * .9) * 2) / 2;
+      if (subjectiveRestriction === "high") maxWeeklyDistanceKm = Math.round(Math.max(minimumWeeklyFloor, maxWeeklyDistanceKm * .75) * 2) / 2;
+      else if (subjectiveRestriction === "moderate") maxWeeklyDistanceKm = Math.round(Math.max(minimumWeeklyFloor, maxWeeklyDistanceKm * .9) * 2) / 2;
+      const longReference = Math.max(recentLongestKm, minimumLongRunKm, (finiteOrNullClient(performanceMemory.typicalRun90Km) ?? 0) * 1.25);
+      const maxLongRunKm = Math.round(clamp(Math.min(longReference * (returnToTraining ? 1.05 : 1.15), maxWeeklyDistanceKm * (returnToTraining ? .58 : .52)), minimumLongRunKm, maxWeeklyDistanceKm) * 2) / 2;
+
+      const strongRecentPerformance = Object.values(performanceMemory.anchors || {}).some(anchor => anchor?.date && daysBetweenKeys(anchor.date, referenceDate) <= 180);
+      const continuityReady = !returnToTraining && ((training.last14Days.runningCount >= 3 && training.last28Days.runningCount >= 6) || (strongRecentPerformance && training.last14Days.runningCount >= 2 && training.last28Days.runningCount >= 4));
+      const steadyContinuityReady = !returnToTraining && (training.last14Days.runningCount >= 2 || (memoryStrong && training.last28Days.runningCount >= 3));
       const recoveryReady = !isNumber(readiness?.score) || readiness.score >= 55;
       const phaseAllowsQuality = ["development", "specific"].includes(phaseInfo.phase);
       const phaseAllowsSteady = ["base", "development", "specific"].includes(phaseInfo.phase);
       const qualityAllowed = continuityReady && recoveryReady && phaseAllowsQuality && subjectiveRestriction === "none";
-      const steadyAllowed = continuityReady && (!isNumber(readiness?.score) || readiness.score >= 50) && phaseAllowsSteady && !["high", "stop"].includes(subjectiveRestriction);
-      const pace = planningPaceProfile(recentActivities);
+      const steadyAllowed = steadyContinuityReady && (!isNumber(readiness?.score) || readiness.score >= 50) && phaseAllowsSteady && !["high", "stop"].includes(subjectiveRestriction);
+      const pace = planningPaceProfile(recentActivities, performanceMemory);
       const reasonParts = [];
-      if (insufficientHistory) reasonParts.push("Histórico parcial: TɅLOS limita la progresión hasta completar cobertura.");
-      if (returnToTraining) reasonParts.push("Carga o continuidad recientes bajas: reconstruir base antes de introducir calidad.");
+      if (returnToTraining) reasonParts.push("Pausa prolongada: reactivación progresiva sin borrar la capacidad histórica.");
+      else if (reducedContinuity) reasonParts.push("Menor continuidad reciente, pero TɅLOS conserva la base residual de los últimos meses.");
+      if (residualWeeklyKm > recentBaselineKm + 2) reasonParts.push(`Memoria deportiva: capacidad residual estimada ${formatNumber(residualWeeklyKm, 1)} km/sem.`);
+      const tenK = performanceMemory.anchors?.["10k"];
+      if (tenK && daysBetweenKeys(tenK.date, referenceDate) <= 365) reasonParts.push(`Referencia 10K: ${formatDuration(tenK.timeSec)} (${formatDate(tenK.date, { month: "short", year: "numeric" })}).`);
       if (subjectiveRestriction === "moderate") reasonParts.push("Sensaciones registradas aconsejan reducir el estímulo esta semana.");
       if (subjectiveRestriction === "high") reasonParts.push("Molestias o fatiga elevadas: semana deliberadamente conservadora.");
-      if (!reasonParts.length) reasonParts.push("La continuidad reciente permite progresión controlada.");
+      if (!reasonParts.length) reasonParts.push("La carga reciente y la memoria deportiva permiten progresión controlada.");
       return {
         returnToTraining,
         rebuildingBase: returnToTraining,
+        reducedContinuity,
         trainingPhase: phaseInfo.phase,
         weeksToGoal: phaseInfo.weeksToGoal,
-        baselineWeeklyDistanceKm: Math.round(baselineWeeklyDistanceKm * 10) / 10,
+        baselineWeeklyDistanceKm: Math.round(effectiveBaselineKm * 10) / 10,
+        recentWeeklyDistanceKm: Math.round(recentBaselineKm * 10) / 10,
+        residualWeeklyDistanceKm: Math.round(residualWeeklyKm * 10) / 10,
         baselineRunsPerWeek: Math.round(baselineRunsPerWeek * 10) / 10,
         maxRunDays,
         maxHardDays: qualityAllowed ? 1 : 0,
         maxWeeklyDistanceKm,
         maxLongRunKm,
+        minimumRunKm,
+        minimumLongRunKm,
         qualityAllowed,
         steadyAllowed,
         avoidConsecutiveRunDays: returnToTraining || subjectiveRestriction === "high",
         subjectiveRestriction,
+        memoryStrength: performanceMemory.memoryStrength || "limited",
         paceBasis: pace.basis,
         easyPaceFastSecPerKm: pace.easyFastSecPerKm,
         easyPaceSlowSecPerKm: pace.easySlowSecPerKm,
@@ -1438,20 +1628,26 @@
       };
     }
 
+    function finiteOrNullClient(value) {
+      if (value === null || value === undefined || value === "") return null;
+      const number = Number(value);
+      return Number.isFinite(number) ? number : null;
+    }
+
     function buildPlanningSnapshot(referenceDate = todayKey(), preferences = state.planPreferences || {}) {
       const reference = dateFromKey(referenceDate) ? String(referenceDate).slice(0, 10) : todayKey();
-      const oldest = addDaysToKey(reference, -59);
-      const activities = state.activities.filter(activity => {
-        const date = activityDateKey(activity);
-        return date >= oldest && date <= reference;
-      });
-      const wellness = state.wellness.filter(item => item.date >= oldest && item.date <= reference);
+      const activityOldest = addDaysToKey(reference, -364);
+      const wellnessOldest = addDaysToKey(reference, -59);
+      const allHistoricalActivities = state.activities.filter(activity => activityDateKey(activity) && activityDateKey(activity) <= reference);
+      const activities = allHistoricalActivities.filter(activity => activityDateKey(activity) >= activityOldest);
+      const wellness = state.wellness.filter(item => item.date >= wellnessOldest && item.date <= reference);
       const latestWellness = wellness.at(-1) || null;
       const readiness = calculateReadiness(latestWellness);
+      const earliestActivityDate = allHistoricalActivities.map(activityDateKey).filter(Boolean).sort()[0] || reference;
+      const availableActivityDays = Math.max(1, daysBetweenKeys(earliestActivityDate, reference) + 1);
       const windowSummary = days => {
         const start = addDaysToKey(reference, -(days - 1));
         const rows = activities.filter(activity => activityDateKey(activity) >= start);
-        const windowWellness = wellness.filter(item => item.date >= start);
         const runs = rows.filter(isRunningActivity);
         const runningDistanceM = runs.reduce((sum, activity) => sum + (isNumber(activity.distanceM) ? activity.distanceM : 0), 0);
         const runningTimeSec = runs.reduce((sum, activity) => sum + (isNumber(activityDuration(activity)) ? activityDuration(activity) : 0), 0);
@@ -1459,11 +1655,9 @@
         const weightedHeartRate = runs.reduce((result, activity) => {
           const duration = activityDuration(activity);
           const heartRate = activity.heartRate?.averageBpm;
-          return isNumber(duration) && isNumber(heartRate)
-            ? { total: result.total + heartRate * duration, seconds: result.seconds + duration }
-            : result;
+          return isNumber(duration) && isNumber(heartRate) ? { total: result.total + heartRate * duration, seconds: result.seconds + duration } : result;
         }, { total: 0, seconds: 0 });
-        const coverageDays = windowWellness.length;
+        const coverageDays = Math.min(days, availableActivityDays);
         return {
           days,
           coverageDays,
@@ -1478,7 +1672,7 @@
           trainingLoad: loads.length ? loads.reduce((sum, value) => sum + value, 0) : null
         };
       };
-      const recentActivities = activities.map(activity => ({
+      const recentActivities = activities.filter(activity => activityDateKey(activity) >= addDaysToKey(reference, -179)).map(activity => ({
         date: activityDateKey(activity),
         sport: isRunningActivity(activity) ? "run" : String(activity.type || "other").slice(0, 30),
         name: String(activity.name || "Actividad").slice(0, 80),
@@ -1492,48 +1686,41 @@
         race: Boolean(activity.flags?.race)
       }));
       const plannedHistory = state.plans.flatMap(record => record.accepted?.plan?.days || [])
-        .filter(day => day.date >= oldest && day.date <= reference && day.sport !== "rest")
+        .filter(day => day.date >= addDaysToKey(reference, -179) && day.date <= reference && day.sport !== "rest")
         .map(day => ({ date: day.date, sport: day.sport, sessionType: day.sessionType, durationMin: day.durationMin, distanceKm: day.distanceKm, intensity: day.intensity }));
       const training = {
-        last7Days: windowSummary(7),
-        last14Days: windowSummary(14),
-        last28Days: windowSummary(28),
-        last42Days: windowSummary(42),
-        last60Days: windowSummary(60)
+        last7Days: windowSummary(7), last14Days: windowSummary(14), last28Days: windowSummary(28), last42Days: windowSummary(42), last60Days: windowSummary(60),
+        last90Days: windowSummary(90), last180Days: windowSummary(180), last365Days: windowSummary(365)
       };
+      const performanceMemory = buildPerformanceMemory(allHistoricalActivities, reference);
+      const execution = buildExecutionHistory(reference, 56);
       const recoveryRows = wellness.map(item => item.recovery || {});
       const metricDays = wellness.length;
+      const recent14Wellness = state.wellness.filter(item => item.date >= addDaysToKey(reference, -13) && item.date <= reference).length;
+      const recent28Wellness = state.wellness.filter(item => item.date >= addDaysToKey(reference, -27) && item.date <= reference).length;
       const coverage = {
         wellnessDays: metricDays,
         hrvDays: recoveryRows.filter(item => isNumber(item.hrvRmssdMs)).length,
         sleepDays: recoveryRows.filter(item => isNumber(item.sleepSeconds)).length,
         restingHeartRateDays: recoveryRows.filter(item => isNumber(item.restingHeartRateBpm)).length,
-        recent14CoveragePercent: training.last14Days.coveragePercent,
-        recent28CoveragePercent: training.last28Days.coveragePercent
+        recent14CoveragePercent: Math.round(clamp(recent14Wellness / 14, 0, 1) * 100),
+        recent28CoveragePercent: Math.round(clamp(recent28Wellness / 28, 0, 1) * 100),
+        activityHistoryDays: availableActivityDays
       };
       const coveredRatios = metricDays ? [coverage.hrvDays, coverage.sleepDays, coverage.restingHeartRateDays].map(count => count / metricDays) : [];
       coverage.percent = coveredRatios.length ? Math.round(average(coveredRatios) * 100) : 0;
-      coverage.readyForPlanning = metricDays >= 14 && coverage.hrvDays >= 7 && training.last14Days.coveragePercent >= 70 && activities.some(isRunningActivity);
+      coverage.readyForPlanning = metricDays >= 14 && coverage.hrvDays >= 7 && coverage.recent14CoveragePercent >= 70 && activities.some(isRunningActivity);
       const week = nextWeekBounds(reference);
-      const load = {
-        ctl: latestWellness?.load?.ctl ?? null,
-        atl: latestWellness?.load?.atl ?? null,
-        form: latestWellness?.load?.form ?? null,
-        rampRate: latestWellness?.load?.rampRate ?? null
-      };
+      const load = { ctl: latestWellness?.load?.ctl ?? null, atl: latestWellness?.load?.atl ?? null, form: latestWellness?.load?.form ?? null, rampRate: latestWellness?.load?.rampRate ?? null };
       const subjective = subjectivePlanningState(reference === todayKey() ? state.subjective : null);
-      const constraints = calculatePlanningConstraints(training, recentActivities, readiness, load, preferences, subjective, reference);
+      const constraints = calculatePlanningConstraints(training, recentActivities, readiness, load, preferences, subjective, reference, performanceMemory, execution);
       return {
-        schemaVersion: "talos-planning-snapshot-1",
+        schemaVersion: "talos-planning-snapshot-2",
         generatedAt: new Date().toISOString(),
         referenceDate: reference,
-        history: { oldest, newest: reference, days: 60 },
+        history: { oldest: activityOldest, newest: reference, days: 365 },
         week,
-        readiness: {
-          score: readiness.score,
-          label: readiness.label,
-          reasons: readiness.reasons.map(reason => reason.text)
-        },
+        readiness: { score: readiness.score, label: readiness.label, reasons: readiness.reasons.map(reason => reason.text) },
         recovery: {
           latestDate: latestWellness?.date || null,
           hrvRmssdMs: latestWellness?.recovery?.hrvRmssdMs ?? null,
@@ -1547,6 +1734,8 @@
         subjective,
         load,
         training,
+        performanceMemory,
+        execution,
         recentActivities,
         plannedHistory,
         constraints,
@@ -1574,8 +1763,10 @@
       const status = state.generatingPlan ? "Generando…" : record?.draft ? "Borrador listo" : record?.accepted ? "Plan guardado" : state.planPreferences ? "Motor preparado" : ready ? "Configura el plan" : "Reuniendo datos";
       const reasons = [
         ...snapshot.readiness.reasons.slice(0, 2),
-        `${snapshot.dataQuality.wellnessDays} días de salud · ${snapshot.training.last28Days.coveragePercent}% cobertura 28 d`,
+        `${snapshot.dataQuality.wellnessDays} días de salud · ${snapshot.dataQuality.activityHistoryDays} días de histórico deportivo`,
+        `Memoria: ${formatNumber(snapshot.performanceMemory.residualWeeklyKm, 1)} km/sem residual · sesión base ≥ ${formatNumber(snapshot.constraints.minimumRunKm, 1)} km`,
         `${trainingPhaseLabel(snapshot.constraints.trainingPhase)}${isNumber(snapshot.constraints.weeksToGoal) ? ` · ${formatNumber(snapshot.constraints.weeksToGoal, 1)} sem.` : ""}`,
+        isNumber(snapshot.execution.sessionAdherencePercent) ? `Cumplimiento 56 d: ${formatNumber(snapshot.execution.sessionAdherencePercent)}%` : "Sin semanas previas suficientes para medir adherencia",
         snapshot.constraints.qualityAllowed ? "Calidad: máximo 1 sesión" : snapshot.constraints.steadyAllowed ? "Estímulo sostenido permitido" : "Sólo carrera fácil"
       ];
       node.innerHTML = `
@@ -2431,6 +2622,111 @@
         <p class="pace-scale-note">Escala fija 3:00–8:00 min/km · un mismo ritmo siempre ocupa lo mismo</p>`;
     }
 
+    function plannedDayForActivity(activity) {
+      const date = activityDateKey(activity);
+      if (!date) return null;
+      const candidates = state.plans.flatMap(record => record.accepted?.plan?.days || []).filter(day => day.date === date && day.sport !== "rest");
+      return candidates.find(day => planActivityMatch(day, [activity])) || candidates.find(day => sportMatchesPlanned(day.sport, activity)) || null;
+    }
+
+    function activityAnalysisRecord(activityId) {
+      return state.analyses.find(item => item.activityId === String(activityId)) || null;
+    }
+
+    function activityAnalysisMarkup(activity) {
+      const record = activityAnalysisRecord(activity.id);
+      const analysis = record?.analysis;
+      if (!analysis) return `
+        <div class="activity-analysis-head"><strong>🧠 Análisis TɅLOS</strong><span class="analysis-badge">v0.14</span></div>
+        <p>Compara lo realizado con el plan, tu carga, recuperación y memoria deportiva.</p>
+        <button class="secondary-button" type="button" data-analyze-activity="${escapeHtml(activity.id)}">Analizar sesión</button>`;
+      const verdictLabel = ({ below_plan: "Por debajo", on_plan: "En objetivo", above_plan: "Carga superior", unplanned: "No prevista", caution: "Precaución" })[analysis.verdict] || "Analizada";
+      const compliance = analysis.verdict === "unplanned" || !isNumber(analysis.compliancePercent) ? "" : ` · ${formatNumber(analysis.compliancePercent)}%`;
+      return `
+        <div class="activity-analysis-head"><strong>🧠 Análisis TɅLOS</strong><span class="analysis-badge">${escapeHtml(verdictLabel)}${escapeHtml(compliance)}</span></div>
+        <p>${escapeHtml(analysis.summary || "Sesión analizada.")}</p>
+        <div class="analysis-points">${(analysis.observations || []).slice(0, 3).map(item => `<div class="analysis-point">• ${escapeHtml(item)}</div>`).join("")}</div>
+        ${analysis.nextAction ? `<p class="analysis-next">Siguiente paso: ${escapeHtml(analysis.nextAction)}</p>` : ""}
+        <button class="secondary-button" type="button" data-analyze-activity="${escapeHtml(activity.id)}">Reanalizar</button>`;
+    }
+
+    function buildActivityReviewRequest(activity) {
+      const date = activityDateKey(activity);
+      const planned = plannedDayForActivity(activity);
+      const wellness = state.wellness.find(item => item.date === date) || null;
+      const nextWellness = state.wellness.find(item => item.date === addDaysToKey(date, 1)) || null;
+      const memory = buildPerformanceMemory(state.activities.filter(item => activityDateKey(item) <= date), date);
+      return {
+        schemaVersion: "talos-activity-review-1",
+        activity: {
+          id: String(activity.id),
+          date,
+          sport: isRunningActivity(activity) ? "run" : String(activity.type || "other").slice(0, 24),
+          name: String(activity.name || "Actividad").slice(0, 100),
+          distanceKm: isNumber(activity.distanceM) ? Math.round(activity.distanceM / 100) / 10 : null,
+          durationMin: isNumber(activityDuration(activity)) ? Math.round(activityDuration(activity) / 60 * 10) / 10 : null,
+          paceSecPerKm: activity.movingPaceSecPerKm ?? null,
+          averageHeartRateBpm: activity.heartRate?.averageBpm ?? null,
+          maxHeartRateBpm: activity.heartRate?.maxBpm ?? null,
+          thresholdHeartRateBpm: activity.heartRate?.thresholdBpm ?? null,
+          trainingLoad: activity.load?.trainingLoad ?? null,
+          intensity: activity.load?.intensity ?? null,
+          race: Boolean(activity.flags?.race),
+          intervals: (activity.intervals || []).slice(0, 30).map(interval => ({
+            label: interval.label || interval.type || null,
+            distanceKm: isNumber(interval.distanceM) ? Math.round(interval.distanceM / 100) / 10 : null,
+            durationMin: isNumber(interval.movingSec ?? interval.elapsedSec) ? Math.round((interval.movingSec ?? interval.elapsedSec) / 6) / 10 : null,
+            paceSecPerKm: interval.paceSecPerKm ?? null,
+            averageHeartRateBpm: interval.heartRate?.averageBpm ?? null
+          }))
+        },
+        planned: planned ? {
+          date: planned.date, sport: planned.sport, sessionType: planned.sessionType, title: planned.title,
+          distanceKm: planned.distanceKm, durationMin: planned.durationMin, intensity: planned.intensity, steps: planned.steps || []
+        } : null,
+        recovery: {
+          readinessScore: wellness ? calculateReadiness(wellness).score : null,
+          sleepSeconds: wellness?.recovery?.sleepSeconds ?? null,
+          hrvRmssdMs: wellness?.recovery?.hrvRmssdMs ?? null,
+          restingHeartRateBpm: wellness?.recovery?.restingHeartRateBpm ?? null,
+          nextDayReadinessScore: nextWellness ? calculateReadiness(nextWellness).score : null
+        },
+        performanceMemory: memory
+      };
+    }
+
+    async function analyzeActivity(activity) {
+      const token = await connectionGet("accessToken").catch(() => "");
+      if (!token) return showToast("Falta el token privado de TɅLOS.", true);
+      const panel = $("#activityAnalysisPanel");
+      const button = panel?.querySelector("[data-analyze-activity]");
+      if (button) { button.disabled = true; button.textContent = "Analizando…"; }
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 22000);
+      try {
+        const response = await fetch(`${state.workerUrl}/activity/analyze`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Talos-Access": token },
+          body: JSON.stringify(buildActivityReviewRequest(activity)),
+          signal: controller.signal
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.ok || !payload.analysis) throw new Error(payload.error || `No se pudo analizar la sesión (HTTP ${response.status}).`);
+        const record = { activityId: String(activity.id), activityDate: activityDateKey(activity), generatedAt: payload.generatedAt || new Date().toISOString(), provider: payload.provider || null, model: payload.model || null, reviewStatus: payload.reviewStatus || null, usage: payload.usage || null, analysis: payload.analysis };
+        await storePut(DATA_STORES.analyses, record);
+        state.analyses = state.analyses.filter(item => item.activityId !== record.activityId).concat(record);
+        if (panel) panel.innerHTML = activityAnalysisMarkup(activity);
+        bindActivityDialogActions(activity);
+        showToast("Análisis de la sesión actualizado.");
+      } catch (error) {
+        showToast(error?.name === "AbortError" ? "El análisis tardó demasiado. Inténtalo de nuevo." : error.message || String(error), true);
+        if (panel) panel.innerHTML = activityAnalysisMarkup(activity);
+        bindActivityDialogActions(activity);
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
     function activityDetailMarkup(activity) {
       const dynamics = activity.runningDynamics || {};
       const elevation = activity.elevation || {};
@@ -2486,11 +2782,13 @@
         ${hasRoute ? '<div class="route-wrap"><div id="routeMap"></div><div class="map-message" id="mapMessage">Preparando el recorrido…</div></div>' : ""}
         <div class="detail-grid">${running ? runningDetails : otherDetails}</div>
         ${runningIntervals || otherIntervals || detailsPending}
+        <div class="activity-analysis" id="activityAnalysisPanel">${activityAnalysisMarkup(activity)}</div>
         <div class="dialog-actions"><button class="secondary-button" type="button" data-download-fit="${escapeHtml(activity.id)}">Descargar FIT original</button></div>`;
     }
 
     function bindActivityDialogActions(activity) {
       $("[data-download-fit]", $("#activityDialogContent"))?.addEventListener("click", () => downloadOriginalFit(activity));
+      $("[data-analyze-activity]", $("#activityDialogContent"))?.addEventListener("click", () => analyzeActivity(activity));
     }
 
     async function fetchActivityDetails(activity) {
@@ -2742,15 +3040,16 @@
     }
 
     async function exportBackup() {
-      const [streams, subjective, settings, plans] = await Promise.all([storeGetAll(DATA_STORES.streams), storeGetAll(DATA_STORES.subjective), storeGetAll(DATA_STORES.settings), storeGetAll(DATA_STORES.plans)]);
+      const [streams, subjective, settings, plans, analyses] = await Promise.all([storeGetAll(DATA_STORES.streams), storeGetAll(DATA_STORES.subjective), storeGetAll(DATA_STORES.settings), storeGetAll(DATA_STORES.plans), storeGetAll(DATA_STORES.analyses)]);
       const payload = {
-        talosBackupVersion: 2,
+        talosBackupVersion: 3,
         appVersion: APP_VERSION,
         exportedAt: new Date().toISOString(),
         activities: state.activities,
         wellness: state.wellness,
         calendar: state.calendar,
         plans,
+        analyses,
         streams,
         subjective,
         settings: settings.filter(item => item.key !== "accessToken")
@@ -2768,6 +3067,7 @@
             storePutMany(DATA_STORES.wellness, (payload.wellness || []).map(normalizeWellness).filter(Boolean)),
             storePutMany(DATA_STORES.calendar, (payload.calendar || []).filter(item => item?.dedupeKey)),
             storePutMany(DATA_STORES.plans, (payload.plans || []).filter(item => item?.weekStart)),
+            storePutMany(DATA_STORES.analyses, (payload.analyses || []).filter(item => item?.activityId)),
             storePutMany(DATA_STORES.streams, (payload.streams || []).filter(item => item?.id)),
             storePutMany(DATA_STORES.subjective, (payload.subjective || []).filter(item => item?.date))
           ]);
@@ -2787,7 +3087,7 @@
 
     async function clearSyncedData() {
       if (!confirm("¿Vaciar las actividades, el bienestar, el calendario, los planes de TɅLOS y los mapas guardados en este dispositivo?")) return;
-      await storeClear([DATA_STORES.activities, DATA_STORES.wellness, DATA_STORES.calendar, DATA_STORES.plans, DATA_STORES.streams, DATA_STORES.subjective, DATA_STORES.settings]);
+      await storeClear([DATA_STORES.activities, DATA_STORES.wellness, DATA_STORES.calendar, DATA_STORES.plans, DATA_STORES.analyses, DATA_STORES.streams, DATA_STORES.subjective, DATA_STORES.settings]);
       await loadLocalData();
       renderAll();
       showToast("Datos locales eliminados. La conexión privada se conserva.");
