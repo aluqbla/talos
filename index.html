@@ -533,21 +533,30 @@
     .interval-section.main .interval-section-head { color: #ffb067; background: rgba(229, 72, 77, .1); }
     .interval-section.cooldown .interval-section-head { color: #8ce0c0; background: rgba(85, 170, 154, .1); }
     .interval-section.laps .interval-section-head { color: #c5b8ff; background: rgba(169, 140, 255, .09); }
-    .interval-section .interval-row { margin: 6px; }
+    .interval-section .interval-row { margin: 0; }
     .interval-row { padding: 8px 9px; border-radius: 12px; background: rgba(255, 255, 255, .035); }
     .interval-copy { display: grid; grid-template-columns: 34px repeat(3, 1fr); align-items: center; gap: 8px; font-size: 10px; }
     .interval-copy span { text-align: right; }
-    .interval-visual { display: grid; grid-template-columns: minmax(84px, auto) minmax(90px, 1fr) minmax(76px, auto); align-items: center; gap: 10px; }
-    .interval-side { min-width: 0; font-variant-numeric: tabular-nums; }
-    .interval-side span, .interval-side strong, .interval-side small { display: block; }
-    .interval-side span { overflow: hidden; color: var(--muted); font-size: 8px; font-weight: 720; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
-    .interval-side strong { margin-top: 2px; overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
-    .interval-side small { margin-top: 2px; color: var(--secondary); font-size: 9px; white-space: nowrap; }
-    .interval-side.end { text-align: right; }
-    .interval-side.end strong.positive { color: #8ce0c0; }
-    .interval-side.end strong.negative { color: #ff9e9a; }
-    .interval-track { height: 10px; overflow: hidden; border-radius: 4px; background: rgba(255, 255, 255, .045); }
-    .interval-bar { height: 100%; min-width: 5px; border-radius: 3px; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .2), 0 0 12px color-mix(in srgb, var(--bar-color) 24%, transparent); }
+    .interval-table { padding: 3px 10px 8px; }
+    .interval-table-head, .interval-data-row {
+      display: grid;
+      grid-template-columns: 50px 58px minmax(92px, 1fr) 45px 42px;
+      align-items: center;
+      gap: 9px;
+      font-variant-numeric: tabular-nums;
+    }
+    .interval-table-head { min-height: 34px; color: var(--muted); font-size: 9px; font-weight: 680; }
+    .interval-table-head span:nth-last-child(-n + 2) { text-align: right; }
+    .interval-data-row { min-height: 39px; border-top: 1px solid rgba(255, 255, 255, .045); font-size: 12px; }
+    .interval-table-head + .interval-data-row { border-top-color: rgba(255, 255, 255, .09); }
+    .interval-distance { overflow: hidden; color: var(--text); font-weight: 680; text-overflow: ellipsis; white-space: nowrap; }
+    .interval-pace { color: var(--text); font-size: 13px; font-weight: 680; }
+    .interval-elevation, .interval-heart { text-align: right; }
+    .interval-elevation.positive { color: #8ce0c0; }
+    .interval-elevation.negative { color: #ff9e9a; }
+    .interval-heart { color: var(--secondary); }
+    .interval-track { height: 14px; overflow: hidden; border-radius: 5px; background: rgba(255, 255, 255, .045); }
+    .interval-bar { height: 100%; min-width: 5px; border-radius: 5px; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .18), 0 0 12px color-mix(in srgb, var(--bar-color) 22%, transparent); }
     .pace-scale-note { margin: 7px 2px 0; color: var(--muted); font-size: 9px; text-align: right; }
 
     .toast {
@@ -567,6 +576,7 @@
       transition: transform .25s ease, opacity .25s ease;
       backdrop-filter: blur(38px) saturate(185%);
       -webkit-backdrop-filter: blur(38px) saturate(185%);
+      pointer-events: none;
     }
     .toast.show { transform: translate(-50%, 0); opacity: 1; }
     .toast.error { border-color: rgba(255, 104, 98, .32); color: #ffd3d1; }
@@ -599,8 +609,11 @@
       .planning-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .plan-form-grid { grid-template-columns: 1fr; }
       .draft-day-body { padding-left: 10px; }
-      .interval-visual { grid-template-columns: 78px minmax(64px, 1fr) 67px; gap: 7px; }
-      .interval-side strong { font-size: 11px; }
+      .interval-table { padding-inline: 7px; }
+      .interval-table-head, .interval-data-row { grid-template-columns: 41px 48px minmax(64px, 1fr) 37px 34px; gap: 6px; }
+      .interval-table-head { font-size: 8px; }
+      .interval-data-row { font-size: 11px; }
+      .interval-pace { font-size: 12px; }
       .sleep-need-copy small { white-space: normal; }
     }
   </style>
@@ -765,7 +778,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.11.0";
+    const APP_VERSION = "0.12.0";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -1427,7 +1440,7 @@
       const record = state.plans.find(item => item.weekStart === snapshot.week.start);
       const seven = snapshot.training.last7Days;
       const ready = snapshot.dataQuality.readyForPlanning;
-      const status = state.generatingPlan ? "Generando…" : record?.draft ? "Borrador listo" : record?.accepted ? "Plan guardado" : state.planPreferences ? "IA preparada" : ready ? "Configura el plan" : "Reuniendo datos";
+      const status = state.generatingPlan ? "Generando…" : record?.draft ? "Borrador listo" : record?.accepted ? "Plan guardado" : state.planPreferences ? "Motor preparado" : ready ? "Configura el plan" : "Reuniendo datos";
       const reasons = [
         ...snapshot.readiness.reasons.slice(0, 2),
         `${snapshot.dataQuality.wellnessDays} días de salud`,
@@ -1487,10 +1500,11 @@
       const plan = draft.plan;
       const days = Array.isArray(plan.days) ? plan.days : [];
       const notes = [...(plan.adjustments || []), ...(plan.cautions || [])];
+      const engineLabel = String(draft.model || "").startsWith("claude-") ? "Motor TɅLOS + Claude Haiku 4.5" : "Motor matemático TɅLOS";
       node.innerHTML = `
         <article class="card plan-draft-card">
           <div class="draft-head">
-            <div><p class="eyebrow">Borrador generado por IA</p><h3>${escapeHtml(plan.objective || "Plan semanal")}</h3><p>${escapeHtml(plan.summary || "Revisa cada día antes de aceptar el plan.")}</p></div>
+            <div><p class="eyebrow">Propuesta segura de TɅLOS</p><h3>${escapeHtml(plan.objective || "Plan semanal")}</h3><p>${escapeHtml(plan.summary || "Revisa cada día antes de aceptar el plan.")}</p></div>
             <div class="draft-total"><strong>${formatNumber(plan.totals?.distanceKm ?? plan.volumeTargetKm, 1)} km</strong><span>${formatNumber(plan.totals?.durationMin)} min</span></div>
           </div>
           <div class="draft-days">${days.map(day => `
@@ -1504,7 +1518,7 @@
               <div class="draft-day-body"><p>${escapeHtml(day.description)}</p><p>${escapeHtml(day.rationale)}</p>${day.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${planStepTarget(step) ? ` · ${escapeHtml(planStepTarget(step))}` : ""}</li>`).join("")}</ol>` : ""}</div>
             </details>`).join("")}</div>
           ${notes.length ? `<div class="draft-notes">${notes.map(note => `<div class="draft-note">${escapeHtml(note)}</div>`).join("")}</div>` : ""}
-          ${isNumber(draft.usage?.estimatedCostCents) ? `<p class="draft-ai-meta">Claude Haiku 4.5 · coste estimado ${formatAiCost(draft.usage.estimatedCostCents)}</p>` : ""}
+          ${isNumber(draft.usage?.estimatedCostCents) ? `<p class="draft-ai-meta">${engineLabel} · coste estimado ${formatAiCost(draft.usage.estimatedCostCents)}</p>` : ""}
           <div class="dialog-actions"><button class="secondary-button" type="button" data-plan-discard>Descartar</button><button class="secondary-button" type="button" data-plan-adjust>Ajustar configuración</button><button class="primary-button" type="button" data-plan-accept>Aceptar plan</button></div>
         </article>`;
       $("[data-plan-discard]", node)?.addEventListener("click", () => discardDraftPlan(weekStart));
@@ -1576,6 +1590,7 @@
             generatedAt: payload.generatedAt,
             provider: payload.provider,
             model: payload.model,
+            reviewStatus: payload.reviewStatus,
             usage: payload.usage,
             preferences: structuredClone(state.planPreferences)
           }
@@ -2118,9 +2133,16 @@
       const intensity = isNumber(paceSecPerKm) && paceSecPerKm > 0
         ? clamp((slowest - paceSecPerKm) / (slowest - fastest), 0, 1)
         : 0;
+      const color = !isNumber(paceSecPerKm) || paceSecPerKm <= 0 ? "#5b7fae"
+        : paceSecPerKm <= 270 ? "#e45b63"
+          : paceSecPerKm <= 300 ? "#eb7c4f"
+            : paceSecPerKm <= 330 ? "#d6a94f"
+              : paceSecPerKm <= 360 ? "#59b5ab"
+                : paceSecPerKm <= 420 ? "#4e9bd4"
+                  : "#5a7fc8";
       return {
-        width: isNumber(paceSecPerKm) && paceSecPerKm > 0 ? 20 + intensity * 80 : 0,
-        color: `hsl(${Math.round(215 - intensity * 215)} 72% 57%)`
+        width: isNumber(paceSecPerKm) && paceSecPerKm > 0 ? 44 + intensity * 56 : 0,
+        color
       };
     }
 
@@ -2183,15 +2205,17 @@
       return { sections, count: rows.length, structured: true };
     }
 
-    function renderRunningIntervalRow(interval) {
+    function renderRunningIntervalRow(interval, structured) {
       const pace = interval.paceSecPerKm;
       const visual = absolutePaceVisual(pace);
       const distance = interval.displayDistanceM;
-      const distanceText = isNumber(distance) && distance < 1000
-        ? `${formatNumber(distance, 0)} m`
-        : isNumber(distance) && Math.abs(distance - 1000) < 1
-          ? "1 km"
-          : formatDistance(distance);
+      const distanceText = !structured && /^Km\s+\d+/i.test(interval.displayLabel)
+        ? interval.displayLabel.replace(/^Km\s+/i, "")
+        : isNumber(distance) && distance < 1000
+          ? `${formatNumber(distance, 0)} m`
+          : isNumber(distance) && Math.abs(distance - 1000) < 1
+            ? "1 km"
+            : isNumber(distance) ? `${formatNumber(distance / 1000, 2)} km` : "—";
       const gain = interval.elevationGainM;
       const loss = interval.elevationLossM;
       const elevation = isNumber(interval.elevationChangeM)
@@ -2200,8 +2224,8 @@
           ? (gain || 0) - (loss || 0)
           : null;
       const elevationClass = isNumber(elevation) ? elevation > .5 ? "positive" : elevation < -.5 ? "negative" : "" : "";
-      const elevationText = isNumber(elevation) ? `${elevation > .5 ? "+" : elevation < -.5 ? "−" : ""}${formatNumber(Math.abs(elevation), 0)} m` : "—";
-      return `<div class="interval-row"><div class="interval-visual"><div class="interval-side"><span>${escapeHtml(interval.displayLabel)}</span><strong>${distanceText}</strong><small>${formatPace(pace)} min/km</small></div><div class="interval-track" aria-label="Ritmo ${formatPace(pace)} minutos por kilómetro, escala fija"><div class="interval-bar" style="--bar-color:${visual.color};width:${visual.width.toFixed(1)}%;background:${visual.color}"></div></div><div class="interval-side end"><span>Desnivel</span><strong class="${elevationClass}">${elevationText}</strong><small>${isNumber(interval.heartRate?.averageBpm) ? `${formatNumber(interval.heartRate.averageBpm)} ppm` : "FC —"}</small></div></div></div>`;
+      const elevationText = isNumber(elevation) ? `${elevation > .5 ? "+" : elevation < -.5 ? "−" : ""}${formatNumber(Math.abs(elevation), 0)}` : "—";
+      return `<div class="interval-data-row" title="${escapeHtml(interval.displayLabel)}"><span class="interval-distance">${distanceText}</span><span class="interval-pace">${formatPace(pace)}</span><div class="interval-track" aria-label="Ritmo ${formatPace(pace)} minutos por kilómetro, escala fija"><div class="interval-bar" style="--bar-color:${visual.color};width:${visual.width.toFixed(1)}%;background:${visual.color}"></div></div><span class="interval-elevation ${elevationClass}">${elevationText}</span><span class="interval-heart">${isNumber(interval.heartRate?.averageBpm) ? formatNumber(interval.heartRate.averageBpm) : "—"}</span></div>`;
     }
 
     function renderRunningIntervals(activity) {
@@ -2212,7 +2236,7 @@
         <div class="interval-list">${prepared.sections.map(section => `
           <section class="interval-section ${section.key}">
             <div class="interval-section-head"><strong>${section.icon} ${section.title}</strong><span>${section.rows.length} ${section.rows.length === 1 ? "bloque" : "bloques"}</span></div>
-            ${section.rows.map(renderRunningIntervalRow).join("")}
+            <div class="interval-table"><div class="interval-table-head"><span>${prepared.structured ? "Dist." : "Km"}</span><span>Ritmo</span><span aria-hidden="true"></span><span>Desn.</span><span>FC</span></div>${section.rows.map(row => renderRunningIntervalRow(row, prepared.structured)).join("")}</div>
           </section>`).join("")}</div>
         <p class="pace-scale-note">Escala fija 3:00–8:00 min/km · un mismo ritmo siempre ocupa lo mismo</p>`;
     }
