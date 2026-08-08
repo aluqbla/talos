@@ -764,7 +764,7 @@
           </div>
           <div class="plan-field">
             <label for="planTargetTime">Tiempo objetivo · opcional</label>
-            <input id="planTargetTime" type="text" inputmode="numeric" placeholder="p. ej. 1:24:30" maxlength="8">
+            <input id="planTargetTime" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="1:25:00 o 12500" maxlength="8">
           </div>
           <div class="plan-field">
             <label for="planPriority">Prioridad de la carrera</label>
@@ -862,7 +862,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.21.0";
+    const APP_VERSION = "0.23.0";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -1187,14 +1187,6 @@
     }
 
 
-    const DEFAULT_SHOES_2026 = [
-      { id: "shoe-supernova-rise-3", name: "adidas Supernova Rise 3", category: "daily", uses: ["recovery","easy","long","steady"], baselineKm: 0, baselineActivities: 0, maxKm: 800, firstUse: "2026-08-06", baselineAt: "2026-08-07T23:44:00.000Z", status: "active", recommend: true },
-      { id: "shoe-terrex-agravic-3", name: "adidas Terrex Agravic 3", category: "trail", uses: ["trail","hills","easy","long"], baselineKm: 302.6, baselineActivities: 25, maxKm: 800, firstUse: "2026-02-24", baselineAt: "2026-08-07T23:44:00.000Z", status: "active", recommend: true },
-      { id: "shoe-adios-pro-4", name: "adidas Adizero Adios Pro 4", category: "race", uses: ["race","intervals","threshold","tempo"], baselineKm: 103.9, baselineActivities: 7, maxKm: 400, firstUse: "2026-01-18", baselineAt: "2026-08-07T23:44:00.000Z", status: "active", recommend: true },
-      { id: "shoe-supernova-rise", name: "adidas Supernova Rise", category: "daily", uses: ["recovery","easy","long"], baselineKm: 838.9, baselineActivities: 84, maxKm: 800, firstUse: "2024-08-12", baselineAt: "2026-08-07T23:44:00.000Z", status: "active", recommend: false },
-      { id: "shoe-boston-12", name: "adidas Adizero Boston 12", category: "quality", uses: ["steady","tempo","threshold","intervals","hills"], baselineKm: 769.2, baselineActivities: 71, maxKm: 800, firstUse: "2024-05-20", baselineAt: "2026-08-07T23:44:00.000Z", status: "active", recommend: true }
-    ];
-
     function normalizeShoe(shoe) {
       const source = shoe && typeof shoe === "object" ? structuredClone(shoe) : {};
       if (!source.id || !source.name) return null;
@@ -1372,13 +1364,25 @@
       return ({ manual:"manual", intervals:"Intervals.icu", plan:"plan TɅLOS" })[value] || value || "";
     }
 
-    async function ensureInitialShoeInventory() {
-      const initialized = await settingGet("shoeInventoryInitialized");
-      if (initialized || state.shoes.length) return;
-      const rows = DEFAULT_SHOES_2026.map(normalizeShoe).filter(Boolean);
-      await storePutMany(DATA_STORES.shoes, rows);
+    const V021_SEEDED_SHOE_IDS = new Set([
+      "shoe-supernova-rise-3",
+      "shoe-terrex-agravic-3",
+      "shoe-adios-pro-4",
+      "shoe-supernova-rise",
+      "shoe-boston-12"
+    ]);
+
+    async function migrateToManualShoeInventory() {
+      const migrated = await settingGet("shoeManualInventoryV022Migrated");
+      if (migrated) return;
+      const seededIds = new Set(state.shoes.filter(shoe => V021_SEEDED_SHOE_IDS.has(shoe.id)).map(shoe => shoe.id));
+      for (const shoeId of seededIds) await storeDelete(DATA_STORES.shoes, shoeId);
+      const assignmentsToDelete = state.shoeAssignments.filter(item => seededIds.has(item.shoeId));
+      for (const assignment of assignmentsToDelete) await storeDelete(DATA_STORES.shoeAssignments, assignment.activityId);
+      state.shoes = state.shoes.filter(shoe => !seededIds.has(shoe.id));
+      state.shoeAssignments = state.shoeAssignments.filter(item => !seededIds.has(item.shoeId));
       await settingSet("shoeInventoryInitialized", true);
-      state.shoes = rows;
+      await settingSet("shoeManualInventoryV022Migrated", true);
     }
 
     async function loadLocalData() {
@@ -1404,7 +1408,7 @@
       state.weeklyReviews = weeklyReviews.sort((a, b) => String(a.weekStart || "").localeCompare(String(b.weekStart || "")));
       state.shoes = shoes.map(normalizeShoe).filter(Boolean).sort((a,b) => a.name.localeCompare(b.name));
       state.shoeAssignments = shoeAssignments.filter(item => item?.activityId && item?.shoeId);
-      await ensureInitialShoeInventory();
+      await migrateToManualShoeInventory();
       await autoAssignExternalGear(state.activities);
       state.planPreferences = planPreferences && typeof planPreferences === "object" ? planPreferences : null;
       state.lastSyncAt = lastSyncAt;
@@ -1637,7 +1641,25 @@
     function parseTargetTimeSeconds(value) {
       const text = String(value || "").trim();
       if (!text) return null;
-      if (!/^\d{1,2}:\d{2}(?::\d{2})?$/.test(text)) return null;
+
+      // 12500 -> 1:25:00; 8500 -> 1:25:00; también admite 85:00 y 1:25:00.
+      if (/^\d{3,6}$/.test(text)) {
+        const seconds = Number(text.slice(-2));
+        if (seconds >= 60) return null;
+        if (text.length <= 4) {
+          const minutes = Number(text.slice(0, -2));
+          const total = minutes * 60 + seconds;
+          return total > 0 ? total : null;
+        }
+        const padded = text.padStart(5, "0");
+        const minutes = Number(padded.slice(-4, -2));
+        const hours = Number(padded.slice(0, -4));
+        if (minutes >= 60) return null;
+        const total = hours * 3600 + minutes * 60 + seconds;
+        return total > 0 ? total : null;
+      }
+
+      if (!/^\d{1,3}:\d{2}(?::\d{2})?$/.test(text)) return null;
       const parts = text.split(":").map(Number);
       if (parts.some(part => !Number.isFinite(part))) return null;
       if (parts.length === 2) {
@@ -1647,7 +1669,8 @@
       }
       const [hours, minutes, seconds] = parts;
       if (minutes >= 60 || seconds >= 60 || hours < 0) return null;
-      return hours * 3600 + minutes * 60 + seconds;
+      const total = hours * 3600 + minutes * 60 + seconds;
+      return total > 0 ? total : null;
     }
 
     function formatTargetTime(seconds) {
@@ -2205,6 +2228,64 @@
         }));
     }
 
+
+    function trainingBlockProfile(referenceDate, phase, reviews = state.weeklyReviews) {
+      if (["taper", "race_week"].includes(phase)) {
+        return { week: null, type: phase, label: phase === "taper" ? "Puesta a punto" : "Competición", volumeFactor: 1, longFactor: 1, forced: false };
+      }
+
+      const completed = (Array.isArray(reviews) ? reviews : [])
+        .filter(item => item?.weekEnd && item.weekEnd <= referenceDate)
+        .sort((a,b) => String(a.weekStart).localeCompare(String(b.weekStart)));
+      const lastThree = completed.slice(-3);
+      const last = completed.at(-1) || null;
+      const descendingRecovery = lastThree.filter(item => item.recoveryTrend === "down").length >= 2;
+      const poorExecution = Boolean(last && (
+        (isNumber(last.score) && last.score < 62) ||
+        (isNumber(last.adherencePercent) && last.adherencePercent < 60) ||
+        (Array.isArray(last.flags) && last.flags.includes("recuperación descendente"))
+      ));
+
+      if (descendingRecovery || poorExecution) {
+        return { week: 4, type: "consolidation", label: "Consolidación anticipada", volumeFactor: .82, longFactor: .86, forced: true };
+      }
+
+      const week = completed.length % 4 + 1;
+      const factorsByPhase = {
+        rebuilding: [
+          { type:"build", label:"Reactivación 1/3", volumeFactor:.90, longFactor:.92 },
+          { type:"build", label:"Reactivación 2/3", volumeFactor:.95, longFactor:.96 },
+          { type:"peak", label:"Carga controlada", volumeFactor:1.00, longFactor:1.00 },
+          { type:"consolidation", label:"Consolidación", volumeFactor:.84, longFactor:.86 }
+        ],
+        base: [
+          { type:"build", label:"Construcción 1/3", volumeFactor:.92, longFactor:.94 },
+          { type:"build", label:"Construcción 2/3", volumeFactor:.97, longFactor:.97 },
+          { type:"peak", label:"Carga alta controlada", volumeFactor:1.00, longFactor:1.00 },
+          { type:"consolidation", label:"Descarga / consolidación", volumeFactor:.84, longFactor:.86 }
+        ],
+        development: [
+          { type:"build", label:"Desarrollo 1/3", volumeFactor:.93, longFactor:.94 },
+          { type:"build", label:"Desarrollo 2/3", volumeFactor:.98, longFactor:.98 },
+          { type:"peak", label:"Semana de estímulo", volumeFactor:1.00, longFactor:1.00 },
+          { type:"consolidation", label:"Descarga / consolidación", volumeFactor:.85, longFactor:.87 }
+        ],
+        specific: [
+          { type:"build", label:"Específica 1/3", volumeFactor:.94, longFactor:.95 },
+          { type:"build", label:"Específica 2/3", volumeFactor:.98, longFactor:.98 },
+          { type:"peak", label:"Específica de mayor carga", volumeFactor:1.00, longFactor:1.00 },
+          { type:"consolidation", label:"Asimilación específica", volumeFactor:.86, longFactor:.88 }
+        ]
+      };
+      const sequence = factorsByPhase[phase] || factorsByPhase.base;
+      return { week, ...sequence[week - 1], forced: false };
+    }
+
+    function trainingBlockLabel(profile) {
+      if (!profile) return "Bloque semanal";
+      return profile.week ? `Bloque · semana ${profile.week}/4 · ${profile.label}` : profile.label;
+    }
+
     function buildPlanningSnapshot(referenceDate = todayKey(), preferences = state.planPreferences || {}) {
       const reference = dateFromKey(referenceDate) ? String(referenceDate).slice(0, 10) : todayKey();
       const activityOldest = addDaysToKey(reference, -364);
@@ -2286,6 +2367,13 @@
       const load = { ctl: latestWellness?.load?.ctl ?? null, atl: latestWellness?.load?.atl ?? null, form: latestWellness?.load?.form ?? null, rampRate: latestWellness?.load?.rampRate ?? null };
       const subjective = subjectivePlanningState(reference === todayKey() ? state.subjective : null);
       const constraints = calculatePlanningConstraints(training, recentActivities, readiness, load, preferences, subjective, reference, performanceMemory, execution);
+      const trainingBlock = trainingBlockProfile(reference, constraints.trainingPhase, state.weeklyReviews);
+      constraints.blockWeek = trainingBlock.week;
+      constraints.blockType = trainingBlock.type;
+      constraints.blockLabel = trainingBlock.label;
+      constraints.blockVolumeFactor = trainingBlock.volumeFactor;
+      constraints.blockLongFactor = trainingBlock.longFactor;
+      constraints.blockForced = Boolean(trainingBlock.forced);
       return {
         schemaVersion: "talos-planning-snapshot-3",
         generatedAt: new Date().toISOString(),
@@ -2345,6 +2433,7 @@
         `Memoria: ${formatNumber(snapshot.performanceMemory.residualWeeklyKm, 1)} km/sem residual · sesión base ≥ ${formatNumber(snapshot.constraints.minimumRunKm, 1)} km`,
         snapshot.performanceForecast?.available ? `Pronóstico ${goalLabel(state.planPreferences?.goal || "")}: ${formatTargetTime(snapshot.performanceForecast.predictedTimeSec)} · confianza ${forecastConfidenceLabel(snapshot.performanceForecast.confidence)}` : "Pronóstico: aún sin referencias suficientes",
         `${trainingPhaseLabel(snapshot.constraints.trainingPhase)}${isNumber(snapshot.constraints.weeksToGoal) ? ` · ${formatNumber(snapshot.constraints.weeksToGoal, 1)} sem.` : ""}`,
+        snapshot.constraints.blockLabel ? `${trainingBlockLabel({ week: snapshot.constraints.blockWeek, label: snapshot.constraints.blockLabel })}${snapshot.constraints.blockForced ? " · adelantada por respuesta reciente" : ""}` : "Bloque semanal sin historial suficiente",
         isNumber(snapshot.execution.sessionAdherencePercent) ? `Cumplimiento 56 d: ${formatNumber(snapshot.execution.sessionAdherencePercent)}%` : "Sin semanas previas suficientes para medir adherencia",
         snapshot.constraints.qualityAllowed ? "Calidad: máximo 1 sesión" : snapshot.constraints.steadyAllowed ? "Estímulo sostenido permitido" : "Sólo carrera fácil"
       ];
@@ -3063,13 +3152,13 @@
         </article>
         <article class="card manage-card" style="grid-column:1/-1">
           <h3>👟 Zapatillas de correr</h3>
-          <p>El kilometraje base procede de Garmin. Las actividades históricas pueden vincularse sin duplicar kilómetros; desde el punto de partida, TɅLOS suma automáticamente las nuevas actividades asignadas.</p>
+          <p>Crea manualmente cada par con su kilometraje actual. Las actividades históricas pueden vincularse sin duplicar ese kilometraje; desde el punto de partida, TɅLOS suma automáticamente las nuevas actividades asignadas.</p>
           <div class="manage-stats">
             <div class="manage-stat"><strong>${state.shoes.filter(shoe => shoe.status === "active").length}</strong><span>ACTIVAS</span></div>
             <div class="manage-stat"><strong>${formatNumber(state.shoes.reduce((sum,shoe) => sum + shoeTotalKm(shoe),0),1)}</strong><span>KM REGISTRADOS</span></div>
             <div class="manage-stat"><strong>${state.shoeAssignments.length}</strong><span>ACTIVIDADES VINCULADAS</span></div>
           </div>
-          <div class="shoe-list">${state.shoes.map(shoe => {
+          <div class="shoe-list">${state.shoes.length ? state.shoes.map(shoe => {
             const wear = shoeWear(shoe);
             const pct = Math.min(100, Math.max(0, wear.ratio * 100));
             return `<div class="shoe-card">
@@ -3078,7 +3167,7 @@
               <div class="shoe-progress ${wear.className}"><span style="width:${pct}%"></span></div>
               <div class="shoe-actions"><button class="secondary-button" type="button" data-edit-shoe="${escapeHtml(shoe.id)}">Editar</button></div>
             </div>`;
-          }).join("")}</div>
+          }).join("") : `<div class="empty-state"><strong>Aún no hay zapatillas</strong><span>Añádelas manualmente con su kilometraje actual y los entrenamientos para los que quieres utilizarlas.</span></div>`}</div>
           <div class="button-row"><button class="primary-button" type="button" data-add-shoe>+ Añadir zapatilla</button></div>
         </article>
         <article class="card manage-card">
@@ -3876,6 +3965,10 @@
       $("#syncTopButton").addEventListener("click", () => syncNow({ manual: true }));
       $("#connectionForm").addEventListener("submit", saveConnection);
       $("#planSettingsForm").addEventListener("submit", savePlanPreferences);
+      $("#planTargetTime").addEventListener("blur", event => {
+        const seconds = parseTargetTimeSeconds(event.currentTarget.value);
+        if (seconds !== null) event.currentTarget.value = formatTargetTime(seconds);
+      });
       $("#shoeForm").addEventListener("submit", saveShoe);
       $$('[data-close-dialog]').forEach(button => button.addEventListener("click", () => closeDialog($(`#${button.dataset.closeDialog}`))));
       $("#activityDialog").addEventListener("close", () => {
