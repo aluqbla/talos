@@ -659,6 +659,211 @@
       .sleep-need-copy small { white-space: normal; }
     }
   </style>
+
+  <style id="cuaderno-visual-v026">
+    :root {
+      --bg: #000000;
+      --panel: rgba(28,28,30,.40);
+      --panel-strong: rgba(44,44,46,.42);
+      --glass: rgba(45,45,52,.22);
+      --line: rgba(255,255,255,.075);
+      --text: #ffffff;
+      --secondary: #ebebf5;
+      --muted: rgba(235,235,245,.60);
+      --blue: #0a84ff;
+      --cyan: #64d2ff;
+      --green: #30d158;
+      --amber: #ffd60a;
+      --red: #ff453a;
+      --purple: #bf5af2;
+      --radius: 24px;
+      --safe-top: max(16px, env(safe-area-inset-top));
+      --safe-bottom: max(12px, env(safe-area-inset-bottom));
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      --shadow-card: 0 12px 38px rgba(0,0,0,.34);
+      --shadow-glass: 0 18px 54px rgba(0,0,0,.46), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.035);
+    }
+
+    html, body { background:#000; color:var(--text); }
+    body {
+      font-size:14px;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(10,132,255,.10), transparent 30%),
+        radial-gradient(circle at 88% 18%, rgba(175,82,222,.07), transparent 28%),
+        #000;
+      text-rendering: optimizeLegibility;
+    }
+    body.modal-open { overflow:hidden; position:fixed; width:100%; left:0; right:0; }
+
+    .app { width:min(980px,100%); padding:0 14px calc(104px + var(--safe-bottom)); }
+    .topbar {
+      min-height:calc(70px + var(--safe-top));
+      padding:var(--safe-top) 0 9px;
+      background:linear-gradient(to bottom,rgba(0,0,0,.88) 68%,rgba(0,0,0,0));
+      -webkit-backdrop-filter:blur(34px) saturate(190%);
+      backdrop-filter:blur(34px) saturate(190%);
+    }
+    .brand-mark { height:33px; color:#fff; filter:drop-shadow(0 2px 12px rgba(255,255,255,.10)); }
+
+    .view { padding-bottom:4px; }
+    .section-heading { margin:8px 2px 12px; }
+    .section-heading h2 { font-size:1.36rem; font-weight:650; letter-spacing:-.025em; }
+    .section-heading p { color:var(--muted); font-size:.78rem; }
+
+    .card, .activity-card, .shoe-card, .activity-classification, .shoe-assignment, .activity-analysis, .planning-forecast, .planning-weekly-memory {
+      background:rgba(28,28,30,.40);
+      border:1px solid rgba(255,255,255,.075);
+      box-shadow:var(--shadow-card);
+      -webkit-backdrop-filter:blur(34px) saturate(190%);
+      backdrop-filter:blur(34px) saturate(190%);
+    }
+    .card { border-radius:24px; padding:16px; }
+
+    .icon-button, .primary-button, .secondary-button, .danger-button, .glass-select, .glass-control, .glass-date {
+      -webkit-backdrop-filter:blur(36px) saturate(195%);
+      backdrop-filter:blur(36px) saturate(195%);
+      background:rgba(45,45,52,.22);
+      border:1px solid rgba(255,255,255,.17);
+      box-shadow:var(--shadow-glass);
+    }
+    .icon-button { width:40px; min-height:40px; border-radius:17px; color:var(--text); }
+    .primary-button, .secondary-button, .danger-button { min-height:42px; border-radius:17px; font-weight:620; }
+    .primary-button { color:#fff; background:rgba(10,132,255,.72); border-color:rgba(120,205,255,.38); }
+    .secondary-button { color:#fff; }
+    .danger-button { color:#ff9f9a; background:rgba(255,69,58,.24); border-color:rgba(255,120,112,.32); }
+    .compact-button { min-height:36px; padding:0 11px; border-radius:14px; font-size:.74rem; white-space:nowrap; }
+
+    .bottom-nav {
+      z-index:100;
+      bottom:calc(10px + env(safe-area-inset-bottom));
+      width:min(calc(100% - 20px),720px);
+      padding:7px 9px;
+      border-radius:30px;
+      background:rgba(39,39,46,.42);
+      border:1px solid rgba(255,255,255,.24);
+      -webkit-backdrop-filter:blur(46px) saturate(210%);
+      backdrop-filter:blur(46px) saturate(210%);
+      box-shadow:0 20px 58px rgba(0,0,0,.66), inset 0 1px 0 rgba(255,255,255,.21), inset 0 -1px 0 rgba(255,255,255,.04);
+    }
+    .nav-button { min-height:54px; border-radius:18px; color:var(--muted); font-size:.65rem; font-weight:500; }
+    .nav-button.active { color:#fff; background:rgba(255,255,255,.075); box-shadow:none; }
+    .nav-button .nav-emoji { font-size:1.24rem; }
+    .nav-button .nav-label { font-size:.65rem; font-weight:500; }
+
+    .activity-toolbar { display:grid; gap:8px; margin:0 0 12px; }
+    .glass-control { display:flex; align-items:center; gap:8px; min-height:44px; padding:0 13px; border-radius:17px; }
+    .glass-control span { color:var(--muted); font-size:1rem; }
+    .glass-control input { width:100%; min-width:0; border:0; outline:0; background:transparent; color:#fff; font-size:16px; }
+    .activity-filter-row { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    .glass-select { width:100%; min-width:0; min-height:42px; border-radius:16px; padding:0 28px 0 10px; color:#fff; font-size:.72rem; outline:0; }
+    .glass-select option { background:#1c1c1e; color:#fff; }
+    .activity-date-row { display:grid; grid-template-columns:1fr 1fr auto; gap:8px; }
+    .glass-date { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:7px; min-height:40px; padding:0 9px; border-radius:15px; }
+    .glass-date span { color:var(--muted); font-size:.68rem; }
+    .glass-date input { width:100%; min-width:0; border:0; background:transparent; color:#fff; font-size:.72rem; outline:0; }
+
+    .activity-card { min-height:88px; padding:10px 11px; border-radius:22px; }
+    .activity-card:active { transform:scale(.988); background:rgba(44,44,46,.42); }
+    .activity-icon { border-radius:14px; background:rgba(10,132,255,.14); }
+    .activity-copy > span:first-child { color:var(--muted); }
+    .activity-copy strong { font-size:.98rem; font-weight:670; letter-spacing:-.018em; }
+    .activity-chips { display:flex; gap:5px; flex-wrap:wrap; margin-top:5px; }
+    .activity-chip { display:inline-flex; align-items:center; min-height:21px; padding:0 7px; border-radius:999px; background:rgba(44,44,46,.38); border:1px solid rgba(255,255,255,.075); color:var(--secondary); font-size:.61rem; font-style:normal; }
+    .activity-chip.race { color:#fff; background:rgba(255,69,58,.18); border-color:rgba(255,100,90,.24); }
+    .activity-chip.training { color:#fff; background:rgba(10,132,255,.18); border-color:rgba(90,180,255,.24); }
+
+    .planning-card { background:rgba(28,28,30,.40); }
+    .planning-explanation-toggle-row { display:flex; justify-content:flex-end; margin-top:4px; }
+    .planning-explanation-toggle { border:0; padding:3px 2px; color:var(--muted); background:transparent; font-size:.66rem; cursor:pointer; }
+    .planning-explanation-toggle:hover { color:var(--secondary); }
+    .planning-reasons { margin-top:7px; }
+
+    .manage-grid { gap:12px; }
+    .manage-card { padding:16px; border-radius:24px; }
+    .manage-card h3 { margin-bottom:12px; font-size:1rem; font-weight:650; }
+    .manage-stats { margin:8px 0 12px; gap:8px; }
+    .manage-stat { padding:12px 4px 11px; border-radius:20px; background:rgba(28,28,30,.40); border:1px solid rgba(255,255,255,.12); box-shadow:0 8px 24px rgba(0,0,0,.25); }
+    .manage-stat strong { font-size:1.35rem; font-weight:720; }
+    .manage-stat span { font-size:.6rem; }
+    .compact-actions { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:7px; }
+    .single-action { display:flex; }
+    .single-action .compact-button { flex:0 0 auto; width:auto; }
+    .database-actions { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .shoe-add-row { margin-top:22px; }
+    .shoe-list { gap:9px; }
+
+    dialog {
+      width:min(680px,calc(100% - 18px));
+      height:auto;
+      max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 14px);
+      margin:calc(var(--safe-top) + 6px) auto calc(var(--safe-bottom) + 6px);
+      border-radius:30px;
+      background:rgba(28,28,32,.64);
+      border:1px solid rgba(255,255,255,.18);
+      -webkit-backdrop-filter:blur(48px) saturate(210%);
+      backdrop-filter:blur(48px) saturate(210%);
+      box-shadow:0 24px 70px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.16);
+    }
+    dialog::backdrop { background:rgba(0,0,0,.38); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+    .dialog-shell {
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+      max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 14px);
+      overflow:hidden;
+    }
+    .dialog-header {
+      position:relative;
+      top:auto;
+      z-index:10;
+      min-height:58px;
+      padding:11px 14px;
+      background:rgba(28,28,32,.56);
+      border-bottom:1px solid rgba(255,255,255,.07);
+    }
+    #activityDialog, #activityDialog .dialog-shell { max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 14px); }
+    #activityDialog .dialog-header { padding-top:11px; }
+    .dialog-header h2 { font-size:1.18rem; font-weight:680; }
+    .dialog-content { min-height:0; overflow:auto; -webkit-overflow-scrolling:touch; padding:8px 14px calc(22px + var(--safe-bottom)); }
+    .dialog-content input, .plan-field select, .plan-field textarea, .activity-type-field select {
+      border:1px solid rgba(255,255,255,.11);
+      background:rgba(255,255,255,.045);
+      -webkit-backdrop-filter:blur(34px) saturate(195%);
+      backdrop-filter:blur(34px) saturate(195%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+      border-radius:14px;
+    }
+
+    .activity-classification { margin:0 0 12px; padding:11px; border-radius:18px; }
+    .activity-classification-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .activity-classification-head strong { font-size:.78rem; }
+    .activity-classification-head span { color:var(--muted); font-size:.68rem; }
+    .segmented-control { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; padding:4px; border-radius:15px; background:rgba(0,0,0,.24); }
+    .segmented-control button { min-height:34px; padding:0 6px; border:0; border-radius:11px; background:transparent; color:var(--muted); font-size:.68rem; font-weight:600; }
+    .segmented-control button.active { color:#fff; background:rgba(10,132,255,.72); box-shadow:inset 0 1px 0 rgba(255,255,255,.20); }
+    .activity-type-field { display:grid !important; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:10px; margin:9px 0 0 !important; color:var(--muted) !important; font-size:.68rem !important; }
+    .activity-type-field select { min-width:0; min-height:36px; padding:0 28px 0 10px; color:#fff; font-size:.72rem; }
+
+    @media (max-width:430px) {
+      .app { padding-inline:10px; }
+      .activity-filter-row { gap:5px; }
+      .glass-select { padding-left:7px; font-size:.64rem; }
+      .activity-date-row { gap:5px; }
+      .database-actions .compact-button { padding-inline:6px; font-size:.67rem; }
+      .compact-actions .compact-button { min-width:0; }
+      .manage-card { padding:14px; }
+    }
+
+    @media (prefers-reduced-transparency: reduce) {
+      .card, .activity-card, .shoe-card, .bottom-nav, dialog,
+      .icon-button, .primary-button, .secondary-button, .danger-button,
+      .glass-select, .glass-control, .glass-date {
+        -webkit-backdrop-filter:none;
+        backdrop-filter:none;
+        background:rgba(44,44,46,.92);
+      }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -689,6 +894,43 @@
 
       <section class="view" id="view-activities" data-view="activities">
         <div class="section-heading"><h2>Actividades</h2><p id="activityCount"></p></div>
+        <div class="activity-toolbar">
+          <div class="activity-search glass-control"><span aria-hidden="true">⌕</span><input id="activitySearch" type="search" placeholder="Buscar actividad…" autocomplete="off"></div>
+          <div class="activity-filter-row">
+            <select id="activitySportFilter" class="glass-select" aria-label="Filtrar por deporte">
+              <option value="all">Todos los deportes</option>
+              <option value="run">Carrera</option>
+              <option value="strength">Fuerza</option>
+              <option value="walk">Paseo</option>
+              <option value="ride">Ciclismo</option>
+              <option value="other">Otros</option>
+            </select>
+            <select id="activityClassificationFilter" class="glass-select" aria-label="Filtrar por clasificación">
+              <option value="all">Entreno / competición</option>
+              <option value="training">Entrenamientos</option>
+              <option value="race">Competiciones</option>
+              <option value="unclassified">Sin clasificar</option>
+            </select>
+            <select id="activityTrainingTypeFilter" class="glass-select" aria-label="Filtrar por tipo de entrenamiento">
+              <option value="all">Todos los tipos</option>
+              <option value="easy">Rodaje suave</option>
+              <option value="recovery">Recuperación</option>
+              <option value="long">Tirada larga</option>
+              <option value="steady">Sostenido / progresivo</option>
+              <option value="tempo">Tempo</option>
+              <option value="threshold">Umbral</option>
+              <option value="intervals">Series / intervalos</option>
+              <option value="hills">Cuestas</option>
+              <option value="strength">Fuerza</option>
+              <option value="other">Otros</option>
+            </select>
+          </div>
+          <div class="activity-date-row">
+            <label class="glass-date"><span>Desde</span><input id="activityDateFrom" type="date"></label>
+            <label class="glass-date"><span>Hasta</span><input id="activityDateTo" type="date"></label>
+            <button class="compact-button secondary-button" id="activityClearFilters" type="button">Limpiar</button>
+          </div>
+        </div>
         <div class="activity-list" id="activityList"></div>
       </section>
 
@@ -870,7 +1112,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.25.1";
+    const APP_VERSION = "0.26.0";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -886,7 +1128,8 @@
       analyses: "activityAnalyses",
       weeklyReviews: "weeklyReviews",
       shoes: "runningShoes",
-      shoeAssignments: "activityShoeAssignments"
+      shoeAssignments: "activityShoeAssignments",
+      activityMeta: "activityMetadata"
     };
     const VIEW_LABELS = { today: "Hoy", activities: "Actividades", plan: "Plan", manage: "Gestión" };
     const TIME_ZONE = "Europe/Madrid";
@@ -902,6 +1145,8 @@
       weeklyReviews: [],
       shoes: [],
       shoeAssignments: [],
+      activityMeta: [],
+      activityFilters: { search: "", sport: "all", classification: "all", trainingType: "all", from: "", to: "" },
       planPreferences: null,
       subjective: null,
       lastSyncAt: null,
@@ -1057,7 +1302,8 @@
         [DATA_STORES.analyses, "activityId"],
         [DATA_STORES.weeklyReviews, "weekStart"],
         [DATA_STORES.shoes, "id"],
-        [DATA_STORES.shoeAssignments, "activityId"]
+        [DATA_STORES.shoeAssignments, "activityId"],
+        [DATA_STORES.activityMeta, "activityId"]
       ];
       for (const [name, keyPath] of definitions) {
         if (!db.objectStoreNames.contains(name)) db.createObjectStore(name, { keyPath });
@@ -1398,7 +1644,7 @@
     }
 
     async function loadLocalData() {
-      const [activities, wellness, calendar, plans, analyses, weeklyReviews, shoes, shoeAssignments, lastSyncAt, workerUrl, subjective, planPreferences] = await Promise.all([
+      const [activities, wellness, calendar, plans, analyses, weeklyReviews, shoes, shoeAssignments, activityMeta, lastSyncAt, workerUrl, subjective, planPreferences] = await Promise.all([
         storeGetAll(DATA_STORES.activities),
         storeGetAll(DATA_STORES.wellness),
         storeGetAll(DATA_STORES.calendar),
@@ -1407,6 +1653,7 @@
         storeGetAll(DATA_STORES.weeklyReviews),
         storeGetAll(DATA_STORES.shoes),
         storeGetAll(DATA_STORES.shoeAssignments),
+        storeGetAll(DATA_STORES.activityMeta),
         settingGet("lastSyncAt"),
         connectionGet("workerUrl").catch(() => null),
         storeGet(DATA_STORES.subjective, todayKey()),
@@ -1420,6 +1667,7 @@
       state.weeklyReviews = weeklyReviews.sort((a, b) => String(a.weekStart || "").localeCompare(String(b.weekStart || "")));
       state.shoes = shoes.map(normalizeShoe).filter(Boolean).sort((a,b) => a.name.localeCompare(b.name));
       state.shoeAssignments = shoeAssignments.filter(item => item?.activityId && item?.shoeId);
+      state.activityMeta = activityMeta.filter(item => item?.activityId);
       await migrateToManualShoeInventory();
       await autoAssignExternalGear(state.activities);
       state.planPreferences = planPreferences && typeof planPreferences === "object" ? planPreferences : null;
@@ -1851,7 +2099,7 @@
         distanceKm: isNumber(activity.distanceM) ? activity.distanceM / 1000 : null,
         durationSec: activityDuration(activity),
         paceSecPerKm: activity.movingPaceSecPerKm,
-        race: Boolean(activity.flags?.race) || /race|carrera|10k|10 km|5k|5 km|media|half|marat/i.test(String(activity.name || ""))
+        race: activityIsCompetition(activity) || /race|carrera|10k|10 km|5k|5 km|media|half|marat/i.test(String(activity.name || ""))
       })).filter(row => isNumber(row.distanceKm) && row.distanceKm > 0);
 
       const weeklyDistances = Array.from({ length: 52 }, (_, index) => {
@@ -2347,7 +2595,7 @@
         thresholdHeartRateBpm: isNumber(activity.heartRate?.thresholdBpm) ? activity.heartRate.thresholdBpm : null,
         trainingLoad: isNumber(activity.load?.trainingLoad) ? activity.load.trainingLoad : null,
         intensity: isNumber(activity.load?.intensity) ? activity.load.intensity : null,
-        race: Boolean(activity.flags?.race)
+        race: activityIsCompetition(activity)
       }));
       const plannedHistory = state.plans.flatMap(record => record.accepted?.plan?.days || [])
         .filter(day => day.date >= addDaysToKey(reference, -179) && day.date <= reference && day.sport !== "rest")
@@ -2460,7 +2708,8 @@
           <div class="planning-metric"><span>Límite prudente</span><strong>${formatNumber(snapshot.constraints.maxWeeklyDistanceKm, 1)} km</strong><small>${snapshot.constraints.maxRunDays} carreras máximo</small></div>
           <div class="planning-metric"><span>CTL / ATL</span><strong>${formatNumber(snapshot.load.ctl, 1)} / ${formatNumber(snapshot.load.atl, 1)}</strong><small>forma / fatiga</small></div>
         </div>
-        <div class="planning-reasons">${reasons.map(reason => `<span class="planning-reason">${escapeHtml(reason)}</span>`).join("")}</div>
+        <div class="planning-explanation-toggle-row"><button class="planning-explanation-toggle" type="button" data-plan-explanations aria-expanded="false">Ver base</button></div>
+        <div class="planning-reasons hidden" data-plan-reasons>${reasons.map(reason => `<span class="planning-reason">${escapeHtml(reason)}</span>`).join("")}</div>
         ${snapshot.performanceForecast?.available ? `<div class="planning-forecast">
           <div><strong>🎯 Pronóstico ${escapeHtml(goalLabel(state.planPreferences?.goal || ""))}</strong><br><small>Rango ${escapeHtml(formatTargetTime(snapshot.performanceForecast.rangeLowSec))}–${escapeHtml(formatTargetTime(snapshot.performanceForecast.rangeHighSec))} · ritmo central ${escapeHtml(formatPace(snapshot.performanceForecast.predictedPaceSecPerKm))}/km · confianza ${escapeHtml(forecastConfidenceLabel(snapshot.performanceForecast.confidence))}. Estimación, no garantía.</small></div>
           <div><div class="forecast-time">${escapeHtml(formatTargetTime(snapshot.performanceForecast.predictedTimeSec))}</div><div class="forecast-status">${escapeHtml(snapshot.performanceForecast.status || "Referencia actual")}${isNumber(snapshot.performanceForecast.targetGapPercent) ? ` · ${snapshot.performanceForecast.targetGapPercent > 0 ? "+" : ""}${formatNumber(snapshot.performanceForecast.targetGapPercent,1)}%` : ""}</div></div>
@@ -2474,6 +2723,13 @@
       $("[data-plan-configure]", node)?.addEventListener("click", openPlanSettingsDialog);
       $("[data-plan-adapt]", node)?.addEventListener("click", adaptCurrentWeek);
       $("[data-plan-generate]", node)?.addEventListener("click", generateWeeklyPlan);
+      $("[data-plan-explanations]", node)?.addEventListener("click", event => {
+        const reasonsNode = $("[data-plan-reasons]", node);
+        const opening = reasonsNode?.classList.contains("hidden");
+        reasonsNode?.classList.toggle("hidden", !opening);
+        event.currentTarget.textContent = opening ? "Ocultar base" : "Ver base";
+        event.currentTarget.setAttribute("aria-expanded", String(opening));
+      });
     }
 
     function planSportIcon(sport, title = "") {
@@ -2821,6 +3077,129 @@
       showToast("Sensaciones guardadas en este dispositivo.");
     }
 
+
+    function activityMetaRecord(activityOrId) {
+      const id = typeof activityOrId === "object" ? String(activityOrId?.id || "") : String(activityOrId || "");
+      return state.activityMeta.find(item => item.activityId === id) || null;
+    }
+
+    function inferredActivityClassification(activity) {
+      const meta = activityMetaRecord(activity);
+      if (meta?.classification === "training" || meta?.classification === "race") return meta.classification;
+      if (meta?.classification === "none") return null;
+      if (activity?.flags?.race) return "race";
+      const name = String(activity?.name || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      return /\b(race|competicion|10k|10 km|5k|5 km|media maraton|half marathon|maraton|marathon)\b/.test(name) ? "race" : null;
+    }
+
+    function activityIsCompetition(activity) {
+      return inferredActivityClassification(activity) === "race";
+    }
+
+    function inferActivityTrainingType(activity) {
+      const meta = activityMetaRecord(activity);
+      if (meta?.trainingType && meta.trainingType !== "auto") return meta.trainingType;
+      if (activityIsCompetition(activity)) return "race";
+      if (!isRunningActivity(activity)) {
+        const value = `${activity?.type || ""} ${activity?.name || ""}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        if (/strength|weight|gym|fuerza|pesas/.test(value)) return "strength";
+        return "other";
+      }
+      const planned = plannedDayForActivity(activity);
+      if (planned?.sessionType) return planned.sessionType;
+      const text = `${activity?.name || ""}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      if (/recuper|regener/.test(text)) return "recovery";
+      if (/tirada|larga|long/.test(text)) return "long";
+      if (/interval|series|repet|x\s*\d+/.test(text)) return "intervals";
+      if (/cuesta|hill/.test(text)) return "hills";
+      if (/umbral|threshold/.test(text)) return "threshold";
+      if (/tempo/.test(text)) return "tempo";
+      if (/progres|steady|sosten/.test(text)) return "steady";
+      return "easy";
+    }
+
+    function trainingTypeLabel(value) {
+      return ({
+        easy: "Rodaje suave", recovery: "Recuperación", long: "Tirada larga",
+        steady: "Sostenido / progresivo", tempo: "Tempo", threshold: "Umbral",
+        intervals: "Series / intervalos", hills: "Cuestas", strength: "Fuerza",
+        other: "Otro", race: "Competición"
+      })[value] || "Sin clasificar";
+    }
+
+    function activitySportGroup(activity) {
+      if (isRunningActivity(activity)) return "run";
+      const value = `${activity?.type || ""} ${activity?.name || ""}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      if (/strength|weight|gym|fuerza|pesas/.test(value)) return "strength";
+      if (/walk|walking|caminata|andar/.test(value)) return "walk";
+      if (/ride|bike|cycle|cycling|ciclismo|bicicleta/.test(value)) return "ride";
+      return "other";
+    }
+
+    function activityMatchesFilters(activity) {
+      const filters = state.activityFilters;
+      const date = activityDateKey(activity);
+      const search = filters.search.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      if (search) {
+        const haystack = `${activity.name || ""} ${activity.type || ""} ${trainingTypeLabel(inferActivityTrainingType(activity))}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        if (!haystack.includes(search)) return false;
+      }
+      if (filters.sport !== "all" && activitySportGroup(activity) !== filters.sport) return false;
+      const classification = inferredActivityClassification(activity);
+      if (filters.classification === "training" && classification !== "training") return false;
+      if (filters.classification === "race" && classification !== "race") return false;
+      if (filters.classification === "unclassified" && classification) return false;
+      if (filters.trainingType !== "all" && inferActivityTrainingType(activity) !== filters.trainingType) return false;
+      if (filters.from && date < filters.from) return false;
+      if (filters.to && date > filters.to) return false;
+      return true;
+    }
+
+    async function saveActivityMeta(activity, patch) {
+      const previous = activityMetaRecord(activity) || { activityId: String(activity.id) };
+      const record = {
+        ...previous,
+        ...patch,
+        activityId: String(activity.id),
+        updatedAt: new Date().toISOString()
+      };
+      await storePut(DATA_STORES.activityMeta, record);
+      state.activityMeta = [...state.activityMeta.filter(item => item.activityId !== record.activityId), record];
+      renderActivities();
+      if ($("#activityDialog")?.open) {
+        $("#activityDialogContent").innerHTML = activityDetailMarkup(activity);
+        bindActivityDialogActions(activity);
+      }
+    }
+
+    function activityClassificationMarkup(activity) {
+      const meta = activityMetaRecord(activity);
+      const classification = meta?.classification === "none" ? "" : (meta?.classification || inferredActivityClassification(activity) || "");
+      const trainingType = meta?.trainingType || "auto";
+      return `<div class="activity-classification">
+        <div class="activity-classification-head"><strong>Clasificación</strong><span>${classification === "race" ? "Competición" : classification === "training" ? "Entrenamiento" : "Sin clasificar"}</span></div>
+        <div class="segmented-control" role="group" aria-label="Clasificación de la actividad">
+          <button type="button" data-classification="none" class="${!classification ? "active" : ""}">Sin clasificar</button>
+          <button type="button" data-classification="training" class="${classification === "training" ? "active" : ""}">Entrenamiento</button>
+          <button type="button" data-classification="race" class="${classification === "race" ? "active" : ""}">Competición</button>
+        </div>
+        ${classification === "training" && isRunningActivity(activity) ? `<label class="activity-type-field">Tipo de entrenamiento
+          <select data-training-type>
+            <option value="auto" ${trainingType === "auto" ? "selected" : ""}>Automático · ${escapeHtml(trainingTypeLabel(inferActivityTrainingType(activity)))}</option>
+            <option value="easy" ${trainingType === "easy" ? "selected" : ""}>Rodaje suave</option>
+            <option value="recovery" ${trainingType === "recovery" ? "selected" : ""}>Recuperación</option>
+            <option value="long" ${trainingType === "long" ? "selected" : ""}>Tirada larga</option>
+            <option value="steady" ${trainingType === "steady" ? "selected" : ""}>Sostenido / progresivo</option>
+            <option value="tempo" ${trainingType === "tempo" ? "selected" : ""}>Tempo</option>
+            <option value="threshold" ${trainingType === "threshold" ? "selected" : ""}>Umbral</option>
+            <option value="intervals" ${trainingType === "intervals" ? "selected" : ""}>Series / intervalos</option>
+            <option value="hills" ${trainingType === "hills" ? "selected" : ""}>Cuestas</option>
+            <option value="other" ${trainingType === "other" ? "selected" : ""}>Otro</option>
+          </select>
+        </label>` : ""}
+      </div>`;
+    }
+
     function activityIcon(type, label = "") {
       const value = `${type || ""} ${label || ""}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
       if (/hiit|crossfit|circuit|cardio/.test(value)) return "🔥";
@@ -2862,20 +3241,50 @@
     }
 
     function renderActivities() {
-      const rows = [...state.activities].sort((a, b) => String(b.start?.local || "").localeCompare(String(a.start?.local || "")));
-      $("#activityCount").textContent = rows.length ? `${rows.length} registradas` : "";
+      const allRows = [...state.activities].sort((a, b) => String(b.start?.local || "").localeCompare(String(a.start?.local || "")));
+      const rows = allRows.filter(activityMatchesFilters);
+      $("#activityCount").textContent = `${rows.length}${rows.length !== allRows.length ? ` de ${allRows.length}` : ""}`;
       $("#activityList").innerHTML = rows.length ? rows.map(activity => {
         const metrics = activityCardMetrics(activity);
+        const classification = inferredActivityClassification(activity);
+        const type = inferActivityTrainingType(activity);
         return `
         <button class="activity-card" type="button" data-activity-id="${escapeHtml(activity.id)}">
           <span class="activity-icon" aria-hidden="true">${activityIcon(activity.type, activity.name)}</span>
-          <span class="activity-copy"><span>${formatDate(activityDateKey(activity), { weekday: "short", day: "numeric", month: "short", year: "numeric" })}</span><strong>${escapeHtml(activity.name)}</strong></span>
+          <span class="activity-copy">
+            <span>${formatDate(activityDateKey(activity), { weekday: "short", day: "numeric", month: "short", year: "numeric" })}</span>
+            <strong>${escapeHtml(activity.name)}</strong>
+            <span class="activity-chips">${classification ? `<em class="activity-chip ${classification}">${classification === "race" ? "Competición" : "Entrenamiento"}</em>` : ""}${classification === "training" ? `<em class="activity-chip">${escapeHtml(trainingTypeLabel(type))}</em>` : ""}</span>
+          </span>
           <span class="activity-stats">
             ${metrics.map(([label, value, unit]) => `<span class="activity-stat"><span>${label}</span><strong>${value}${unit ? `<small>${unit}</small>` : ""}</strong></span>`).join("")}
           </span>
         </button>`;
-      }).join("") : emptyState("🏃🏻‍♂️", "Aún no hay actividades", "Configura la conexión y pulsa Actualizar para descargar tus entrenamientos de Intervals.icu.", true);
+      }).join("") : emptyState("⌕", "No hay resultados", "Prueba a cambiar o limpiar los filtros.", false);
       $$('[data-activity-id]', $("#activityList")).forEach(button => button.addEventListener("click", () => openActivity(button.dataset.activityId)));
+    }
+
+    function syncActivityFilterState() {
+      state.activityFilters = {
+        search: $("#activitySearch")?.value || "",
+        sport: $("#activitySportFilter")?.value || "all",
+        classification: $("#activityClassificationFilter")?.value || "all",
+        trainingType: $("#activityTrainingTypeFilter")?.value || "all",
+        from: $("#activityDateFrom")?.value || "",
+        to: $("#activityDateTo")?.value || ""
+      };
+      renderActivities();
+    }
+
+    function clearActivityFilters() {
+      state.activityFilters = { search: "", sport: "all", classification: "all", trainingType: "all", from: "", to: "" };
+      if ($("#activitySearch")) $("#activitySearch").value = "";
+      if ($("#activitySportFilter")) $("#activitySportFilter").value = "all";
+      if ($("#activityClassificationFilter")) $("#activityClassificationFilter").value = "all";
+      if ($("#activityTrainingTypeFilter")) $("#activityTrainingTypeFilter").value = "all";
+      if ($("#activityDateFrom")) $("#activityDateFrom").value = "";
+      if ($("#activityDateTo")) $("#activityDateTo").value = "";
+      renderActivities();
     }
 
     function emptyState(icon, title, text, withButton = false) {
@@ -3158,18 +3567,15 @@
       $("#manageContent").innerHTML = `
         <article class="card manage-card">
           <h3><span class="connection-dot ${state.hasToken ? "ok" : ""}"></span>Conexión con Intervals.icu</h3>
-          <p>${state.hasToken ? `Configurada. Última actualización: ${escapeHtml(lastSync)}.` : "Falta guardar el token privado en este dispositivo."}</p>
-          <div class="button-row"><button class="primary-button" type="button" data-manage-sync>Actualizar</button><button class="secondary-button" type="button" data-configure>Configurar conexión</button></div>
+          <div class="button-row compact-actions"><button class="primary-button compact-button" type="button" data-manage-sync>Actualizar</button><button class="secondary-button compact-button" type="button" data-configure>Configurar conexión</button></div>
         </article>
         <article class="card manage-card">
           <h3>Base de datos</h3>
-          <p>Los datos permanecen en IndexedDB. Reconstruir recorre el histórico disponible en Intervals; las vueltas completas se añaden al abrir cada actividad.</p>
           <div class="manage-stats"><div class="manage-stat"><strong>${state.activities.length}</strong><span>ACTIVIDADES</span></div><div class="manage-stat"><strong>${state.wellness.length}</strong><span>DÍAS</span></div><div class="manage-stat"><strong>${state.calendar.length + acceptedPlanCount}</strong><span>PLANES</span></div></div>
-          <div class="button-row"><button class="secondary-button" type="button" data-export>Exportar JSON</button><button class="secondary-button" type="button" data-import>Importar JSON</button><button class="secondary-button" type="button" data-rebuild>Reconstruir desde Intervals</button></div>
+          <div class="button-row compact-actions database-actions"><button class="secondary-button compact-button" type="button" data-export>Exportar</button><button class="secondary-button compact-button" type="button" data-import>Importar</button><button class="secondary-button compact-button" type="button" data-rebuild>Reconstruir</button></div>
         </article>
         <article class="card manage-card" style="grid-column:1/-1">
           <h3>👟 Zapatillas de correr</h3>
-          <p>Crea manualmente cada par con su kilometraje actual. Las actividades históricas pueden vincularse sin duplicar ese kilometraje; desde el punto de partida, TɅLOS suma automáticamente las nuevas actividades asignadas.</p>
           <div class="manage-stats">
             <div class="manage-stat"><strong>${state.shoes.filter(shoe => shoe.status === "active").length}</strong><span>ACTIVAS</span></div>
             <div class="manage-stat"><strong>${formatNumber(state.shoes.reduce((sum,shoe) => sum + shoeTotalKm(shoe),0),1)}</strong><span>KM REGISTRADOS</span></div>
@@ -3185,17 +3591,17 @@
               <div class="shoe-actions"><button class="secondary-button" type="button" data-edit-shoe="${escapeHtml(shoe.id)}">Editar</button></div>
             </div>`;
           }).join("") : `<div class="empty-state"><strong>Aún no hay zapatillas</strong><span>Añádelas manualmente con su kilometraje actual y los entrenamientos para los que quieres utilizarlas.</span></div>`}</div>
-          <div class="button-row"><button class="primary-button" type="button" data-add-shoe>+ Añadir zapatilla</button></div>
+          <div class="button-row shoe-add-row"><button class="primary-button compact-button" type="button" data-add-shoe>Añadir zapatilla</button></div>
         </article>
         <article class="card manage-card">
           <h3>Arquitectura activa</h3>
           <p>Intervals.icu para sincronización, streams para el detalle y FIT como respaldo. Base local: ${escapeHtml(state.dataDbName || DATA_DB_DEFAULT)}.</p>
-          <div class="button-row"><button class="secondary-button" type="button" data-download-worker>Comprobar Worker</button></div>
+          <div class="button-row compact-actions single-action"><button class="secondary-button compact-button" type="button" data-download-worker>Comprobar Worker</button></div>
         </article>
         <article class="card manage-card">
           <h3>Restablecer datos sincronizados</h3>
           <p>Elimina actividades, bienestar, calendario, planes de TɅLOS, asignaciones de zapatillas y mapas. El inventario de zapatillas y la conexión privada se conservan.</p>
-          <div class="button-row"><button class="danger-button" type="button" data-clear>Vaciar datos locales</button></div>
+          <div class="button-row compact-actions single-action"><button class="danger-button compact-button" type="button" data-clear>Vaciar datos locales</button></div>
         </article>`;
       $("[data-manage-sync]").addEventListener("click", () => syncNow({ manual: true }));
       $("[data-configure]").addEventListener("click", openConnectionDialog);
@@ -3338,12 +3744,33 @@
       }
     }
 
+    let dialogScrollY = 0;
+
+    function lockPageForDialog() {
+      if (document.body.classList.contains("modal-open")) return;
+      dialogScrollY = window.scrollY || 0;
+      document.body.style.top = `-${dialogScrollY}px`;
+      document.body.classList.add("modal-open");
+    }
+
+    function unlockPageForDialog() {
+      if (!document.body.classList.contains("modal-open")) return;
+      document.body.classList.remove("modal-open");
+      document.body.style.top = "";
+      window.scrollTo(0, dialogScrollY);
+    }
+
     function openDialog(dialog) {
+      lockPageForDialog();
+      dialog.addEventListener("close", unlockPageForDialog, { once: true });
       if (typeof dialog.showModal === "function") dialog.showModal(); else dialog.setAttribute("open", "");
     }
 
     function closeDialog(dialog) {
-      if (typeof dialog.close === "function") dialog.close(); else dialog.removeAttribute("open");
+      if (typeof dialog.close === "function") dialog.close(); else {
+        dialog.removeAttribute("open");
+        unlockPageForDialog();
+      }
     }
 
     async function openConnectionDialog() {
@@ -3597,7 +4024,7 @@
           thresholdHeartRateBpm: activity.heartRate?.thresholdBpm ?? null,
           trainingLoad: activity.load?.trainingLoad ?? null,
           intensity: activity.load?.intensity ?? null,
-          race: Boolean(activity.flags?.race),
+          race: activityIsCompetition(activity),
           intervals: (activity.intervals || []).slice(0, 30).map(interval => ({
             label: interval.label || interval.type || null,
             distanceKm: isNumber(interval.distanceM) ? Math.round(interval.distanceM / 100) / 10 : null,
@@ -3703,6 +4130,7 @@
       ].filter(Boolean).join("");
       return `
         <div class="activity-detail-date">${escapeHtml(formatFullDate(activityDateKey(activity)))}</div>
+        ${activityClassificationMarkup(activity)}
         <div class="activity-hero">
           ${heroMarkup}
         </div>
@@ -3717,6 +4145,8 @@
     function bindActivityDialogActions(activity) {
       $("[data-download-fit]", $("#activityDialogContent"))?.addEventListener("click", () => downloadOriginalFit(activity));
       $("[data-analyze-activity]", $("#activityDialogContent"))?.addEventListener("click", () => analyzeActivity(activity));
+      $$("[data-classification]", $("#activityDialogContent")).forEach(button => button.addEventListener("click", () => saveActivityMeta(activity, { classification: button.dataset.classification || "none" })));
+      $("[data-training-type]", $("#activityDialogContent"))?.addEventListener("change", event => saveActivityMeta(activity, { trainingType: event.target.value }));
       $("[data-activity-shoe]", $("#activityDialogContent"))?.addEventListener("change", event => saveActivityShoe(activity, event.target.value, "manual"));
       $("[data-assign-recommended-shoe]", $("#activityDialogContent"))?.addEventListener("click", event => saveActivityShoe(activity, event.currentTarget.dataset.assignRecommendedShoe, "plan"));
     }
@@ -3971,9 +4401,9 @@
     }
 
     async function exportBackup() {
-      const [streams, subjective, settings, plans, analyses, weeklyReviews, shoes, shoeAssignments] = await Promise.all([storeGetAll(DATA_STORES.streams), storeGetAll(DATA_STORES.subjective), storeGetAll(DATA_STORES.settings), storeGetAll(DATA_STORES.plans), storeGetAll(DATA_STORES.analyses), storeGetAll(DATA_STORES.weeklyReviews), storeGetAll(DATA_STORES.shoes), storeGetAll(DATA_STORES.shoeAssignments)]);
+      const [streams, subjective, settings, plans, analyses, weeklyReviews, shoes, shoeAssignments, activityMeta] = await Promise.all([storeGetAll(DATA_STORES.streams), storeGetAll(DATA_STORES.subjective), storeGetAll(DATA_STORES.settings), storeGetAll(DATA_STORES.plans), storeGetAll(DATA_STORES.analyses), storeGetAll(DATA_STORES.weeklyReviews), storeGetAll(DATA_STORES.shoes), storeGetAll(DATA_STORES.shoeAssignments), storeGetAll(DATA_STORES.activityMeta)]);
       const payload = {
-        talosBackupVersion: 4,
+        talosBackupVersion: 5,
         appVersion: APP_VERSION,
         exportedAt: new Date().toISOString(),
         activities: state.activities,
@@ -3984,6 +4414,7 @@
         weeklyReviews,
         shoes,
         shoeAssignments,
+        activityMeta,
         streams,
         subjective,
         settings: settings.filter(item => item.key !== "accessToken")
@@ -4005,6 +4436,7 @@
             storePutMany(DATA_STORES.weeklyReviews, (payload.weeklyReviews || []).filter(item => item?.weekStart)),
             storePutMany(DATA_STORES.shoes, (payload.shoes || []).map(normalizeShoe).filter(Boolean)),
             storePutMany(DATA_STORES.shoeAssignments, (payload.shoeAssignments || []).filter(item => item?.activityId && item?.shoeId)),
+            storePutMany(DATA_STORES.activityMeta, (payload.activityMeta || []).filter(item => item?.activityId)),
             storePutMany(DATA_STORES.streams, (payload.streams || []).filter(item => item?.id)),
             storePutMany(DATA_STORES.subjective, (payload.subjective || []).filter(item => item?.date))
           ]);
@@ -4025,7 +4457,7 @@
 
     async function clearSyncedData() {
       if (!confirm("¿Vaciar las actividades, el bienestar, el calendario, los planes de TɅLOS y los mapas guardados en este dispositivo?")) return;
-      await storeClear([DATA_STORES.activities, DATA_STORES.wellness, DATA_STORES.calendar, DATA_STORES.plans, DATA_STORES.analyses, DATA_STORES.weeklyReviews, DATA_STORES.shoeAssignments, DATA_STORES.streams, DATA_STORES.subjective, DATA_STORES.settings]);
+      await storeClear([DATA_STORES.activities, DATA_STORES.wellness, DATA_STORES.calendar, DATA_STORES.plans, DATA_STORES.analyses, DATA_STORES.weeklyReviews, DATA_STORES.shoeAssignments, DATA_STORES.activityMeta, DATA_STORES.streams, DATA_STORES.subjective, DATA_STORES.settings]);
       await loadLocalData();
       renderAll();
       showToast("Datos locales eliminados. La conexión privada se conserva.");
@@ -4033,6 +4465,13 @@
 
     function bindEvents() {
       $$(".nav-button").forEach(button => button.addEventListener("click", () => setView(button.dataset.target)));
+      $("#activitySearch")?.addEventListener("input", syncActivityFilterState);
+      $("#activitySportFilter")?.addEventListener("change", syncActivityFilterState);
+      $("#activityClassificationFilter")?.addEventListener("change", syncActivityFilterState);
+      $("#activityTrainingTypeFilter")?.addEventListener("change", syncActivityFilterState);
+      $("#activityDateFrom")?.addEventListener("change", syncActivityFilterState);
+      $("#activityDateTo")?.addEventListener("change", syncActivityFilterState);
+      $("#activityClearFilters")?.addEventListener("click", clearActivityFilters);
       $("#syncTopButton").addEventListener("click", () => syncNow({ manual: true }));
       $("#connectionForm").addEventListener("submit", saveConnection);
       $("#planSettingsForm").addEventListener("submit", savePlanPreferences);
