@@ -1099,6 +1099,339 @@
     }
   </style>
 
+  <style id="talos-v0283-calendar-width-fix">
+    /* Plan · calendario mensual a ancho máximo */
+    #view-plan .calendar-card {
+      width: 100%;
+      margin: 10px 0 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+    #view-plan .calendar-toolbar { padding: 3px 2px 9px; }
+    #view-plan .weekdays { padding: 0 1px; }
+    #view-plan .month-grid { gap: 2px; padding: 0 1px; }
+    #view-plan .day-cell {
+      min-width: 0;
+      padding-left: 2px !important;
+      padding-right: 2px !important;
+      border-radius: 11px !important;
+    }
+    #view-plan .day-sleep {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: clip;
+      white-space: nowrap;
+      text-align: center;
+      font-size: clamp(7.8px, 2.35vw, 9.3px) !important;
+      letter-spacing: -.035em;
+    }
+    #view-plan .day-sports-line { justify-content: center; }
+
+    @media (max-width: 430px) {
+      #view-plan .calendar-card {
+        width: calc(100% + 20px);
+        margin-left: -10px;
+        margin-right: -10px;
+      }
+      #view-plan .calendar-toolbar { padding-left: 6px; padding-right: 6px; }
+      #view-plan .weekdays,
+      #view-plan .month-grid { padding-left: 4px; padding-right: 4px; }
+      #view-plan .month-grid { gap: 2px; }
+      #view-plan .day-cell { padding-left: 1px !important; padding-right: 1px !important; }
+      #view-plan .day-cell .day-number { right: 4px; }
+      #view-plan .day-sleep { font-size: clamp(7.4px, 2.45vw, 9.2px) !important; }
+    }
+
+    @media (max-width: 350px) {
+      #view-plan .calendar-card { width: calc(100% + 20px); }
+      #view-plan .weekdays,
+      #view-plan .month-grid { padding-left: 2px; padding-right: 2px; }
+      #view-plan .month-grid { gap: 1px; }
+      #view-plan .day-sleep { font-size: 7.4px !important; letter-spacing: -.05em; }
+      #view-plan .day-sport-icon { font-size: .82rem !important; }
+    }
+  </style>
+
+
+  <style id="talos-v0284-evolution-day-dialog-fix">
+    /* Plan · ficha del día realmente ajustada al contenido */
+    #planDayDialog {
+      width: min(500px, calc(100% - 24px));
+      height: auto !important;
+      max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px);
+      overflow: hidden;
+    }
+    #planDayDialog .dialog-shell {
+      display: block !important;
+      height: auto !important;
+      max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px);
+      overflow: auto !important;
+      overscroll-behavior: contain;
+    }
+    #planDayDialog .dialog-header {
+      position: sticky !important;
+      top: 0;
+      z-index: 12;
+      min-height: 46px;
+      padding: 7px 10px;
+    }
+    #planDayDialog .dialog-header h2 { font-size: .96rem; }
+    #planDayDialog .dialog-content {
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      overflow: visible !important;
+      padding: 3px 10px 10px;
+    }
+    #planDayDialog .day-health-grid { margin-bottom: 6px; }
+    #planDayDialog .plan-day-section { margin-top: 7px; }
+    #planDayDialog .plan-day-section h4 { margin-bottom: 5px; }
+    #planDayDialog .plan-empty { margin: 7px 2px 2px; }
+
+    /* Evolución · un único selector temporal, a ancho completo */
+    .evolution-toolbar {
+      display: grid !important;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 5px;
+      width: 100%;
+      overflow: visible;
+      padding: 0 0 2px;
+    }
+    .evolution-range {
+      width: 100%;
+      min-width: 0;
+      padding: 0 4px;
+      font-size: .64rem;
+      text-align: center;
+    }
+    .evolution-card-head { justify-content: flex-start; margin-bottom: 8px; }
+    .evolution-card-head > span.evolution-period-label { display: none !important; }
+
+    /* Ejes considerablemente más legibles */
+    .evolution-chart svg { min-height: 205px; }
+    .chart-legend { gap: 12px; margin-top: 8px; font-size: .68rem; }
+    .chart-dot { width: 8px; height: 8px; }
+
+    @media (max-width: 430px) {
+      #planDayDialog { width: calc(100% - 22px); }
+      .evolution-toolbar { gap: 4px; }
+      .evolution-range { min-height: 31px; padding-inline: 2px; font-size: .59rem; }
+    }
+  </style>
+
+
+  <style id="talos-v0285-evolution-spacing-filters">
+    /* Evolución · títulos, gráficas y filtros */
+    .evolution-range {
+      font-size: .76rem !important;
+      font-weight: 680;
+      letter-spacing: -.018em;
+      white-space: nowrap;
+      padding-inline: 2px !important;
+    }
+    .evolution-distance-card .evolution-card-head,
+    .evolution-load-card .evolution-card-head { margin-bottom: 2px; }
+    .evolution-load-card .chart-legend { margin-top: 2px; }
+
+    @media (max-width: 430px) {
+      .evolution-distance-card .evolution-card-head,
+      .evolution-load-card .evolution-card-head { margin-bottom: 0 !important; }
+      .evolution-distance-card .evolution-chart,
+      .evolution-load-card .evolution-chart { margin-top: 0 !important; }
+      .evolution-load-card .evolution-chart { margin-bottom: 0 !important; }
+      .evolution-load-card .chart-legend { margin-top: 0 !important; }
+      .evolution-range {
+        min-height: 34px !important;
+        font-size: .76rem !important;
+        line-height: 1;
+      }
+    }
+
+    @media (max-width: 365px) {
+      .evolution-range { font-size: .71rem !important; letter-spacing: -.025em; }
+    }
+  </style>
+
+
+  <style id="talos-v0286-day-dialog-exact-fit">
+    /* Plan · ficha del día: termina exactamente donde termina el contenido */
+    #planDayDialog {
+      min-height: 0 !important;
+      height: auto;
+      max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 18px);
+    }
+    #planDayDialog .dialog-shell {
+      min-height: 0 !important;
+      height: auto !important;
+      max-height: none;
+      overflow: hidden !important;
+    }
+    #planDayDialog .dialog-content {
+      min-height: 0 !important;
+      height: auto !important;
+      max-height: none;
+      overflow: visible !important;
+      padding-bottom: 6px !important;
+    }
+    #planDayDialog .plan-day-detail {
+      min-height: 0 !important;
+      height: auto !important;
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    #planDayDialog .plan-day-detail > :last-child,
+    #planDayDialog .plan-day-section:last-child,
+    #planDayDialog .planned-session:last-child,
+    #planDayDialog .plan-empty:last-child {
+      margin-bottom: 0 !important;
+    }
+    #planDayDialog.is-scrollable .dialog-shell {
+      overflow: auto !important;
+      max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 18px);
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+  </style>
+
+
+  <style id="talos-v0287-compact-day-calendar">
+    /* Ficha del día: panel propio, NO <dialog>, altura estrictamente natural */
+    .plan-day-overlay[hidden] { display: none !important; }
+    .plan-day-overlay {
+      position: fixed;
+      z-index: 460;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding:
+        calc(max(12px, env(safe-area-inset-top)) + 8px)
+        12px
+        calc(max(12px, env(safe-area-inset-bottom)) + 8px);
+      background: rgba(0,0,0,.38);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+    }
+    .plan-day-popover {
+      width: min(470px, 100%);
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: calc(100dvh - max(24px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 28px);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 24px;
+      background: rgba(28,28,32,.76);
+      -webkit-backdrop-filter: blur(48px) saturate(210%);
+      backdrop-filter: blur(48px) saturate(210%);
+      box-shadow: 0 24px 70px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.16);
+    }
+    .plan-day-popover-header {
+      display: grid;
+      grid-template-columns: 34px minmax(0,1fr) 34px 34px;
+      align-items: center;
+      gap: 5px;
+      min-height: 44px;
+      padding: 5px 7px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      background: rgba(28,28,32,.58);
+    }
+    .plan-day-popover-header h2 {
+      margin: 0;
+      min-width: 0;
+      overflow: hidden;
+      color: var(--text);
+      font-size: .93rem;
+      font-weight: 680;
+      line-height: 1.12;
+      letter-spacing: -.022em;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .plan-day-arrow,
+    .plan-day-close {
+      width: 34px;
+      height: 34px;
+      min-height: 34px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 13px;
+      background: rgba(255,255,255,.045);
+      color: var(--secondary);
+      cursor: pointer;
+      -webkit-backdrop-filter: blur(28px) saturate(185%);
+      backdrop-filter: blur(28px) saturate(185%);
+    }
+    .plan-day-arrow { font-size: 1.4rem; line-height: 1; }
+    .plan-day-close { font-size: 1rem; }
+    .plan-day-popover-content {
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: calc(100dvh - max(24px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 88px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: 5px 9px 7px;
+    }
+    .plan-day-popover-content .plan-day-detail {
+      height: auto !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .plan-day-popover-content .day-health-grid { margin: 0 0 5px !important; gap: 4px !important; }
+    .plan-day-popover-content .day-health-metric { min-height: 0; padding: 6px 3px !important; }
+    .plan-day-popover-content .plan-day-section { margin-top: 6px !important; }
+    .plan-day-popover-content .plan-day-section h4 { margin: 0 0 4px !important; }
+    .plan-day-popover-content .plan-empty { margin: 6px 2px 0 !important; padding-bottom: 0 !important; }
+    .plan-day-popover-content .plan-day-detail > :last-child,
+    .plan-day-popover-content .plan-day-section:last-child,
+    .plan-day-popover-content .planned-session:last-child,
+    .plan-day-popover-content .planned-session-body > :last-child {
+      margin-bottom: 0 !important;
+    }
+
+    /* Calendario: previsto = contorno azul; realizado = recuadro azul completo */
+    #view-plan .day-cell.planned-day {
+      border-color: rgba(10,132,255,.92) !important;
+      box-shadow: inset 0 0 0 1px rgba(10,132,255,.28);
+    }
+    #view-plan .day-cell.completed-day {
+      border-color: rgba(120,205,255,.62) !important;
+      background: rgba(10,132,255,.68) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.24),
+        0 7px 20px rgba(10,132,255,.20);
+    }
+    #view-plan .day-cell.completed-day .day-number,
+    #view-plan .day-cell.completed-day .day-sleep,
+    #view-plan .day-cell.completed-day .day-sport-icon,
+    #view-plan .day-cell.completed-day .day-more-icons {
+      color: #fff !important;
+    }
+
+    @media (max-width: 430px) {
+      .plan-day-overlay { padding-left: 8px; padding-right: 8px; }
+      .plan-day-popover { width: min(450px, 100%); border-radius: 22px; }
+      .plan-day-popover-header {
+        grid-template-columns: 32px minmax(0,1fr) 32px 32px;
+        min-height: 42px;
+        padding: 4px 6px;
+      }
+      .plan-day-arrow,
+      .plan-day-close { width: 32px; height: 32px; min-height: 32px; }
+      .plan-day-popover-header h2 { font-size: .89rem; }
+      .plan-day-popover-content { padding: 4px 7px 6px; }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -1236,12 +1569,17 @@
     </div>
   </dialog>
 
-  <dialog id="planDayDialog">
-    <div class="dialog-shell">
-      <div class="dialog-header"><h2 id="planDayDialogTitle">Día</h2><button class="icon-button" type="button" data-close-dialog="planDayDialog" aria-label="Cerrar">✕</button></div>
-      <div class="dialog-content" id="planDayDialogContent"></div>
-    </div>
-  </dialog>
+  <div class="plan-day-overlay" id="planDayOverlay" hidden aria-hidden="true">
+    <section class="plan-day-popover" role="dialog" aria-modal="true" aria-labelledby="planDayDialogTitle">
+      <div class="plan-day-popover-header">
+        <button class="plan-day-arrow" type="button" id="planDayPrev" aria-label="Día anterior">‹</button>
+        <h2 id="planDayDialogTitle">Día</h2>
+        <button class="plan-day-arrow" type="button" id="planDayNext" aria-label="Día siguiente">›</button>
+        <button class="plan-day-close" type="button" id="planDayClose" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="plan-day-popover-content" id="planDayDialogContent"></div>
+    </section>
+  </div>
 
   <dialog id="planSettingsDialog">
     <div class="dialog-shell">
@@ -1363,7 +1701,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.28.2";
+    const APP_VERSION = "0.28.7";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -1410,7 +1748,7 @@
       selectedTodayDate: null,
       monthCursor: new Date(),
       selectedPlanDate: null,
-      evolutionRange: "6m",
+      evolutionRange: "7d",
       dataDbName: null,
       map: null,
       mapLayer: null,
@@ -3678,7 +4016,14 @@
       $("#monthTitle").innerHTML = `<span class="calendar-year">${year}</span><span class="calendar-month">${escapeHtml(monthName)}</span>`;
       const byDay = new Map();
       const activitiesByDay = new Map();
+      const planStatusByDay = new Map();
       const wellnessByDay = new Map(state.wellness.map(item => [item.date, item]));
+      const markPlannedStatus = (key, matched = false) => {
+        const status = planStatusByDay.get(key) || { planned: false, completed: false };
+        status.planned = true;
+        if (matched) status.completed = true;
+        planStatusByDay.set(key, status);
+      };
       for (const activity of state.activities) {
         const key = activityDateKey(activity);
         if (!key) continue;
@@ -3690,9 +4035,12 @@
       for (const event of state.calendar) {
         const key = String(event.startLocal || "").slice(0, 10);
         if (!key) continue;
+        const calendarEventText = `${event?.type || ""} ${event?.category || ""} ${event?.name || ""}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        if (/\b(rest|descanso)\b/.test(calendarEventText)) continue;
         if (!byDay.has(key)) byDay.set(key, []);
         const dayActivities = activitiesByDay.get(key) || [];
         const matched = calendarEventMatch(event, dayActivities);
+        markPlannedStatus(key, Boolean(matched));
         if (!matched) byDay.get(key).push({ icon: activityIcon(`${event.type || ""} ${event.category || ""}`, event.name), name: event.name || event.type || "Entrenamiento", done: false });
       }
       for (const record of state.plans) {
@@ -3702,6 +4050,7 @@
           if (!byDay.has(key)) byDay.set(key, []);
           const dayActivities = activitiesByDay.get(key) || [];
           const matched = planActivityMatch(day, dayActivities);
+          markPlannedStatus(key, Boolean(matched));
           if (!matched) byDay.get(key).push({ icon: planSportIcon(day.sport, day.title), name: day.title || "Entrenamiento TɅLOS", done: false, localPlan: true });
         }
       }
@@ -3711,7 +4060,7 @@
         const items = byDay.get(key) || [];
         const wellness = wellnessByDay.get(key);
         const health = isNumber(wellness?.recovery?.sleepSeconds)
-          ? `<span class="day-sleep ${qualityClass(wellness.recovery.sleepQualityLabel)}" title="Sueño ${qualityLabel(wellness.recovery.sleepQualityLabel).toLowerCase()}">💤 ${formatCompactSleep(wellness.recovery.sleepSeconds)}</span>`
+          ? `<span class="day-sleep ${qualityClass(wellness.recovery.sleepQualityLabel)}" title="Sueño ${qualityLabel(wellness.recovery.sleepQualityLabel).toLowerCase()}">💤${formatCompactSleep(wellness.recovery.sleepSeconds)}</span>`
           : `<span class="day-sleep">&nbsp;</span>`;
         const displaySports = [];
         for (const item of items) {
@@ -3720,7 +4069,9 @@
         }
         const sports = displaySports.slice(0, 3).map(item => `<span class="day-sport-icon ${item.done ? "done" : ""}" title="${escapeHtml(item.name)}">${item.icon}</span>`).join("");
         const more = displaySports.length > 3 ? `<span class="day-more-icons">+${displaySports.length - 3}</span>` : "";
-        cells.push(`<button class="day-cell ${key === todayKey() ? "today" : ""}" type="button" data-calendar-date="${key}" aria-label="Ver ${formatDate(key, { day: "numeric", month: "long", year: "numeric" })}"><span class="day-number">${day}</span><span class="day-health">${health}</span><span class="day-items"><span class="day-sports-line">${sports}${more}</span></span></button>`);
+        const planStatus = planStatusByDay.get(key);
+        const planClass = planStatus?.completed ? "completed-day" : planStatus?.planned ? "planned-day" : "";
+        cells.push(`<button class="day-cell ${key === todayKey() ? "today" : ""} ${planClass}" type="button" data-calendar-date="${key}" aria-label="Ver ${formatDate(key, { day: "numeric", month: "long", year: "numeric" })}"><span class="day-number">${day}</span><span class="day-health">${health}</span><span class="day-items"><span class="day-sports-line">${sports}${more}</span></span></button>`);
       }
       $("#monthGrid").innerHTML = cells.join("");
       $$('[data-calendar-date]', $("#monthGrid")).forEach(button => button.addEventListener("click", () => {
@@ -3782,16 +4133,47 @@
       </article>`;
     }
 
-    function openPlanDayDialog(date) {
+    function closePlanDayDialog() {
+      const overlay = $("#planDayOverlay");
+      if (!overlay || overlay.hidden) return;
+      overlay.hidden = true;
+      overlay.setAttribute("aria-hidden", "true");
+      unlockPageForDialog();
+    }
+
+    function bindPlanDayDialogContent() {
+      $$('[data-plan-activity-id]', $("#planDayDialogContent")).forEach(button => button.addEventListener("click", () => {
+        closePlanDayDialog();
+        setTimeout(() => openActivity(button.dataset.planActivityId), 80);
+      }));
+    }
+
+    function renderOpenPlanDay(date) {
       if (!date) return;
       state.selectedPlanDate = date;
       $("#planDayDialogTitle").textContent = formatFullDate(date);
       $("#planDayDialogContent").innerHTML = planDayDetailMarkup(date);
-      openDialog($("#planDayDialog"));
-      $$('[data-plan-activity-id]', $("#planDayDialogContent")).forEach(button => button.addEventListener("click", () => {
-        closeDialog($("#planDayDialog"));
-        setTimeout(() => openActivity(button.dataset.planActivityId), 80);
-      }));
+      bindPlanDayDialogContent();
+      const content = $("#planDayDialogContent");
+      if (content) content.scrollTop = 0;
+    }
+
+    function navigatePlanDay(offset) {
+      const current = state.selectedPlanDate || todayKey();
+      const next = addDaysToKey(current, offset);
+      if (!next) return;
+      renderOpenPlanDay(next);
+    }
+
+    function openPlanDayDialog(date) {
+      if (!date) return;
+      const overlay = $("#planDayOverlay");
+      if (!overlay) return;
+      renderOpenPlanDay(date);
+      lockPageForDialog();
+      overlay.hidden = false;
+      overlay.setAttribute("aria-hidden", "false");
+      requestAnimationFrame(() => $("#planDayClose")?.focus({ preventScroll: true }));
     }
 
     function openShoeDialog(shoeId = null) {
@@ -4000,7 +4382,7 @@
 
     function barChartSvg(rows, color = "#0a84ff", range = "30d") {
       if (!rows.length) return '<div class="chart-empty">Sin kilómetros registrados en este periodo.</div>';
-      const width = 640, height = 184, top = 22, bottom = 34, left = 43, right = 10;
+      const width = 640, height = 226, top = 60, bottom = 46, left = 54, right = 12;
       const plotH = height - top - bottom, plotW = width - left - right;
       const rawMax = Math.max(0, ...rows.map(row => row.value));
       const step = niceChartStep(Math.max(rawMax,1), 4);
@@ -4011,8 +4393,8 @@
       const grid = [];
       for (let value=0; value<=axisMax + step*.01; value += step) {
         const y = top + plotH - (value/axisMax)*plotH;
-        grid.push(`<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${value===0?'.12':'.055'})"/>`);
-        grid.push(`<text x="${left-7}" y="${(y+3.5).toFixed(1)}" fill="rgba(235,235,245,.52)" font-size="9.5" text-anchor="end">${escapeHtml(formatNumber(value, value < 10 && step < 1 ? 1 : 0))}</text>`);
+        grid.push(`<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${value===0?'.14':'.06'})"/>`);
+        grid.push(`<text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.66)" font-size="13.5" font-weight="600" text-anchor="end">${escapeHtml(formatNumber(value, value < 10 && step < 1 ? 1 : 0))}</text>`);
       }
 
       const bars = rows.map((row,index) => {
@@ -4024,10 +4406,10 @@
 
       const ticks = chartTickIndexes(rows.length,range).map(index => {
         const x = left + index*slot + slot/2;
-        return `<text x="${x.toFixed(1)}" y="${height-9}" fill="rgba(235,235,245,.52)" font-size="9.5" text-anchor="middle">${escapeHtml(rows[index].label)}</text>`;
+        return `<text x="${x.toFixed(1)}" y="${height-12}" fill="rgba(235,235,245,.66)" font-size="13" font-weight="600" text-anchor="middle">${escapeHtml(rows[index].label)}</text>`;
       }).join("");
 
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Kilómetros de carrera en el periodo">${grid.join("")}${bars}${ticks}<text x="${left}" y="13" fill="rgba(235,235,245,.62)" font-size="12" font-weight="650">máx. ${formatNumber(rawMax,1)} km</text><text x="8" y="${top-4}" fill="rgba(235,235,245,.42)" font-size="8.5">km</text></svg>`;
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Kilómetros de carrera en el periodo">${grid.join("")}${bars}${ticks}<text x="${left}" y="20" fill="rgba(235,235,245,.82)" font-size="16" font-weight="700">máx. ${formatNumber(rawMax,1)} km</text><text x="10" y="${top-9}" fill="rgba(235,235,245,.62)" font-size="12.5" font-weight="650">km</text></svg>`;
     }
 
     function loadChartTickIndexes(rows, range) {
@@ -4051,16 +4433,17 @@
       let rows = state.wellness.filter(item => item.date >= start && item.date <= todayKey() && (isNumber(item.load?.ctl) || isNumber(item.load?.atl))).sort((a,b)=>a.date.localeCompare(b.date));
       if (range === "all") rows = compactSeries(rows, 220);
       if (rows.length < 2) return '<div class="chart-empty">Aún no hay suficiente histórico de carga.</div>';
-      const values = rows.flatMap(row => [row.load?.ctl,row.load?.atl]).filter(isNumber);
+
+      const values = rows.flatMap(row => [row.load?.ctl, row.load?.atl]).filter(isNumber);
       const rawMin = Math.min(...values), rawMax = Math.max(...values);
       const span = Math.max(rawMax - rawMin, 4);
-      const step = niceChartStep(span, 4);
-      let axisMin = Math.max(0, Math.floor(rawMin / step) * step);
+      const step = niceChartStep(span, 5);
+      let axisMin = Math.floor(rawMin / step) * step;
       let axisMax = Math.ceil(rawMax / step) * step;
       if (axisMax <= axisMin) axisMax = axisMin + step;
-      if ((axisMax - axisMin) / step < 3) axisMax = axisMin + step * 3;
+      if ((axisMax - axisMin) / step < 4) axisMax = axisMin + step * 4;
 
-      const width=640,height=184,left=43,right=10,top=16,bottom=34,plotW=width-left-right,plotH=height-top-bottom;
+      const width=640,height=204,left=54,right=12,top=14,bottom=40,plotW=width-left-right,plotH=height-top-bottom;
       const point = (value,index) => {
         const x = left + index/(rows.length-1)*plotW;
         const y = top + (axisMax-value)/(axisMax-axisMin)*plotH;
@@ -4072,8 +4455,9 @@
       for (let value=axisMin; value<=axisMax + step*.01; value+=step) {
         const y = top + (axisMax-value)/(axisMax-axisMin)*plotH;
         const digits = step < 1 ? 1 : 0;
-        grid.push(`<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${Math.abs(value-axisMin)<.001?'.11':'.045'})"/>`);
-        grid.push(`<text x="${left-7}" y="${(y+3.5).toFixed(1)}" fill="rgba(235,235,245,.52)" font-size="9.5" text-anchor="end">${escapeHtml(formatNumber(value,digits))}</text>`);
+        const zero = Math.abs(value) < step * .01;
+        grid.push(`<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${zero?'.16':'.055'})" stroke-width="${zero?'1.4':'1'}"/>`);
+        grid.push(`<text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.66)" font-size="13.5" font-weight="600" text-anchor="end">${escapeHtml(formatNumber(value,digits))}</text>`);
       }
       const tickIndexes = loadChartTickIndexes(rows,range);
       const ticks = tickIndexes.map(index => {
@@ -4081,9 +4465,9 @@
         const label = ["6m","1y"].includes(range)
           ? monthBucketLabel(monthBucketKey(rows[index].date), false)
           : formatDate(rows[index].date,{day:"numeric",month:"short"});
-        return `<text x="${x.toFixed(1)}" y="${height-9}" fill="rgba(235,235,245,.52)" font-size="9.5" text-anchor="middle">${escapeHtml(label)}</text>`;
+        return `<text x="${x.toFixed(1)}" y="${height-12}" fill="rgba(235,235,245,.66)" font-size="13" font-weight="600" text-anchor="middle">${escapeHtml(label)}</text>`;
       }).join("");
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolución de forma y fatiga">${grid.join("")}<polyline points="${ctl}" fill="none" stroke="#0a84ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${atl}" fill="none" stroke="#ff9f0a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>${ticks}<text x="8" y="${top-4}" fill="rgba(235,235,245,.42)" font-size="8.5">carga</text></svg>`;
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolución de forma y fatiga">${grid.join("")}<polyline points="${ctl}" fill="none" stroke="#0a84ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${atl}" fill="none" stroke="#ff9f0a" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" opacity=".92"/>${ticks}<text x="10" y="${top-8}" fill="rgba(235,235,245,.62)" font-size="12.5" font-weight="650">carga</text></svg>`;
     }
 
     function shoeInventoryMarkup() {
@@ -4111,7 +4495,7 @@
     function renderEvolution() {
       const node = $("#evolutionContent");
       if (!node) return;
-      const range = state.evolutionRange || "6m";
+      const range = state.evolutionRange || "7d";
       const start = evolutionRangeStart(range);
       const runs = state.activities.filter(activity => isRunningActivity(activity) && activityDateKey(activity) >= start && activityDateKey(activity) <= todayKey() && isNumber(activity.distanceM));
       const km = runs.reduce((sum,activity)=>sum + activity.distanceM/1000,0);
@@ -4129,12 +4513,12 @@
           <div class="evolution-stat"><span>MEDIA / SEM.</span><strong>${formatNumber(weeklyAverage,1)}</strong></div>
           <div class="evolution-stat"><span>MÁS LARGA</span><strong>${formatNumber(longest,1)} km</strong></div>
         </div>
-        <article class="evolution-card">
-          <div class="evolution-card-head"><strong>🏃 Kilómetros recorridos</strong><span>${escapeHtml(evolutionPeriodLabel(range))}</span></div>
+        <article class="evolution-card evolution-distance-card">
+          <div class="evolution-card-head"><strong>🏃 Kilómetros recorridos</strong></div>
           <div class="evolution-chart">${barChartSvg(distanceRows,"#0a84ff",range)}</div>
         </article>
-        <article class="evolution-card">
-          <div class="evolution-card-head"><strong>📈 Forma y fatiga</strong><span>${escapeHtml(evolutionPeriodLabel(range))}</span></div>
+        <article class="evolution-card evolution-load-card">
+          <div class="evolution-card-head"><strong>📈 Estado de forma</strong></div>
           <div class="evolution-chart">${loadChartSvg(range)}</div>
           <div class="chart-legend"><span><i class="chart-dot" style="background:#0a84ff"></i>Forma</span><span><i class="chart-dot" style="background:#ff9f0a"></i>Fatiga</span></div>
         </article>
@@ -5047,6 +5431,12 @@
       });
       $("#shoeForm").addEventListener("submit", saveShoe);
       $$('[data-close-dialog]').forEach(button => button.addEventListener("click", () => closeDialog($(`#${button.dataset.closeDialog}`))));
+      $("#planDayClose")?.addEventListener("click", closePlanDayDialog);
+      $("#planDayPrev")?.addEventListener("click", () => navigatePlanDay(-1));
+      $("#planDayNext")?.addEventListener("click", () => navigatePlanDay(1));
+      $("#planDayOverlay")?.addEventListener("click", event => {
+        if (event.target === $("#planDayOverlay")) closePlanDayDialog();
+      });
       $("#activityDialog").addEventListener("close", () => {
         if (state.map) { state.map.remove(); state.map = null; }
       });
