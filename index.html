@@ -898,6 +898,207 @@
     }
   </style>
 
+
+  <style id="talos-v028-layout">
+    /* Navegación */
+    .bottom-nav { grid-template-columns: repeat(5,minmax(0,1fr)); width:min(calc(100% - 20px),760px); }
+    .nav-button { min-width:0; padding-inline:1px; }
+    .nav-button .nav-label { font-size:.60rem; }
+
+    /* Hoy */
+    .reason-list { display:none !important; }
+    .readiness-card { grid-column:1/-1; padding-bottom:12px; }
+    .sleep-need { display:none !important; }
+    .sleep-need-compact {
+      grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; gap:10px;
+      min-height:38px; margin:8px 0 10px; padding:7px 11px; border-radius:15px;
+      background:rgba(28,28,30,.34); border:1px solid rgba(255,255,255,.075);
+      -webkit-backdrop-filter:blur(30px) saturate(185%); backdrop-filter:blur(30px) saturate(185%);
+    }
+    .sleep-need-compact span { color:var(--muted); font-size:.66rem; }
+    .sleep-need-compact strong { color:#fff; font-size:.82rem; font-weight:680; white-space:nowrap; }
+    .sleep-quality-line { display:flex; align-items:center; justify-content:center; gap:4px; margin-top:2px; min-height:13px; }
+    .sleep-quality-line .quality-word { font-size:8px; font-weight:700; }
+    .sleep-quality-line .sleep-score-number { color:#fff; font-size:8px; font-weight:650; }
+
+    .today-compact-pair { display:grid; grid-template-columns:1fr 1fr; gap:8px; grid-column:1/-1; }
+    .today-mini-card { min-width:0; padding:10px 10px 9px; border-radius:19px; background:rgba(28,28,30,.40); border:1px solid rgba(255,255,255,.075); box-shadow:var(--shadow-card); -webkit-backdrop-filter:blur(34px) saturate(190%); backdrop-filter:blur(34px) saturate(190%); }
+    .today-mini-head { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:7px; }
+    .today-mini-head strong { font-size:.76rem; font-weight:680; white-space:nowrap; }
+    .today-mini-head span { color:var(--muted); font-size:.58rem; white-space:nowrap; }
+    .today-mini-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }
+    .today-mini-value { min-width:0; padding:6px 4px; border-radius:11px; background:rgba(255,255,255,.035); text-align:center; }
+    .today-mini-value span { display:block; overflow:hidden; color:var(--muted); font-size:.55rem; line-height:1.1; white-space:nowrap; text-overflow:ellipsis; }
+    .today-mini-value strong { display:block; margin-top:2px; color:#fff; font-size:.72rem; line-height:1.1; font-weight:690; white-space:nowrap; }
+    .today-mini-value strong small { color:var(--muted); font-size:.53rem; }
+
+    .upcoming-card { grid-column:1/-1; padding:11px 12px; border-radius:20px; background:rgba(28,28,30,.40); border:1px solid rgba(255,255,255,.075); box-shadow:var(--shadow-card); -webkit-backdrop-filter:blur(34px) saturate(190%); backdrop-filter:blur(34px) saturate(190%); }
+    .upcoming-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
+    .upcoming-head strong { font-size:.78rem; font-weight:680; }
+    .upcoming-head span { color:var(--muted); font-size:.58rem; }
+    .upcoming-list { display:grid; }
+    .upcoming-row { width:100%; min-width:0; display:grid; grid-template-columns:42px 22px minmax(0,1fr) auto; align-items:center; gap:6px; min-height:38px; padding:5px 2px; border:0; border-top:1px solid rgba(255,255,255,.06); background:transparent; color:#fff; text-align:left; cursor:pointer; }
+    .upcoming-row:first-child { border-top:0; }
+    .upcoming-date { color:var(--muted); font-size:.62rem; font-weight:650; text-transform:capitalize; }
+    .upcoming-icon { font-size:1rem; text-align:center; }
+    .upcoming-copy { min-width:0; }
+    .upcoming-copy strong { display:block; overflow:hidden; font-size:.72rem; line-height:1.2; white-space:nowrap; text-overflow:ellipsis; }
+    .upcoming-copy span { display:block; margin-top:2px; overflow:hidden; color:var(--muted); font-size:.60rem; line-height:1.15; white-space:nowrap; text-overflow:ellipsis; }
+    .upcoming-open { color:var(--muted); font-size:1rem; transition:transform .18s ease; }
+    .upcoming-row[aria-expanded="true"] .upcoming-open { transform:rotate(90deg); }
+    .upcoming-detail { margin:0 0 4px 64px; padding:8px 9px 9px; border-radius:13px; background:rgba(255,255,255,.032); border:1px solid rgba(255,255,255,.055); color:var(--secondary); }
+    .upcoming-detail p { margin:0 0 7px; color:var(--muted); font-size:.66rem; line-height:1.38; }
+    .upcoming-detail .draft-steps { margin:5px 0 0; padding-left:17px; }
+    .upcoming-detail .draft-steps li { padding:3px 0; font-size:.64rem; line-height:1.32; }
+    .upcoming-detail .shoe-recommendation { margin-top:7px; }
+
+
+    /* Actividades */
+    .activity-count-compact { margin:1px 3px 8px; color:var(--muted); font-size:.65rem; text-align:right; }
+    .activity-card { position:relative; overflow:hidden; }
+    .activity-card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--sport-color,#0a84ff); opacity:.9; }
+    .activity-card .activity-icon { color:#fff; background:color-mix(in srgb,var(--sport-color,#0a84ff) 20%,transparent); border:1px solid color-mix(in srgb,var(--sport-color,#0a84ff) 28%,transparent); }
+    .activity-card.sport-run { --sport-color:#0a84ff; }
+    .activity-card.sport-strength { --sport-color:#b98b1d; }
+    .activity-card.sport-hiit { --sport-color:#ff8a24; }
+    .activity-card.sport-hike { --sport-color:#b54843; }
+    .activity-card.sport-ride { --sport-color:#30b7a5; }
+    .activity-card.sport-walk { --sport-color:#6e9f72; }
+    .activity-card.sport-swim { --sport-color:#64d2ff; }
+    .activity-card.sport-other { --sport-color:#8e8e93; }
+
+    /* Plan mensual compacto */
+    .calendar-card { padding:12px 9px 10px; }
+    .month-grid { gap:4px; }
+    .day-cell { position:relative; min-height:62px !important; height:62px; padding:18px 4px 4px !important; border-radius:13px !important; overflow:hidden; }
+    .day-cell .day-number { position:absolute; top:5px; right:6px; margin:0; color:var(--secondary); font-size:.66rem; font-weight:720; line-height:1; }
+    .day-health { display:block; min-height:16px; }
+    .day-sleep { display:block; overflow:hidden; font-size:.56rem; line-height:16px; white-space:nowrap; text-overflow:ellipsis; }
+    .day-items { display:block; min-height:17px; }
+    .day-sports-line { display:flex; align-items:center; gap:2px; min-height:17px; overflow:hidden; white-space:nowrap; }
+    .day-sport-icon { font-size:.82rem; line-height:1; }
+    .day-more-icons { color:var(--muted); font-size:.52rem; }
+    .day-item, .day-more { display:none !important; }
+    .plan-day-detail { margin:0; box-shadow:none; background:transparent; border:0; padding:0; }
+    #planDayDialog { width:min(560px,calc(100% - 22px)); height:auto; }
+    #planDayDialog .dialog-shell { display:block; height:auto; max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 26px); overflow:hidden; }
+    #planDayDialog .dialog-header { min-height:50px; padding:8px 11px; }
+    #planDayDialog .dialog-header h2 { font-size:1.02rem; }
+    #planDayDialog .dialog-header .icon-button { width:34px; min-height:34px; border-radius:14px; }
+    #planDayDialog .dialog-content { min-height:0; max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 88px); overflow:auto; padding:4px 11px 12px; }
+    #planDayDialog .day-health-grid { margin-bottom:8px; gap:5px; }
+    #planDayDialog .day-health-metric { padding:7px 4px; }
+    #planDayDialog .plan-day-section { margin-top:9px; }
+
+
+    /* Evolución */
+    .evolution-wrap { display:grid; gap:12px; }
+    .evolution-toolbar { display:flex; gap:5px; overflow-x:auto; padding:0 1px 2px; scrollbar-width:none; }
+    .evolution-toolbar::-webkit-scrollbar { display:none; }
+    .evolution-range { flex:0 0 auto; min-height:32px; padding:0 10px; border-radius:13px; border:1px solid rgba(255,255,255,.13); background:rgba(45,45,52,.18); color:var(--muted); font-size:.66rem; font-weight:650; }
+    .evolution-range.active { color:#fff; background:rgba(10,132,255,.55); border-color:rgba(90,180,255,.34); }
+    .evolution-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+    .evolution-stat { min-width:0; padding:10px 4px; border-radius:17px; background:rgba(28,28,30,.40); border:1px solid rgba(255,255,255,.075); text-align:center; }
+    .evolution-stat span { display:block; color:var(--muted); font-size:.55rem; line-height:1.1; }
+    .evolution-stat strong { display:block; margin-top:4px; overflow:hidden; color:#fff; font-size:.90rem; font-weight:720; white-space:nowrap; text-overflow:ellipsis; }
+    .evolution-card { padding:13px; border-radius:22px; background:rgba(28,28,30,.40); border:1px solid rgba(255,255,255,.075); box-shadow:var(--shadow-card); -webkit-backdrop-filter:blur(34px) saturate(190%); backdrop-filter:blur(34px) saturate(190%); }
+    .evolution-card-head { display:flex; align-items:flex-end; justify-content:space-between; gap:8px; margin-bottom:8px; }
+    .evolution-card-head strong { font-size:.86rem; }
+    .evolution-card-head span { color:var(--muted); font-size:.60rem; }
+    .evolution-chart { width:100%; overflow:hidden; border-radius:14px; background:rgba(0,0,0,.15); }
+    .evolution-chart svg { display:block; width:100%; height:auto; }
+    .chart-empty { min-height:120px; display:grid; place-items:center; color:var(--muted); font-size:.72rem; }
+    .forecast-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+    .forecast-card { min-width:0; padding:10px 5px; border-radius:16px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.065); text-align:center; }
+    .forecast-card span { display:block; color:var(--muted); font-size:.56rem; }
+    .forecast-card strong { display:block; margin-top:4px; color:#fff; font-size:.82rem; font-weight:650; white-space:nowrap; }
+    .forecast-card small { display:block; margin-top:3px; color:var(--muted); font-size:.51rem; line-height:1.2; }
+    .chart-legend { display:flex; justify-content:flex-end; gap:10px; margin-top:5px; color:var(--muted); font-size:.56rem; }
+    .chart-dot { display:inline-block; width:7px; height:7px; margin-right:3px; border-radius:50%; vertical-align:middle; }
+    .evolution-shoes { margin-top:0; }
+    .evolution-shoes .shoe-add-row { margin-top:22px; }
+
+    /* Datos */
+    .manage-grid { gap:9px; }
+    .manage-card h3 { display:flex; align-items:center; gap:6px; margin-bottom:9px; font-size:.86rem; }
+    .manage-compact-pair { grid-column:1/-1; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .manage-mini-card { min-width:0; padding:10px; border-radius:18px; background:rgba(28,28,30,.40); border:1px solid rgba(255,255,255,.075); }
+    .manage-mini-card h3 { margin:0 0 7px; font-size:.70rem; font-weight:650; white-space:nowrap; }
+    .mini-version { margin-left:auto; color:var(--muted); font-size:.55rem; font-weight:600; }
+    .manage-mini-card .compact-button { width:100%; min-height:32px; padding-inline:6px; font-size:.63rem; }
+    .database-actions .compact-button { font-size:.66rem; }
+
+    @media (max-width:430px) {
+      .bottom-nav { padding-inline:5px; }
+      .nav-button .nav-emoji { font-size:1.08rem; }
+      .nav-button .nav-label { font-size:.54rem; }
+      .today-compact-pair { gap:6px; }
+      .today-mini-card { padding:8px 7px; }
+      .today-mini-head strong { font-size:.69rem; }
+      .today-mini-head span { font-size:.52rem; }
+      .today-mini-value { padding:5px 2px; }
+      .today-mini-value span { font-size:.50rem; }
+      .today-mini-value strong { font-size:.66rem; }
+      .evolution-stats, .forecast-grid { gap:4px; }
+      .evolution-stat { padding-inline:2px; }
+      .evolution-stat strong { font-size:.80rem; }
+      .forecast-card { padding-inline:2px; }
+      .forecast-card strong { font-size:.72rem; }
+      .day-cell { min-height:58px !important; height:58px; }
+    }
+  </style>
+
+
+  <style id="talos-v0281-corrections">
+    /* Hoy · sueño / VFC */
+    .sleep-quality-line { display:none !important; }
+    .today-sleep-quality { grid-column:1/-1; }
+    .today-sleep-quality strong { display:flex !important; align-items:baseline; justify-content:center; gap:5px; }
+    .today-sleep-quality .quality-word { font-size:.70rem; font-style:normal; font-weight:720; }
+    .today-sleep-quality .sleep-score-inline { color:#fff; font-size:.67rem; font-style:normal; font-weight:680; }
+    .today-sleep-quality .quality-excellent { color:#74e69a !important; }
+    .today-sleep-quality .quality-good { color:#8bc8ff !important; }
+    .today-sleep-quality .quality-fair { color:#ffd17a !important; }
+    .today-sleep-quality .quality-poor { color:#ff9792 !important; }
+
+    /* Hoy · ¿Cómo te encuentras? */
+    .form-card { padding:10px 11px !important; border-radius:20px !important; }
+    .form-card .data-title { margin-bottom:6px; }
+    .form-card .data-title h3 { font-size:.78rem; font-weight:680; }
+    .form-card .data-title span { font-size:.56rem; }
+    .form-card .feelings { gap:5px; }
+    .form-card .feeling-field label { margin-bottom:3px; font-size:.58rem; white-space:nowrap; }
+    .form-card .feeling-field select {
+      min-height:33px; padding:0 6px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.075);
+      background:rgba(255,255,255,.035); color:#fff;
+      font-size:.66rem;
+      -webkit-backdrop-filter:blur(28px) saturate(180%); backdrop-filter:blur(28px) saturate(180%);
+    }
+
+    /* Plan · altura exacta para número + sueño + actividad */
+    .day-cell { min-height:72px !important; height:72px !important; padding:19px 4px 5px !important; }
+    .day-health { min-height:18px !important; }
+    .day-sleep { line-height:18px !important; font-size:.58rem !important; }
+    .day-items { min-height:20px !important; }
+    .day-sports-line { min-height:20px !important; gap:3px !important; }
+    .day-sport-icon { font-size:.90rem !important; }
+
+    /* Evolución · ejes y etiquetas */
+    .evolution-chart svg { min-height:174px; }
+
+    @media (max-width:430px) {
+      .day-cell { min-height:69px !important; height:69px !important; padding-top:18px !important; }
+      .day-health { min-height:17px !important; }
+      .day-sleep { line-height:17px !important; }
+      .day-items, .day-sports-line { min-height:19px !important; }
+      .day-sport-icon { font-size:.86rem !important; }
+      .form-card { padding:9px !important; }
+      .form-card .feelings { gap:4px; }
+      .form-card .feeling-field select { min-height:32px; padding-inline:4px; font-size:.62rem; }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -927,7 +1128,6 @@
       </section>
 
       <section class="view" id="view-activities" data-view="activities">
-        <div class="section-heading"><h2>Actividades</h2><p id="activityCount"></p></div>
         <div class="activity-toolbar">
           <div class="activity-search glass-control"><span aria-hidden="true">⌕</span><input id="activitySearch" type="search" placeholder="Buscar actividad…" autocomplete="off"></div>
           <div class="activity-filter-row">
@@ -935,8 +1135,11 @@
               <option value="all">Todos los deportes</option>
               <option value="run">Carrera</option>
               <option value="strength">Fuerza</option>
+              <option value="hiit">HIIT</option>
+              <option value="hike">Senderismo</option>
               <option value="walk">Paseo</option>
               <option value="ride">Ciclismo</option>
+              <option value="swim">Natación</option>
               <option value="other">Otros</option>
             </select>
             <select id="activityClassificationFilter" class="glass-select" aria-label="Filtrar por clasificación">
@@ -965,6 +1168,7 @@
             <button class="compact-button secondary-button" id="activityClearFilters" type="button">Limpiar</button>
           </div>
         </div>
+        <div class="activity-count-compact" id="activityCount"></div>
         <div class="activity-list" id="activityList"></div>
       </section>
 
@@ -980,11 +1184,14 @@
           <div class="weekdays" aria-hidden="true"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
           <div class="month-grid" id="monthGrid"></div>
         </div>
-        <div id="planDayDetail"></div>
+      </section>
+
+      <section class="view" id="view-evolution" data-view="evolution">
+        <div id="evolutionContent"></div>
       </section>
 
       <section class="view" id="view-manage" data-view="manage">
-        <div class="section-heading"><h2>Gestión</h2><p id="appVersionLabel"></p></div>
+        <span id="appVersionLabel" class="hidden"></span>
         <div class="grid manage-grid" id="manageContent"></div>
       </section>
     </main>
@@ -1000,8 +1207,11 @@
     <button class="nav-button" type="button" data-target="plan">
       <span class="nav-emoji" aria-hidden="true">📅</span><span class="nav-label">Plan</span>
     </button>
+    <button class="nav-button" type="button" data-target="evolution">
+      <span class="nav-emoji" aria-hidden="true">📈</span><span class="nav-label">Evolución</span>
+    </button>
     <button class="nav-button" type="button" data-target="manage">
-      <span class="nav-emoji" aria-hidden="true">⚙️</span><span class="nav-label">Gestión</span>
+      <span class="nav-emoji" aria-hidden="true">🗄️</span><span class="nav-label">Datos</span>
     </button>
   </nav>
 
@@ -1023,6 +1233,13 @@
     <div class="dialog-shell">
       <div class="dialog-header"><h2 id="activityDialogTitle">Actividad</h2><button class="icon-button" type="button" data-close-dialog="activityDialog" aria-label="Cerrar">✕</button></div>
       <div class="dialog-content" id="activityDialogContent"></div>
+    </div>
+  </dialog>
+
+  <dialog id="planDayDialog">
+    <div class="dialog-shell">
+      <div class="dialog-header"><h2 id="planDayDialogTitle">Día</h2><button class="icon-button" type="button" data-close-dialog="planDayDialog" aria-label="Cerrar">✕</button></div>
+      <div class="dialog-content" id="planDayDialogContent"></div>
     </div>
   </dialog>
 
@@ -1146,7 +1363,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.27.1";
+    const APP_VERSION = "0.28.2";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -1165,7 +1382,7 @@
       shoeAssignments: "activityShoeAssignments",
       activityMeta: "activityMetadata"
     };
-    const VIEW_LABELS = { today: "Hoy", activities: "Actividades", plan: "Plan", manage: "Gestión" };
+    const VIEW_LABELS = { today: "Hoy", activities: "Actividades", plan: "Plan", evolution: "Evolución", manage: "Datos" };
     const TIME_ZONE = "Europe/Madrid";
     const DAY_MS = 86400000;
     const STREAM_CACHE_VERSION = 3;
@@ -1193,6 +1410,7 @@
       selectedTodayDate: null,
       monthCursor: new Date(),
       selectedPlanDate: null,
+      evolutionRange: "6m",
       dataDbName: null,
       map: null,
       mapLayer: null,
@@ -1835,10 +2053,10 @@
       if (!current || !isNumber(current.load?.ctl)) return { label: "Sin tendencia", detail: "Aún no hay suficientes datos de carga." };
       const priorRows = state.wellness.filter(item => item.date < current.date && isNumber(item.load?.ctl));
       const reference = priorRows.length ? priorRows[Math.max(0, priorRows.length - 28)] : null;
-      if (!reference || !isNumber(reference.load?.ctl) || reference.load.ctl === 0) return { label: "En observación", detail: `CTL actual ${formatNumber(current.load.ctl, 1)}.` };
+      if (!reference || !isNumber(reference.load?.ctl) || reference.load.ctl === 0) return { label: "En observación", detail: `Forma actual ${formatNumber(current.load.ctl, 1)}.` };
       const change = ((current.load.ctl / reference.load.ctl) - 1) * 100;
       const label = change > 5 ? "Mejorando" : change < -5 ? "Descendiendo" : "Estable";
-      return { label, detail: `CTL ${change >= 0 ? "+" : ""}${formatNumber(change, 0)} % frente a ${formatDate(reference.date, { day: "numeric", month: "short" })}.` };
+      return { label, detail: `Forma ${change >= 0 ? "+" : ""}${formatNumber(change, 0)} % frente a ${formatDate(reference.date, { day: "numeric", month: "short" })}.` };
     }
 
     function dateKeyFromDate(date) {
@@ -2725,7 +2943,6 @@
         ...snapshot.readiness.reasons.slice(0, 2),
         `${snapshot.dataQuality.wellnessDays} días de salud · ${snapshot.dataQuality.activityHistoryDays} días de histórico deportivo`,
         `Memoria: ${formatNumber(snapshot.performanceMemory.residualWeeklyKm, 1)} km/sem residual · sesión base ≥ ${formatNumber(snapshot.constraints.minimumRunKm, 1)} km`,
-        snapshot.performanceForecast?.available ? `Pronóstico ${goalLabel(state.planPreferences?.goal || "")}: ${formatTargetTime(snapshot.performanceForecast.predictedTimeSec)} · confianza ${forecastConfidenceLabel(snapshot.performanceForecast.confidence)}` : "Pronóstico: aún sin referencias suficientes",
         `${trainingPhaseLabel(snapshot.constraints.trainingPhase)}${isNumber(snapshot.constraints.weeksToGoal) ? ` · ${formatNumber(snapshot.constraints.weeksToGoal, 1)} sem.` : ""}`,
         snapshot.constraints.blockLabel ? `${trainingBlockLabel({ week: snapshot.constraints.blockWeek, label: snapshot.constraints.blockLabel })}${snapshot.constraints.blockForced ? " · adelantada por respuesta reciente" : ""}` : "Bloque semanal sin historial suficiente",
         isNumber(snapshot.execution.sessionAdherencePercent) ? `Cumplimiento 56 d: ${formatNumber(snapshot.execution.sessionAdherencePercent)}%` : "Sin semanas previas suficientes para medir adherencia",
@@ -2740,17 +2957,13 @@
           <div class="planning-metric"><span>Estado TɅLOS</span><strong>${isNumber(snapshot.readiness.score) ? snapshot.readiness.score : "—"}</strong><small>${escapeHtml(snapshot.readiness.label)}</small></div>
           <div class="planning-metric"><span>Carrera · 7 días</span><strong>${formatNumber(seven.runningDistanceM / 1000, 1)} km</strong><small>${seven.runningCount} sesiones</small></div>
           <div class="planning-metric"><span>Límite prudente</span><strong>${formatNumber(snapshot.constraints.maxWeeklyDistanceKm, 1)} km</strong><small>${snapshot.constraints.maxRunDays} carreras máximo</small></div>
-          <div class="planning-metric"><span>CTL / ATL</span><strong>${formatNumber(snapshot.load.ctl, 1)} / ${formatNumber(snapshot.load.atl, 1)}</strong><small>forma / fatiga</small></div>
+          <div class="planning-metric"><span>Forma / Fatiga</span><strong>${formatNumber(snapshot.load.ctl, 1)} / ${formatNumber(snapshot.load.atl, 1)}</strong><small>carga estable / reciente</small></div>
         </div>
         <div class="planning-explanation-toggle-row"><button class="planning-explanation-toggle" type="button" data-plan-explanations aria-expanded="false">Ver base</button></div>
         <div class="planning-reasons hidden" data-plan-reasons>${reasons.map(reason => `<span class="planning-reason">${escapeHtml(reason)}</span>`).join("")}</div>
-        ${snapshot.performanceForecast?.available ? `<div class="planning-forecast">
-          <div><strong>🎯 Pronóstico ${escapeHtml(goalLabel(state.planPreferences?.goal || ""))}</strong><br><small>Rango ${escapeHtml(formatTargetTime(snapshot.performanceForecast.rangeLowSec))}–${escapeHtml(formatTargetTime(snapshot.performanceForecast.rangeHighSec))} · ritmo central ${escapeHtml(formatPace(snapshot.performanceForecast.predictedPaceSecPerKm))}/km · confianza ${escapeHtml(forecastConfidenceLabel(snapshot.performanceForecast.confidence))}. Estimación, no garantía.</small></div>
-          <div><div class="forecast-time">${escapeHtml(formatTargetTime(snapshot.performanceForecast.predictedTimeSec))}</div><div class="forecast-status">${escapeHtml(snapshot.performanceForecast.status || "Referencia actual")}${isNumber(snapshot.performanceForecast.targetGapPercent) ? ` · ${snapshot.performanceForecast.targetGapPercent > 0 ? "+" : ""}${formatNumber(snapshot.performanceForecast.targetGapPercent,1)}%` : ""}</div></div>
-        </div>` : ""}
         ${latestWeekly ? `<div class="planning-weekly-memory"><strong>🧠 Última semana · ${latestWeekly.score}/100</strong><span>${latestWeekly.adherencePercent}% cumplimiento · ${formatNumber(latestWeekly.actualDistanceKm,1)}/${formatNumber(latestWeekly.plannedDistanceKm,1)} km${latestWeekly.flags?.length ? ` · ${escapeHtml(latestWeekly.flags[0])}` : ""}</span></div>` : ""}
         <div class="planning-actions">
-          <button class="secondary-button" type="button" data-plan-configure>Configurar</button>
+          <button class="secondary-button" type="button" data-plan-configure>Configurar plan</button>
           ${canAdaptCurrentWeek ? `<button class="secondary-button" type="button" data-plan-adapt ${state.adaptingPlan ? "disabled" : ""}>${state.adaptingPlan ? "Revisando…" : "Revisar semana actual"}</button>` : ""}
           ${ready && state.planPreferences && !record?.draft ? `<button class="primary-button" type="button" data-plan-generate ${state.generatingPlan ? "disabled" : ""}>${record?.accepted ? "Regenerar" : "Generar semana"}</button>` : ""}
         </div>`;
@@ -3027,19 +3240,48 @@
       return null;
     }
 
-    function todayPlannedSessionMarkup(date) {
-      const day = acceptedPlanDayForDate(date);
-      if (!day) return "";
-      const actuals = state.activities.filter(activity => activityDateKey(activity) === date);
-      const matched = day.sport !== "rest" ? planActivityMatch(day, actuals) : null;
-      const status = matched ? "Realizado" : day.sport === "rest" ? "Descanso" : date < todayKey() ? "No completado" : "Previsto";
-      const shoe = day.sport === "run" ? shoeRecommendationLine(day) : "";
-      return `<article class="today-plan-card">
-        <div class="today-plan-head"><span>Entrenamiento previsto</span><em class="today-plan-status ${matched ? "done" : ""}">${escapeHtml(status)}</em></div>
-        <div class="today-plan-title">${escapeHtml(day.title || (day.sport === "rest" ? "Descanso" : "Entrenamiento TɅLOS"))}</div>
-        <div class="today-plan-metric">${escapeHtml(planDayMetric(day))}${day.intensity && day.sport !== "rest" ? ` · ${escapeHtml(day.intensity)}` : ""}</div>
-        ${day.description ? `<p class="today-plan-description">${escapeHtml(day.description)}</p>` : ""}
-        ${shoe ? `<div class="today-plan-shoe">${escapeHtml(shoe)}</div>` : ""}
+    function upcomingPlanSessions(fromDate = todayKey(), limit = 3) {
+      const days = state.plans
+        .flatMap(record => record.accepted?.plan?.days || [])
+        .filter(day => day?.date >= fromDate && day?.sport && day.sport !== "rest")
+        .sort((a,b) => a.date.localeCompare(b.date));
+      const unique = [];
+      const seen = new Set();
+      for (const day of days) {
+        const key = `${day.date}:${day.sport}:${day.title || day.sessionType || ""}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        unique.push(day);
+        if (unique.length >= limit) break;
+      }
+      return unique;
+    }
+
+    function upcomingPlanMarkup(fromDate) {
+      const rows = upcomingPlanSessions(fromDate, 3);
+      if (!rows.length) return `<article class="upcoming-card"><div class="upcoming-head"><strong>Próximos entrenamientos</strong><span>Plan aceptado</span></div><div class="plan-empty">No hay próximos entrenamientos en un plan aceptado.</div></article>`;
+      return `<article class="upcoming-card">
+        <div class="upcoming-head"><strong>Próximos entrenamientos</strong><span>${rows.length} siguientes</span></div>
+        <div class="upcoming-list">${rows.map(day => {
+          const date = dateFromKey(day.date);
+          const weekday = date ? new Intl.DateTimeFormat("es-ES", { weekday:"short", day:"numeric" }).format(date).replace(".", "") : day.date;
+          const matched = planActivityMatch(day, state.activities.filter(activity => activityDateKey(activity) === day.date));
+          const detailId = `upcoming-${day.date}-${String(day.sessionType || day.sport || "session").replace(/[^a-z0-9_-]/gi, "-")}`;
+          const steps = day.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${planStepTarget(step) ? ` · ${escapeHtml(planStepTarget(step))}` : ""}</li>`).join("")}</ol>` : "";
+          return `<div class="upcoming-item">
+            <button type="button" class="upcoming-row" data-toggle-upcoming="${escapeHtml(detailId)}" aria-expanded="false" aria-controls="${escapeHtml(detailId)}">
+              <span class="upcoming-date">${escapeHtml(weekday)}</span>
+              <span class="upcoming-icon" aria-hidden="true">${planSportIcon(day.sport, day.title)}</span>
+              <span class="upcoming-copy"><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><span>${escapeHtml(planDayMetric(day))}${day.intensity ? ` · ${escapeHtml(day.intensity)}` : ""}${matched ? " · realizado" : ""}</span></span>
+              <span class="upcoming-open" aria-hidden="true">›</span>
+            </button>
+            <div class="upcoming-detail hidden" id="${escapeHtml(detailId)}" data-upcoming-detail="${escapeHtml(detailId)}">
+              ${day.description ? `<p>${escapeHtml(day.description)}</p>` : ""}
+              ${steps}
+              ${shoeRecommendationMarkup(day)}
+            </div>
+          </div>`;
+        }).join("")}</div>
       </article>`;
     }
 
@@ -3059,11 +3301,12 @@
       const body = current?.body || {};
       const hrvRecent = median(state.wellness.filter(item => item.date <= (current?.date || todayKey())).slice(-7).map(item => item.recovery?.hrvRmssdMs));
       const scoreText = readiness.score === null ? "—" : readiness.score;
-      const reasons = readiness.reasons.length ? readiness.reasons.map(reason => `<span class="reason-chip ${reason.good ? "good" : "warn"}">${escapeHtml(reason.text)}</span>`).join("") : '<span class="reason-chip">Sin información suficiente</span>';
+      const sleepQuality = qualityLabel(recovery.sleepQualityLabel);
+      const sleepQualityClass = qualityClass(recovery.sleepQualityLabel);
       const subjective = state.subjective || {};
       const feelingsMarkup = isToday ? `
           <article class="card data-card form-card">
-            <div class="data-title"><h3>Cómo te encuentras hoy</h3><span>Opcional · guardado local</span></div>
+            <div class="data-title"><h3>Cómo te encuentras hoy</h3><span>Opcional</span></div>
             <div class="feelings">
               ${feelingSelect("energy", "⚡ Energía", subjective.energy, ["Sin registrar", "Muy baja", "Baja", "Normal", "Buena", "Muy buena"])}
               ${feelingSelect("legs", "🦵 Piernas", subjective.legs, ["Sin registrar", "Muy cargadas", "Cargadas", "Normales", "Sueltas", "Muy sueltas"])}
@@ -3077,46 +3320,43 @@
           <div class="today-day-nav-copy"><span>${isToday ? "Hoy" : selectedIndex === 1 ? "Ayer" : `Hace ${selectedIndex} días`}</span><strong>${formatFullDate(currentDate)}</strong></div>
           <button class="day-nav-button" type="button" data-today-index="${selectedIndex - 1}" aria-label="Ver el día siguiente" ${isToday ? "disabled" : ""}>›</button>
         </div>
-        ${todayPlannedSessionMarkup(currentDate)}
         <div class="grid today-grid">
           <article class="card readiness-card">
             <div class="readiness-head">
               <div class="score-ring" style="--score:${readiness.score || 0};--score-color:${readiness.color}"><span class="score-value">${scoreText}</span></div>
               <div class="score-copy"><p class="eyebrow">Disponibilidad del día</p><h2>${escapeHtml(readiness.label)}</h2><p>${wellness ? "Datos sincronizados" : "Sin datos sincronizados para este día"}</p></div>
             </div>
-            <div class="reason-list">${reasons}</div>
             <div class="metric-strip">
               <div class="mini-metric"><span>💤 Sueño</span><strong>${formatSleep(recovery.sleepSeconds)}</strong></div>
-              <div class="mini-metric"><span>〰️ VFC</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"}</strong></div>
+              <div class="mini-metric"><span>〽️ VFC</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"}</strong></div>
               <div class="mini-metric"><span>❤️ Reposo</span><strong>${isNumber(recovery.restingHeartRateBpm) ? `${formatNumber(recovery.restingHeartRateBpm)} ppm` : "—"}</strong></div>
               <div class="mini-metric"><span>👟 Pasos</span><strong>${isNumber(body.steps) ? formatNumber(body.steps) : "—"}</strong></div>
             </div>
-            <div class="sleep-need">
-              <div class="sleep-need-copy"><span>🌙 Necesidad de sueño · próxima noche</span><small>${escapeHtml(sleepNeed.detail)}${sleepNeed.provisional ? " · cálculo provisional" : ""}</small></div>
-              <strong>${formatSleep(sleepNeed.seconds)}</strong>
-            </div>
           </article>
 
-          <article class="card data-card">
-            <div class="data-title"><h3>Variabilidad de la frecuencia cardiaca</h3><span>RMSSD</span></div>
-            <div class="data-list">
-              <div class="data-row"><span>🌙 Media nocturna</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} <small>ms</small>` : "—"}</strong></div>
-              <div class="data-row"><span>📅 Media de 7 días</span><strong>${isNumber(hrvRecent) ? `${formatNumber(hrvRecent)} <small>ms</small>` : "—"}</strong></div>
-              <div class="data-row"><span>📊 Línea base de 28 días</span><strong>${isNumber(readiness.hrvBase) ? `${formatNumber(readiness.hrvBase)} <small>ms</small>` : "—"}</strong></div>
-              <div class="data-row"><span>💤 Calidad del sueño</span><strong>${qualityLabel(recovery.sleepQualityLabel)}${isNumber(recovery.sleepScore) ? ` · ${formatNumber(recovery.sleepScore)}` : ""}</strong></div>
-            </div>
-          </article>
+          <div class="sleep-need-compact"><span>🌙 Necesidad de sueño · próxima noche</span><strong>${formatSleep(sleepNeed.seconds)}</strong></div>
 
-          <article class="card form-card">
-            <div class="form-summary"><div><p class="eyebrow">Estado de forma</p><h3>${escapeHtml(form.label)}</h3><p>${escapeHtml(form.detail)}</p></div><span class="status-pill">Transparente</span></div>
-            <div class="load-grid">
-              <div class="load-item"><span>CTL · forma</span><strong>${formatNumber(load.ctl, 1)}</strong></div>
-              <div class="load-item"><span>ATL · fatiga</span><strong>${formatNumber(load.atl, 1)}</strong></div>
-              <div class="load-item"><span>Forma</span><strong>${isNumber(load.form) ? `${load.form >= 0 ? "+" : ""}${formatNumber(load.form, 1)}` : "—"}</strong></div>
-              <div class="load-item"><span>Ramp rate</span><strong>${isNumber(load.rampRate) ? `${load.rampRate >= 0 ? "+" : ""}${formatNumber(load.rampRate, 1)}` : "—"}</strong></div>
-            </div>
-          </article>
+          <div class="today-compact-pair">
+            <article class="today-mini-card">
+              <div class="today-mini-head"><strong>〽️ VFC</strong><span>tendencia</span></div>
+              <div class="today-mini-grid">
+                <div class="today-mini-value"><span>Noche</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} <small>ms</small>` : "—"}</strong></div>
+                <div class="today-mini-value"><span>7 días</span><strong>${isNumber(hrvRecent) ? `${formatNumber(hrvRecent)} <small>ms</small>` : "—"}</strong></div>
+                <div class="today-mini-value today-sleep-quality"><span>Calidad del sueño</span><strong>${recovery.sleepQualityLabel ? `<em class="quality-word ${sleepQualityClass}">${escapeHtml(sleepQuality)}</em>` : "—"}${isNumber(recovery.sleepScore) ? `<em class="sleep-score-inline">${formatNumber(recovery.sleepScore)}</em>` : ""}</strong></div>
+              </div>
+            </article>
+            <article class="today-mini-card">
+              <div class="today-mini-head"><strong>📈 Estado de forma</strong><span>${escapeHtml(form.label)}</span></div>
+              <div class="today-mini-grid">
+                <div class="today-mini-value"><span>Forma</span><strong>${formatNumber(load.ctl, 1)}</strong></div>
+                <div class="today-mini-value"><span>Fatiga</span><strong>${formatNumber(load.atl, 1)}</strong></div>
+                <div class="today-mini-value"><span>Frescura</span><strong>${isNumber(load.form) ? `${load.form >= 0 ? "+" : ""}${formatNumber(load.form, 1)}` : "—"}</strong></div>
+                <div class="today-mini-value"><span>Tendencia</span><strong>${isNumber(load.rampRate) ? `${load.rampRate >= 0 ? "+" : ""}${formatNumber(load.rampRate, 1)}` : "—"}</strong></div>
+              </div>
+            </article>
+          </div>
 
+          ${upcomingPlanMarkup(isToday ? todayKey() : currentDate)}
           ${feelingsMarkup}
         </div>`;
 
@@ -3124,6 +3364,18 @@
       $$('[data-today-index]', $("#todayContent")).forEach(button => button.addEventListener("click", () => {
         state.selectedTodayDate = dayKeys[Number(button.dataset.todayIndex)];
         renderToday();
+      }));
+      $$('[data-toggle-upcoming]', $("#todayContent")).forEach(button => button.addEventListener("click", () => {
+        const detailId = button.dataset.toggleUpcoming;
+        const detail = document.getElementById(detailId);
+        if (!detail) return;
+        const opening = detail.classList.contains("hidden");
+        $$('[data-upcoming-detail]', $("#todayContent")).forEach(node => node.classList.add("hidden"));
+        $$('[data-toggle-upcoming]', $("#todayContent")).forEach(node => node.setAttribute("aria-expanded", "false"));
+        if (opening) {
+          detail.classList.remove("hidden");
+          button.setAttribute("aria-expanded", "true");
+        }
       }));
     }
 
@@ -3191,11 +3443,14 @@
     }
 
     function activitySportGroup(activity) {
-      if (isRunningActivity(activity)) return "run";
       const value = `${activity?.type || ""} ${activity?.name || ""}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      if (/hiit|crossfit|circuit|cardio/.test(value)) return "hiit";
+      if (/hike|hiking|sender|trail walk/.test(value)) return "hike";
+      if (isRunningActivity(activity)) return "run";
       if (/strength|weight|gym|fuerza|pesas/.test(value)) return "strength";
       if (/walk|walking|caminata|andar/.test(value)) return "walk";
       if (/ride|bike|cycle|cycling|ciclismo|bicicleta/.test(value)) return "ride";
+      if (/swim|natacion/.test(value)) return "swim";
       return "other";
     }
 
@@ -3229,9 +3484,13 @@
       await storePut(DATA_STORES.activityMeta, record);
       state.activityMeta = [...state.activityMeta.filter(item => item.activityId !== record.activityId), record];
       renderActivities();
+      renderPlan();
+      renderEvolution();
       if ($("#activityDialog")?.open) {
+        if (state.map) { state.map.remove(); state.map = null; }
         $("#activityDialogContent").innerHTML = activityDetailMarkup(activity);
         bindActivityDialogActions(activity);
+        await loadAndRenderStreams(activity).catch(() => {});
       }
     }
 
@@ -3312,7 +3571,7 @@
         const classification = inferredActivityClassification(activity);
         const type = inferActivityTrainingType(activity);
         return `
-        <button class="activity-card" type="button" data-activity-id="${escapeHtml(activity.id)}">
+        <button class="activity-card sport-${escapeHtml(activitySportGroup(activity))}" type="button" data-activity-id="${escapeHtml(activity.id)}">
           <span class="activity-icon" aria-hidden="true">${activityIcon(activity.type, activity.name)}</span>
           <span class="activity-copy">
             <span>${formatDate(activityDateKey(activity), { weekday: "short", day: "numeric", month: "short", year: "numeric" })}</span>
@@ -3426,30 +3685,24 @@
         if (!activitiesByDay.has(key)) activitiesByDay.set(key, []);
         activitiesByDay.get(key).push(activity);
         if (!byDay.has(key)) byDay.set(key, []);
-        byDay.get(key).push({ icon: activityIcon(activity.type, activity.name), name: activity.name, done: true, activityId: activity.id });
+        byDay.get(key).push({ icon: activityIcon(activity.type, activity.name), name: activity.name, done: true, activityId: activity.id, actual: true });
       }
       for (const event of state.calendar) {
         const key = String(event.startLocal || "").slice(0, 10);
         if (!key) continue;
         if (!byDay.has(key)) byDay.set(key, []);
-        const icon = activityIcon(`${event.type || ""} ${event.category || ""}`, event.name);
         const dayActivities = activitiesByDay.get(key) || [];
-        const completed = Boolean(calendarEventMatch(event, dayActivities));
-        byDay.get(key).unshift({ icon, name: event.name || event.type || "Entrenamiento", done: completed });
+        const matched = calendarEventMatch(event, dayActivities);
+        if (!matched) byDay.get(key).push({ icon: activityIcon(`${event.type || ""} ${event.category || ""}`, event.name), name: event.name || event.type || "Entrenamiento", done: false });
       }
       for (const record of state.plans) {
         for (const day of record.accepted?.plan?.days || []) {
           const key = day.date;
-          if (!key) continue;
+          if (!key || day.sport === "rest") continue;
           if (!byDay.has(key)) byDay.set(key, []);
           const dayActivities = activitiesByDay.get(key) || [];
-          const completed = Boolean(planActivityMatch(day, dayActivities));
-          byDay.get(key).unshift({
-            icon: planSportIcon(day.sport, day.title),
-            name: day.title || "Entrenamiento TɅLOS",
-            done: completed,
-            localPlan: true
-          });
+          const matched = planActivityMatch(day, dayActivities);
+          if (!matched) byDay.get(key).push({ icon: planSportIcon(day.sport, day.title), name: day.title || "Entrenamiento TɅLOS", done: false, localPlan: true });
         }
       }
       const cells = Array.from({ length: leading }, () => '<div class="day-cell blank"></div>');
@@ -3458,21 +3711,25 @@
         const items = byDay.get(key) || [];
         const wellness = wellnessByDay.get(key);
         const health = isNumber(wellness?.recovery?.sleepSeconds)
-          ? `<span class="day-sleep ${qualityClass(wellness.recovery.sleepQualityLabel)}" title="Sueño ${qualityLabel(wellness.recovery.sleepQualityLabel).toLowerCase()}">💤${formatCompactSleep(wellness.recovery.sleepSeconds)}</span>`
-          : "";
-        const visible = items.slice(0, 2).map(item => `<span class="day-item ${item.done ? "done" : ""}" title="${escapeHtml(item.name)}">${item.icon} ${escapeHtml(item.name)}</span>`).join("");
-        cells.push(`<button class="day-cell ${key === todayKey() ? "today" : ""} ${key === state.selectedPlanDate ? "selected" : ""}" type="button" data-calendar-date="${key}" aria-label="Ver ${formatDate(key, { day: "numeric", month: "long", year: "numeric" })}"><span class="day-number">${day}</span><span class="day-items">${visible}${items.length > 2 ? `<span class="day-more">+${items.length - 2}</span>` : ""}</span>${health ? `<span class="day-health">${health}</span>` : ""}</button>`);
+          ? `<span class="day-sleep ${qualityClass(wellness.recovery.sleepQualityLabel)}" title="Sueño ${qualityLabel(wellness.recovery.sleepQualityLabel).toLowerCase()}">💤 ${formatCompactSleep(wellness.recovery.sleepSeconds)}</span>`
+          : `<span class="day-sleep">&nbsp;</span>`;
+        const displaySports = [];
+        for (const item of items) {
+          if (!item.actual && displaySports.some(existing => !existing.actual && existing.icon === item.icon)) continue;
+          displaySports.push(item);
+        }
+        const sports = displaySports.slice(0, 3).map(item => `<span class="day-sport-icon ${item.done ? "done" : ""}" title="${escapeHtml(item.name)}">${item.icon}</span>`).join("");
+        const more = displaySports.length > 3 ? `<span class="day-more-icons">+${displaySports.length - 3}</span>` : "";
+        cells.push(`<button class="day-cell ${key === todayKey() ? "today" : ""}" type="button" data-calendar-date="${key}" aria-label="Ver ${formatDate(key, { day: "numeric", month: "long", year: "numeric" })}"><span class="day-number">${day}</span><span class="day-health">${health}</span><span class="day-items"><span class="day-sports-line">${sports}${more}</span></span></button>`);
       }
       $("#monthGrid").innerHTML = cells.join("");
       $$('[data-calendar-date]', $("#monthGrid")).forEach(button => button.addEventListener("click", () => {
         state.selectedPlanDate = button.dataset.calendarDate;
-        renderPlan();
-        $("#planDayDetail")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        openPlanDayDialog(button.dataset.calendarDate);
       }));
-      renderPlanDayDetail(state.selectedPlanDate);
     }
 
-    function renderPlanDayDetail(date) {
+    function planDayDetailMarkup(date) {
       const wellness = state.wellness.find(item => item.date === date);
       const recovery = wellness?.recovery || {};
       const load = wellness?.load || {};
@@ -3482,11 +3739,11 @@
       const localPlanned = state.plans.flatMap(record => record.accepted?.plan?.days || []).filter(day => day.date === date);
       const metrics = [
         ["💤 Sueño", formatSleep(recovery.sleepSeconds)],
-        ["⭐ Puntuación", isNumber(recovery.sleepScore) ? `${formatNumber(recovery.sleepScore)}/100` : "—"],
-        ["〰️ VFC", isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"],
-        ["❤️ FC reposo", isNumber(recovery.restingHeartRateBpm) ? `${formatNumber(recovery.restingHeartRateBpm)} ppm` : "—"],
-        ["👟 Pasos", isNumber(body.steps) ? formatNumber(body.steps) : "—"],
-        ["📈 CTL / ATL", isNumber(load.ctl) && isNumber(load.atl) ? `${formatNumber(load.ctl, 1)} / ${formatNumber(load.atl, 1)}` : "—"]
+        ["⭐ Sueño", isNumber(recovery.sleepScore) ? `${formatNumber(recovery.sleepScore)}/100` : "—"],
+        ["〽️ VFC", isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"],
+        ["❤️ Reposo", isNumber(recovery.restingHeartRateBpm) ? `${formatNumber(recovery.restingHeartRateBpm)} ppm` : "—"],
+        ["📈 Forma", isNumber(load.ctl) ? formatNumber(load.ctl, 1) : "—"],
+        ["⚡ Fatiga", isNumber(load.atl) ? formatNumber(load.atl, 1) : "—"]
       ];
       const activityMarkup = activities.map(activity => `
         <button class="plan-activity-button" type="button" data-plan-activity-id="${escapeHtml(activity.id)}">
@@ -3496,8 +3753,7 @@
         </button>`).join("");
       const plannedMarkup = planned.map(event => {
         const matched = calendarEventMatch(event, activities);
-        return `
-        <div class="plan-activity-button">
+        return `<div class="plan-activity-button">
           <span class="sport" aria-hidden="true">${activityIcon(`${event.type || ""} ${event.category || ""}`, event.name)}</span>
           <span class="copy"><strong>${escapeHtml(event.name || event.type || "Entrenamiento")}</strong><span>${isNumber(event.distanceM) ? formatDistance(event.distanceM) : "Planificado"}${isNumber(event.movingTimeSec) ? ` · ${formatDuration(event.movingTimeSec)}` : ""}${matched ? " · realizado" : ""}</span></span>
           <span class="open" aria-hidden="true">${matched ? "✓" : ""}</span>
@@ -3505,11 +3761,10 @@
       }).join("");
       const localPlannedMarkup = localPlanned.map(day => {
         const matched = planActivityMatch(day, activities);
-        return `
-        <details class="planned-session">
+        return `<details class="planned-session" ${day.sport !== "rest" ? "open" : ""}>
           <summary class="plan-activity-button">
             <span class="sport" aria-hidden="true">${planSportIcon(day.sport, day.title)}</span>
-            <span class="copy"><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><span>${escapeHtml(planDayMetric(day))} · ${escapeHtml(day.intensity || "easy")}${shoeRecommendationLine(day) ? ` · ${escapeHtml(shoeRecommendationLine(day))}` : ""}${matched ? " · realizado" : ""}</span></span>
+            <span class="copy"><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><span>${escapeHtml(planDayMetric(day))}${day.intensity ? ` · ${escapeHtml(day.intensity)}` : ""}${matched ? " · realizado" : ""}</span></span>
             <span class="open" aria-hidden="true">${matched ? "✓" : "›"}</span>
           </summary>
           <div class="planned-session-body">
@@ -3520,20 +3775,28 @@
           </div>
         </details>`;
       }).join("");
-      $("#planDayDetail").innerHTML = `
-        <article class="card plan-day-detail">
-          <div class="plan-day-head"><div><p>Detalle del día</p><h3>${escapeHtml(formatFullDate(date))}</h3></div>${date === todayKey() ? '<span class="status-pill">Hoy</span>' : ""}</div>
-          <div class="day-health-grid">${metrics.map(([label, value]) => `<div class="day-health-metric"><span>${label}</span><strong>${value}</strong></div>`).join("")}</div>
-          ${activities.length ? `<div class="plan-day-section"><h4>Actividad realizada</h4>${activityMarkup}</div>` : '<p class="plan-empty">No hay actividad registrada este día.</p>'}
-          ${planned.length || localPlanned.length ? `<div class="plan-day-section"><h4>Entrenamiento previsto</h4>${localPlannedMarkup}${plannedMarkup}</div>` : ""}
-        </article>`;
-      $$('[data-plan-activity-id]', $("#planDayDetail")).forEach(button => button.addEventListener("click", () => openActivity(button.dataset.planActivityId)));
+      return `<article class="plan-day-detail">
+        <div class="day-health-grid">${metrics.map(([label,value]) => `<div class="day-health-metric"><span>${label}</span><strong>${value}</strong></div>`).join("")}</div>
+        ${activities.length ? `<div class="plan-day-section"><h4>Actividad realizada</h4>${activityMarkup}</div>` : ""}
+        ${planned.length || localPlanned.length ? `<div class="plan-day-section"><h4>Entrenamiento previsto</h4>${localPlannedMarkup}${plannedMarkup}</div>` : `<p class="plan-empty">No hay entrenamiento previsto este día.</p>`}
+      </article>`;
     }
 
+    function openPlanDayDialog(date) {
+      if (!date) return;
+      state.selectedPlanDate = date;
+      $("#planDayDialogTitle").textContent = formatFullDate(date);
+      $("#planDayDialogContent").innerHTML = planDayDetailMarkup(date);
+      openDialog($("#planDayDialog"));
+      $$('[data-plan-activity-id]', $("#planDayDialogContent")).forEach(button => button.addEventListener("click", () => {
+        closeDialog($("#planDayDialog"));
+        setTimeout(() => openActivity(button.dataset.planActivityId), 80);
+      }));
+    }
 
     function openShoeDialog(shoeId = null) {
       const shoe = shoeId ? state.shoes.find(item => item.id === shoeId) : null;
-      $("#shoeDialogTitle").textContent = shoe ? "Editar zapatilla" : "Añadir zapatilla";
+      $("#shoeDialogTitle").textContent = shoe ? "Editar zapatilla" : "Añadir zapatillas";
       $("#shoeId").value = shoe?.id || "";
       $("#shoeName").value = shoe?.name || "";
       $("#shoeCategory").value = shoe?.category || "daily";
@@ -3575,6 +3838,7 @@
       state.shoes = [...state.shoes.filter(item => item.id !== shoe.id), shoe].sort((a,b) => a.name.localeCompare(b.name));
       closeDialog($("#shoeDialog"));
       renderPlan();
+      renderEvolution();
       renderManage();
       showToast("Zapatilla guardada.");
     }
@@ -3594,6 +3858,7 @@
       bindActivityDialogActions(activity);
       await loadAndRenderStreams(activity).catch(() => {});
       renderPlan();
+      renderEvolution();
       showToast(shoeId ? "Zapatilla asignada a la actividad." : "Asignación de zapatilla eliminada.");
     }
 
@@ -3623,56 +3888,291 @@
       </div>`;
     }
 
+    function monthStartKeyFromOffset(referenceDate, monthOffset) {
+      const date = dateFromKey(referenceDate) || new Date();
+      const value = new Date(date.getFullYear(), date.getMonth() + monthOffset, 1, 12);
+      return `${value.getFullYear()}-${String(value.getMonth()+1).padStart(2,"0")}-01`;
+    }
+
+    function monthBucketKey(dateKey) {
+      return String(dateKey || "").slice(0,7);
+    }
+
+    function monthBucketLabel(monthKey, includeYear = false) {
+      const date = dateFromKey(`${monthKey}-01`);
+      if (!date) return monthKey;
+      return new Intl.DateTimeFormat("es-ES", includeYear ? { month:"short", year:"2-digit" } : { month:"short" }).format(date).replace(".","");
+    }
+
+    function nextMonthBucket(monthKey) {
+      const date = dateFromKey(`${monthKey}-01`);
+      if (!date) return monthKey;
+      const next = new Date(date.getFullYear(), date.getMonth()+1, 1, 12);
+      return `${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,"0")}`;
+    }
+
+    function evolutionRangeStart(range, referenceDate = todayKey()) {
+      if (range === "all") {
+        const dates = [...state.activities.map(activityDateKey), ...state.wellness.map(item => item.date)].filter(Boolean).sort();
+        return dates[0] || monthStartKeyFromOffset(referenceDate, -12);
+      }
+      if (range === "6m") return monthStartKeyFromOffset(referenceDate, -6);   // 6 meses completos + mes actual
+      if (range === "1y") return monthStartKeyFromOffset(referenceDate, -12);  // 12 meses completos + mes actual
+      const days = ({ "7d": 6, "30d": 29 })[range] ?? 29;
+      return addDaysToKey(referenceDate, -days);
+    }
+
+    function evolutionPeriodLabel(range) {
+      return ({ "7d": "7 días", "30d": "30 días", "6m": "6 meses + actual", "1y": "12 meses + actual", all: "Todo" })[range] || "6 meses + actual";
+    }
+
+    function evolutionDistanceSeries(range) {
+      const end = todayKey();
+      const start = evolutionRangeStart(range, end);
+      const runs = state.activities.filter(activity => isRunningActivity(activity) && activityDateKey(activity) >= start && activityDateKey(activity) <= end && isNumber(activity.distanceM));
+      const mode = ["6m","1y","all"].includes(range) ? "month" : "day";
+      const buckets = new Map();
+
+      for (const activity of runs) {
+        const key = activityDateKey(activity);
+        const date = dateFromKey(key);
+        if (!date) continue;
+        const bucketKey = mode === "month" ? monthBucketKey(key) : key;
+        const label = mode === "month"
+          ? monthBucketLabel(bucketKey, range === "all")
+          : formatDate(key, { day:"numeric", month:"short" });
+        const row = buckets.get(bucketKey) || { key:bucketKey, label, value:0 };
+        row.value += activity.distanceM / 1000;
+        buckets.set(bucketKey,row);
+      }
+
+      if (mode === "day") {
+        let cursor = start;
+        while (cursor <= end) {
+          if (!buckets.has(cursor)) buckets.set(cursor,{ key:cursor, label:formatDate(cursor,{day:"numeric",month:"short"}), value:0 });
+          cursor = addDaysToKey(cursor,1);
+        }
+      } else {
+        let cursor = monthBucketKey(start);
+        const endMonth = monthBucketKey(end);
+        while (cursor <= endMonth) {
+          if (!buckets.has(cursor)) buckets.set(cursor,{ key:cursor, label:monthBucketLabel(cursor, range === "all"), value:0 });
+          const next = nextMonthBucket(cursor);
+          if (next === cursor) break;
+          cursor = next;
+        }
+      }
+      return [...buckets.values()].sort((a,b)=>a.key.localeCompare(b.key));
+    }
+
+    function compactSeries(rows, maxPoints = 180) {
+      if (rows.length <= maxPoints) return rows;
+      const stride = Math.ceil(rows.length / maxPoints);
+      return rows.filter((_,index) => index % stride === 0 || index === rows.length - 1);
+    }
+
+    function chartTickIndexes(length, range) {
+      if (length <= 0) return [];
+      if (range === "7d" || (["6m","1y"].includes(range) && length <= 13)) return Array.from({length},(_,i)=>i);
+      if (range === "30d") {
+        const indexes = [];
+        for (let i=0;i<length;i+=5) indexes.push(i);
+        if (indexes.at(-1) !== length-1) indexes.push(length-1);
+        return indexes;
+      }
+      const target = 8;
+      if (length <= target) return Array.from({length},(_,i)=>i);
+      const stride = Math.ceil((length-1)/(target-1));
+      const indexes = [];
+      for (let i=0;i<length;i+=stride) indexes.push(i);
+      if (indexes.at(-1) !== length-1) indexes.push(length-1);
+      return indexes;
+    }
+
+    function niceChartStep(maxValue, targetTicks = 4) {
+      if (!isNumber(maxValue) || maxValue <= 0) return 1;
+      const rough = maxValue / Math.max(2,targetTicks);
+      const power = Math.pow(10, Math.floor(Math.log10(rough)));
+      const fraction = rough / power;
+      const nice = fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 2.5 ? 2.5 : fraction <= 5 ? 5 : 10;
+      return nice * power;
+    }
+
+    function barChartSvg(rows, color = "#0a84ff", range = "30d") {
+      if (!rows.length) return '<div class="chart-empty">Sin kilómetros registrados en este periodo.</div>';
+      const width = 640, height = 184, top = 22, bottom = 34, left = 43, right = 10;
+      const plotH = height - top - bottom, plotW = width - left - right;
+      const rawMax = Math.max(0, ...rows.map(row => row.value));
+      const step = niceChartStep(Math.max(rawMax,1), 4);
+      const axisMax = Math.max(step, Math.ceil(Math.max(rawMax,1) / step) * step);
+      const slot = plotW / rows.length;
+      const barW = Math.max(2, Math.min(22, slot * .68));
+
+      const grid = [];
+      for (let value=0; value<=axisMax + step*.01; value += step) {
+        const y = top + plotH - (value/axisMax)*plotH;
+        grid.push(`<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${value===0?'.12':'.055'})"/>`);
+        grid.push(`<text x="${left-7}" y="${(y+3.5).toFixed(1)}" fill="rgba(235,235,245,.52)" font-size="9.5" text-anchor="end">${escapeHtml(formatNumber(value, value < 10 && step < 1 ? 1 : 0))}</text>`);
+      }
+
+      const bars = rows.map((row,index) => {
+        const h = rawMax <= 0 ? 0 : (row.value / axisMax) * plotH;
+        const x = left + index * slot + (slot - barW)/2;
+        const y = top + plotH - h;
+        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(row.value>0?1:0,h).toFixed(1)}" rx="${Math.min(3,barW/2).toFixed(1)}" fill="${color}" opacity="${index === rows.length-1 ? .95 : .64}"/>`;
+      }).join("");
+
+      const ticks = chartTickIndexes(rows.length,range).map(index => {
+        const x = left + index*slot + slot/2;
+        return `<text x="${x.toFixed(1)}" y="${height-9}" fill="rgba(235,235,245,.52)" font-size="9.5" text-anchor="middle">${escapeHtml(rows[index].label)}</text>`;
+      }).join("");
+
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Kilómetros de carrera en el periodo">${grid.join("")}${bars}${ticks}<text x="${left}" y="13" fill="rgba(235,235,245,.62)" font-size="12" font-weight="650">máx. ${formatNumber(rawMax,1)} km</text><text x="8" y="${top-4}" fill="rgba(235,235,245,.42)" font-size="8.5">km</text></svg>`;
+    }
+
+    function loadChartTickIndexes(rows, range) {
+      if (!rows.length) return [];
+      if (range === "7d") return chartTickIndexes(rows.length,"7d");
+      if (range === "30d") return chartTickIndexes(rows.length,"30d");
+      if (["6m","1y"].includes(range)) {
+        const indexes = [];
+        let previousMonth = "";
+        rows.forEach((row,index) => {
+          const month = monthBucketKey(row.date);
+          if (month !== previousMonth) { indexes.push(index); previousMonth = month; }
+        });
+        return indexes;
+      }
+      return chartTickIndexes(rows.length,"all");
+    }
+
+    function loadChartSvg(range) {
+      const start = evolutionRangeStart(range);
+      let rows = state.wellness.filter(item => item.date >= start && item.date <= todayKey() && (isNumber(item.load?.ctl) || isNumber(item.load?.atl))).sort((a,b)=>a.date.localeCompare(b.date));
+      if (range === "all") rows = compactSeries(rows, 220);
+      if (rows.length < 2) return '<div class="chart-empty">Aún no hay suficiente histórico de carga.</div>';
+      const values = rows.flatMap(row => [row.load?.ctl,row.load?.atl]).filter(isNumber);
+      const rawMin = Math.min(...values), rawMax = Math.max(...values);
+      const span = Math.max(rawMax - rawMin, 4);
+      const step = niceChartStep(span, 4);
+      let axisMin = Math.max(0, Math.floor(rawMin / step) * step);
+      let axisMax = Math.ceil(rawMax / step) * step;
+      if (axisMax <= axisMin) axisMax = axisMin + step;
+      if ((axisMax - axisMin) / step < 3) axisMax = axisMin + step * 3;
+
+      const width=640,height=184,left=43,right=10,top=16,bottom=34,plotW=width-left-right,plotH=height-top-bottom;
+      const point = (value,index) => {
+        const x = left + index/(rows.length-1)*plotW;
+        const y = top + (axisMax-value)/(axisMax-axisMin)*plotH;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      };
+      const ctl = rows.map((row,index)=>isNumber(row.load?.ctl)?point(row.load.ctl,index):null).filter(Boolean).join(" ");
+      const atl = rows.map((row,index)=>isNumber(row.load?.atl)?point(row.load.atl,index):null).filter(Boolean).join(" ");
+      const grid = [];
+      for (let value=axisMin; value<=axisMax + step*.01; value+=step) {
+        const y = top + (axisMax-value)/(axisMax-axisMin)*plotH;
+        const digits = step < 1 ? 1 : 0;
+        grid.push(`<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${Math.abs(value-axisMin)<.001?'.11':'.045'})"/>`);
+        grid.push(`<text x="${left-7}" y="${(y+3.5).toFixed(1)}" fill="rgba(235,235,245,.52)" font-size="9.5" text-anchor="end">${escapeHtml(formatNumber(value,digits))}</text>`);
+      }
+      const tickIndexes = loadChartTickIndexes(rows,range);
+      const ticks = tickIndexes.map(index => {
+        const x = left + index/(rows.length-1)*plotW;
+        const label = ["6m","1y"].includes(range)
+          ? monthBucketLabel(monthBucketKey(rows[index].date), false)
+          : formatDate(rows[index].date,{day:"numeric",month:"short"});
+        return `<text x="${x.toFixed(1)}" y="${height-9}" fill="rgba(235,235,245,.52)" font-size="9.5" text-anchor="middle">${escapeHtml(label)}</text>`;
+      }).join("");
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolución de forma y fatiga">${grid.join("")}<polyline points="${ctl}" fill="none" stroke="#0a84ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${atl}" fill="none" stroke="#ff9f0a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>${ticks}<text x="8" y="${top-4}" fill="rgba(235,235,245,.42)" font-size="8.5">carga</text></svg>`;
+    }
+
+    function shoeInventoryMarkup() {
+      return `<article class="evolution-card evolution-shoes">
+        <div class="evolution-card-head"><strong>👟 Zapatillas de correr</strong><span>${state.shoes.filter(shoe=>shoe.status === "active").length} activas</span></div>
+        <div class="shoe-list">${state.shoes.length ? state.shoes.map(shoe => {
+          const wear = shoeWear(shoe);
+          const pct = Math.min(100, Math.max(0, wear.ratio * 100));
+          return `<div class="shoe-card">
+            <div><strong>${escapeHtml(shoe.name)}</strong><span class="shoe-meta">${escapeHtml(shoeCategoryLabel(shoe.category))} · ${shoeTotalActivities(shoe)} actividades · ${shoe.status === "retired" ? "retirada" : shoe.recommend ? "recomendable" : "sin recomendación automática"}</span></div>
+            <div class="shoe-km"><strong>${formatNumber(wear.total,1)} km</strong><span>de ${formatNumber(shoe.maxKm,0)} km · ${escapeHtml(wear.label)}</span></div>
+            <div class="shoe-progress ${wear.className}"><span style="width:${pct}%"></span></div>
+            <div class="shoe-actions"><button class="secondary-button" type="button" data-edit-shoe="${escapeHtml(shoe.id)}">Editar</button></div>
+          </div>`;
+        }).join("") : `<div class="empty-state"><strong>Aún no hay zapatillas</strong></div>`}</div>
+        <div class="button-row shoe-add-row"><button class="primary-button compact-button" type="button" data-add-shoe>Añadir zapatillas</button></div>
+      </article>`;
+    }
+
+    function bindShoeInventoryActions(root = document) {
+      $("[data-add-shoe]", root)?.addEventListener("click", () => openShoeDialog());
+      $$('[data-edit-shoe]', root).forEach(button => button.addEventListener("click", () => openShoeDialog(button.dataset.editShoe)));
+    }
+
+    function renderEvolution() {
+      const node = $("#evolutionContent");
+      if (!node) return;
+      const range = state.evolutionRange || "6m";
+      const start = evolutionRangeStart(range);
+      const runs = state.activities.filter(activity => isRunningActivity(activity) && activityDateKey(activity) >= start && activityDateKey(activity) <= todayKey() && isNumber(activity.distanceM));
+      const km = runs.reduce((sum,activity)=>sum + activity.distanceM/1000,0);
+      const longest = Math.max(0,...runs.map(activity=>activity.distanceM/1000));
+      const spanDays = Math.max(1, daysBetweenKeys(start,todayKey()) + 1);
+      const weeklyAverage = km / Math.max(1, spanDays/7);
+      const distanceRows = evolutionDistanceSeries(range);
+      const memory = buildPerformanceMemory(state.activities.filter(activity => activityDateKey(activity) <= todayKey()), todayKey());
+      const forecasts = ["5k","10k","half_marathon","marathon"].map(goal => buildPerformanceForecast(memory,{goal},todayKey(),state.weeklyReviews));
+      node.innerHTML = `<div class="evolution-wrap">
+        <div class="evolution-toolbar">${[["7d","7 días"],["30d","1 mes"],["6m","6 meses"],["1y","1 año"],["all","Todo"]].map(([value,label])=>`<button type="button" class="evolution-range ${range===value?"active":""}" data-evolution-range="${value}">${label}</button>`).join("")}</div>
+        <div class="evolution-stats">
+          <div class="evolution-stat"><span>KM CORRIENDO</span><strong>${formatNumber(km,1)}</strong></div>
+          <div class="evolution-stat"><span>CARRERAS</span><strong>${runs.length}</strong></div>
+          <div class="evolution-stat"><span>MEDIA / SEM.</span><strong>${formatNumber(weeklyAverage,1)}</strong></div>
+          <div class="evolution-stat"><span>MÁS LARGA</span><strong>${formatNumber(longest,1)} km</strong></div>
+        </div>
+        <article class="evolution-card">
+          <div class="evolution-card-head"><strong>🏃 Kilómetros recorridos</strong><span>${escapeHtml(evolutionPeriodLabel(range))}</span></div>
+          <div class="evolution-chart">${barChartSvg(distanceRows,"#0a84ff",range)}</div>
+        </article>
+        <article class="evolution-card">
+          <div class="evolution-card-head"><strong>📈 Forma y fatiga</strong><span>${escapeHtml(evolutionPeriodLabel(range))}</span></div>
+          <div class="evolution-chart">${loadChartSvg(range)}</div>
+          <div class="chart-legend"><span><i class="chart-dot" style="background:#0a84ff"></i>Forma</span><span><i class="chart-dot" style="background:#ff9f0a"></i>Fatiga</span></div>
+        </article>
+        <article class="evolution-card">
+          <div class="evolution-card-head"><strong>🎯 Pronóstico de carrera</strong><span>estimación actual</span></div>
+          <div class="forecast-grid">${forecasts.map((forecast,index) => {
+            const labels=["5 km","10 km","Media","Maratón"];
+            return `<div class="forecast-card"><span>${labels[index]}</span><strong>${forecast?.available ? escapeHtml(formatTargetTime(forecast.predictedTimeSec)) : "—"}</strong><small>${forecast?.available ? `${escapeHtml(formatTargetTime(forecast.rangeLowSec))}–${escapeHtml(formatTargetTime(forecast.rangeHighSec))}` : "Sin referencia"}</small></div>`;
+          }).join("")}</div>
+        </article>
+        ${shoeInventoryMarkup()}
+      </div>`;
+      $$('[data-evolution-range]',node).forEach(button => button.addEventListener("click",()=>{ state.evolutionRange=button.dataset.evolutionRange; renderEvolution(); }));
+      bindShoeInventoryActions(node);
+    }
+
     function renderManage() {
-      const lastSync = state.lastSyncAt ? new Intl.DateTimeFormat("es-ES", { dateStyle: "medium", timeStyle: "short" }).format(new Date(state.lastSyncAt)) : "Nunca";
       const acceptedPlanCount = state.plans.reduce((total, record) => total + (record.accepted?.plan?.days || []).filter(day => day.sport !== "rest").length, 0);
       $("#appVersionLabel").textContent = `TɅLOS ${APP_VERSION}`;
       $("#manageContent").innerHTML = `
         <article class="card manage-card">
-          <h3><span class="connection-dot ${state.hasToken ? "ok" : ""}"></span>Conexión con Intervals.icu</h3>
+          <h3>🔗 <span class="connection-dot ${state.hasToken ? "ok" : ""}"></span>Conexión con Intervals.icu</h3>
           <div class="button-row compact-actions"><button class="primary-button compact-button" type="button" data-manage-sync>Actualizar</button><button class="secondary-button compact-button" type="button" data-configure>Configurar conexión</button></div>
         </article>
         <article class="card manage-card">
-          <h3>Base de datos</h3>
+          <h3>🗄️ Base de datos</h3>
           <div class="manage-stats"><div class="manage-stat"><strong>${state.activities.length}</strong><span>ACTIVIDADES</span></div><div class="manage-stat"><strong>${state.wellness.length}</strong><span>DÍAS</span></div><div class="manage-stat"><strong>${state.calendar.length + acceptedPlanCount}</strong><span>PLANES</span></div></div>
-          <div class="button-row compact-actions database-actions"><button class="secondary-button compact-button" type="button" data-export>Exportar</button><button class="secondary-button compact-button" type="button" data-import>Importar</button><button class="secondary-button compact-button" type="button" data-rebuild>Reconstruir</button></div>
+          <div class="button-row compact-actions database-actions"><button class="secondary-button compact-button" type="button" data-export>⬆️ Exportar</button><button class="secondary-button compact-button" type="button" data-import>⬇️ Importar</button><button class="secondary-button compact-button" type="button" data-rebuild>🔄 Reconstruir</button></div>
         </article>
-        <article class="card manage-card" style="grid-column:1/-1">
-          <h3>👟 Zapatillas de correr</h3>
-          <div class="manage-stats">
-            <div class="manage-stat"><strong>${state.shoes.filter(shoe => shoe.status === "active").length}</strong><span>ACTIVAS</span></div>
-            <div class="manage-stat"><strong>${formatNumber(state.shoes.reduce((sum,shoe) => sum + shoeTotalKm(shoe),0),1)}</strong><span>KM REGISTRADOS</span></div>
-            <div class="manage-stat"><strong>${state.shoeAssignments.length}</strong><span>ACTIVIDADES VINCULADAS</span></div>
-          </div>
-          <div class="shoe-list">${state.shoes.length ? state.shoes.map(shoe => {
-            const wear = shoeWear(shoe);
-            const pct = Math.min(100, Math.max(0, wear.ratio * 100));
-            return `<div class="shoe-card">
-              <div><strong>${escapeHtml(shoe.name)}</strong><span class="shoe-meta">${escapeHtml(shoeCategoryLabel(shoe.category))} · ${shoeTotalActivities(shoe)} actividades · ${shoe.status === "retired" ? "retirada" : shoe.recommend ? "recomendable" : "sin recomendación automática"}</span></div>
-              <div class="shoe-km"><strong>${formatNumber(wear.total,1)} km</strong><span>de ${formatNumber(shoe.maxKm,0)} km · ${escapeHtml(wear.label)}</span></div>
-              <div class="shoe-progress ${wear.className}"><span style="width:${pct}%"></span></div>
-              <div class="shoe-actions"><button class="secondary-button" type="button" data-edit-shoe="${escapeHtml(shoe.id)}">Editar</button></div>
-            </div>`;
-          }).join("") : `<div class="empty-state"><strong>Aún no hay zapatillas</strong><span>Añádelas manualmente con su kilometraje actual y los entrenamientos para los que quieres utilizarlas.</span></div>`}</div>
-          <div class="button-row shoe-add-row"><button class="primary-button compact-button" type="button" data-add-shoe>Añadir zapatilla</button></div>
-        </article>
-        <article class="card manage-card">
-          <h3>Arquitectura activa</h3>
-          <p>Intervals.icu para sincronización, streams para el detalle y FIT como respaldo. Base local: ${escapeHtml(state.dataDbName || DATA_DB_DEFAULT)}.</p>
-          <div class="button-row compact-actions single-action"><button class="secondary-button compact-button" type="button" data-download-worker>Comprobar Worker</button></div>
-        </article>
-        <article class="card manage-card">
-          <h3>Restablecer datos sincronizados</h3>
-          <p>Elimina actividades, bienestar, calendario, planes de TɅLOS, asignaciones de zapatillas y mapas. El inventario de zapatillas y la conexión privada se conservan.</p>
-          <div class="button-row compact-actions single-action"><button class="danger-button compact-button" type="button" data-clear>Vaciar datos locales</button></div>
-        </article>`;
+        <div class="manage-compact-pair">
+          <article class="manage-mini-card"><h3>🏗️ Arquitectura <span class="mini-version">${escapeHtml(APP_VERSION)}</span></h3><button class="secondary-button compact-button" type="button" data-download-worker>Comprobar Worker</button></article>
+          <article class="manage-mini-card"><h3>♻️ Restablecer datos</h3><button class="danger-button compact-button" type="button" data-clear>Vaciar datos locales</button></article>
+        </div>`;
       $("[data-manage-sync]").addEventListener("click", () => syncNow({ manual: true }));
       $("[data-configure]").addEventListener("click", openConnectionDialog);
       $("[data-export]").addEventListener("click", exportBackup);
       $("[data-import]").addEventListener("click", () => $("#importInput").click());
       $("[data-rebuild]").addEventListener("click", rebuildFromIntervals);
-      $("[data-add-shoe]")?.addEventListener("click", () => openShoeDialog());
-      $$("[data-edit-shoe]").forEach(button => button.addEventListener("click", () => openShoeDialog(button.dataset.editShoe)));
       $("[data-download-worker]").addEventListener("click", () => window.open(state.workerUrl, "_blank", "noopener"));
       $("[data-clear]").addEventListener("click", clearSyncedData);
     }
@@ -3696,6 +4196,7 @@
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
       if (view === "plan") renderPlan();
+      if (view === "evolution") renderEvolution();
       if (view === "manage") renderManage();
     }
 
