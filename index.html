@@ -870,7 +870,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.25.0";
+    const APP_VERSION = "0.25.1";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -2598,7 +2598,12 @@
           body: JSON.stringify({ snapshot, preferences: state.planPreferences })
         });
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok || !payload.ok) throw new Error(payload.error || "No se pudo generar el plan semanal.");
+        if (!response.ok || !payload.ok) {
+          const validationDetail = Array.isArray(payload.validationErrors) && payload.validationErrors.length
+            ? ` ${payload.validationErrors[0]}`
+            : "";
+          throw new Error(`${payload.error || "No se pudo generar el plan semanal."}${validationDetail}`);
+        }
         const existing = state.plans.find(item => item.weekStart === payload.plan.weekStart);
         const record = {
           weekStart: payload.plan.weekStart,
