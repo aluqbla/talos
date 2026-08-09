@@ -864,6 +864,40 @@
     }
   </style>
 
+
+  <style id="talos-v027-polish">
+    .metric-strip { overflow: hidden; }
+    .mini-metric { padding: 9px 5px; }
+    .mini-metric span { font-size: 9px; letter-spacing: -.01em; }
+    .mini-metric strong { font-size: 12.5px; letter-spacing: -.025em; text-overflow: clip; }
+    .mini-metric strong small { font-size: 8px; }
+
+    .today-plan-card { margin: 10px 0 12px; padding: 13px 14px; border-radius: 22px; background: rgba(28,28,30,.40); border: 1px solid rgba(255,255,255,.075); box-shadow: var(--shadow-card); -webkit-backdrop-filter: blur(34px) saturate(190%); backdrop-filter: blur(34px) saturate(190%); }
+    .today-plan-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .today-plan-head span { color:var(--muted); font-size:.68rem; font-weight:650; text-transform:uppercase; letter-spacing:.055em; }
+    .today-plan-status { min-height:24px; padding:0 8px; display:inline-flex; align-items:center; border-radius:999px; background:rgba(10,132,255,.15); border:1px solid rgba(90,180,255,.18); color:#d9efff; font-size:.63rem; font-weight:650; }
+    .today-plan-status.done { background:rgba(48,209,88,.14); border-color:rgba(80,220,110,.20); color:#d8ffe3; }
+    .today-plan-title { margin:7px 0 3px; font-size:1rem; line-height:1.18; font-weight:670; letter-spacing:-.018em; }
+    .today-plan-metric { color:var(--secondary); font-size:.78rem; line-height:1.35; }
+    .today-plan-description { margin:8px 0 0; color:var(--muted); font-size:.74rem; line-height:1.42; }
+    .today-plan-shoe { margin-top:7px; color:#cde8ff; font-size:.69rem; }
+
+    .detail-grid { display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)) !important; gap:6px !important; margin-top:10px !important; }
+    .detail-item { min-width:0; min-height:66px; padding:8px 5px !important; border-radius:15px !important; display:flex !important; flex-direction:column; align-items:center !important; justify-content:center !important; gap:4px !important; text-align:center; background:rgba(44,44,46,.32) !important; }
+    .detail-item span { display:block; width:100%; overflow:hidden; color:var(--muted); font-size:8.5px !important; line-height:1.15; white-space:nowrap; text-overflow:ellipsis; }
+    .detail-item strong { display:block; width:100%; color:var(--text); font-size:11.5px !important; line-height:1.18; font-weight:680; text-align:center !important; white-space:normal; }
+    .detail-item strong small { font-size:8px; color:var(--muted); font-weight:600; }
+
+    @media (max-width:430px) {
+      .mini-metric span { font-size:8.5px; }
+      .mini-metric strong { font-size:12px; }
+      .detail-grid { gap:5px !important; }
+      .detail-item { min-height:62px; padding:7px 3px !important; }
+      .detail-item span { font-size:8px !important; }
+      .detail-item strong { font-size:10.8px !important; }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -1112,7 +1146,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.26.0";
+    const APP_VERSION = "0.27.1";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -2981,6 +3015,34 @@
       });
     }
 
+
+    function acceptedPlanDayForDate(date) {
+      const records = state.plans
+        .filter(record => record?.accepted?.plan?.days?.length)
+        .sort((a,b) => String(b.accepted?.acceptedAt || b.accepted?.generatedAt || "").localeCompare(String(a.accepted?.acceptedAt || a.accepted?.generatedAt || "")));
+      for (const record of records) {
+        const day = record.accepted.plan.days.find(item => item.date === date);
+        if (day) return day;
+      }
+      return null;
+    }
+
+    function todayPlannedSessionMarkup(date) {
+      const day = acceptedPlanDayForDate(date);
+      if (!day) return "";
+      const actuals = state.activities.filter(activity => activityDateKey(activity) === date);
+      const matched = day.sport !== "rest" ? planActivityMatch(day, actuals) : null;
+      const status = matched ? "Realizado" : day.sport === "rest" ? "Descanso" : date < todayKey() ? "No completado" : "Previsto";
+      const shoe = day.sport === "run" ? shoeRecommendationLine(day) : "";
+      return `<article class="today-plan-card">
+        <div class="today-plan-head"><span>Entrenamiento previsto</span><em class="today-plan-status ${matched ? "done" : ""}">${escapeHtml(status)}</em></div>
+        <div class="today-plan-title">${escapeHtml(day.title || (day.sport === "rest" ? "Descanso" : "Entrenamiento TɅLOS"))}</div>
+        <div class="today-plan-metric">${escapeHtml(planDayMetric(day))}${day.intensity && day.sport !== "rest" ? ` · ${escapeHtml(day.intensity)}` : ""}</div>
+        ${day.description ? `<p class="today-plan-description">${escapeHtml(day.description)}</p>` : ""}
+        ${shoe ? `<div class="today-plan-shoe">${escapeHtml(shoe)}</div>` : ""}
+      </article>`;
+    }
+
     function renderToday() {
       const dayKeys = recentDayKeys(7);
       const currentDate = dayKeys.includes(state.selectedTodayDate) ? state.selectedTodayDate : dayKeys[0];
@@ -3015,6 +3077,7 @@
           <div class="today-day-nav-copy"><span>${isToday ? "Hoy" : selectedIndex === 1 ? "Ayer" : `Hace ${selectedIndex} días`}</span><strong>${formatFullDate(currentDate)}</strong></div>
           <button class="day-nav-button" type="button" data-today-index="${selectedIndex - 1}" aria-label="Ver el día siguiente" ${isToday ? "disabled" : ""}>›</button>
         </div>
+        ${todayPlannedSessionMarkup(currentDate)}
         <div class="grid today-grid">
           <article class="card readiness-card">
             <div class="readiness-head">
@@ -3702,11 +3765,15 @@
       const token = await connectionGet("accessToken").catch(() => "");
       if (!token) return openConnectionDialog();
       const savedCursor = await settingGet("rebuildCursor");
-      const canResume = typeof savedCursor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(savedCursor);
-      if (!confirm(`${canResume ? "¿Reanudar" : "¿Reconstruir"} el histórico disponible en Intervals.icu hasta 2014? No creará duplicados y podrá continuar si se interrumpe.`)) return;
+      const historyMinimumKey = "2018-01-01";
+      const canResume = typeof savedCursor === "string"
+        && /^\d{4}-\d{2}-\d{2}$/.test(savedCursor)
+        && savedCursor >= historyMinimumKey
+        && savedCursor <= todayKey();
+      if (!confirm(`${canResume ? "¿Reanudar" : "¿Reconstruir"} el histórico disponible en Intervals.icu hasta 2018? No creará duplicados y podrá continuar si se interrumpe.`)) return;
       setSyncing(true);
       let cursor = new Date(`${canResume ? savedCursor : todayKey()}T12:00:00Z`);
-      const minimum = new Date("2014-01-01T12:00:00Z");
+      const minimum = new Date(`${historyMinimumKey}T12:00:00Z`);
       let windows = 0;
       try {
         while (cursor >= minimum) {
@@ -4098,10 +4165,6 @@
       const otherIntervals = !running && intervals.length ? `
         <div class="section-heading"><h2>Bloques e intervalos</h2><p>${intervals.length}</p></div>
         <div class="interval-list">${intervals.map((interval, index) => `<div class="interval-row"><div class="interval-copy"><strong>${index + 1}</strong><span>${formatDuration(interval.movingSec ?? interval.elapsedSec)}</span><span>${isNumber(interval.heartRate?.averageBpm) ? `${formatNumber(interval.heartRate.averageBpm)} ppm` : "FC —"}</span><span>${isNumber(interval.distanceM) && interval.distanceM > 0 ? formatIntervalDistance(normalizedIntervalDisplayDistance(interval, false)) : escapeHtml(interval.label || interval.type || "Bloque")}</span></div></div>`).join("")}</div>` : "";
-      const optionalDynamics = [
-        isNumber(dynamics.groundContactTimeMs) ? `<div class="detail-item"><span>🦶 Contacto suelo</span><strong>${formatNumber(dynamics.groundContactTimeMs)} ms</strong></div>` : "",
-        isNumber(dynamics.verticalOscillationCm) ? `<div class="detail-item"><span>↕️ Oscilación vertical</span><strong>${formatNumber(dynamics.verticalOscillationCm, 1)} cm</strong></div>` : ""
-      ].filter(Boolean).join("");
       const heroMarkup = running ? `
           <div class="hero-stat"><span>Distancia</span><strong>${isNumber(activity.distanceM) ? formatNumber(activity.distanceM / 1000, 2) : "—"} <small>km</small></strong></div>
           <div class="hero-stat"><span>Ritmo mov.</span><strong>${formatPace(activity.movingPaceSecPerKm)} <small>/km</small></strong></div>
@@ -4109,14 +4172,16 @@
           <div class="hero-stat"><span>Duración</span><strong>${formatDuration(duration)}</strong></div>
           <div class="hero-stat"><span>FC media</span><strong>${formatNumber(heart.averageBpm)} <small>ppm</small></strong></div>
           <div class="hero-stat"><span>Calorías</span><strong>${formatNumber(activity.caloriesKcal)} <small>kcal</small></strong></div>`;
+      const ascentLabel = elevation.correctionApplied ? "⛰️ Ascenso ICU*" : "⛰️ Ascenso";
       const runningDetails = [
-        `<div class="detail-item"><span>❤️ FC media / máxima</span><strong>${formatNumber(heart.averageBpm)} / ${formatNumber(heart.maxBpm)} ppm</strong></div>`,
-        isNumber(dynamics.averageCadenceSpm) ? `<div class="detail-item"><span>👟 Cadencia</span><strong>${formatNumber(dynamics.averageCadenceSpm)} spm</strong></div>` : "",
-        power.streamAvailable || power.available || isNumber(power.averageWatts) ? `<div class="detail-item"><span>⚡ Potencia</span><strong id="detailPower">${isNumber(power.averageWatts) ? `${formatNumber(power.averageWatts)} W` : "Cargando…"}</strong></div>` : "",
-        isNumber(load.trainingLoad) ? `<div class="detail-item"><span>📈 Carga</span><strong>${formatNumber(load.trainingLoad)}</strong></div>` : "",
-        isNumber(elevation.gainM) ? `<div class="detail-item"><span>⛰️ Ascenso corregido</span><strong>${formatNumber(elevation.gainM)} m</strong></div>` : "",
-        isNumber(temperature.averageC) ? `<div class="detail-item"><span>🌡️ Temperatura</span><strong>${formatNumber(temperature.averageC, 1)} °C</strong></div>` : "",
-        optionalDynamics
+        `<div class="detail-item" title="Frecuencia cardiaca media y máxima"><span>❤️ FC med./máx.</span><strong>${formatNumber(heart.averageBpm)} / ${formatNumber(heart.maxBpm)} <small>ppm</small></strong></div>`,
+        isNumber(dynamics.averageCadenceSpm) ? `<div class="detail-item" title="Cadencia media de carrera"><span>👟 Cadencia</span><strong>${formatNumber(dynamics.averageCadenceSpm)} <small>spm</small></strong></div>` : "",
+        power.streamAvailable || power.available || isNumber(power.averageWatts) ? `<div class="detail-item" title="Potencia media recibida de la actividad"><span>⚡ Potencia</span><strong id="detailPower">${isNumber(power.averageWatts) ? `${formatNumber(power.averageWatts)} <small>W</small>` : "Cargando…"}</strong></div>` : "",
+        isNumber(load.trainingLoad) ? `<div class="detail-item" title="Carga icu_training_load recibida de Intervals.icu"><span>📈 Carga ICU</span><strong>${formatNumber(load.trainingLoad)}</strong></div>` : "",
+        isNumber(elevation.gainM) ? `<div class="detail-item" title="${elevation.correctionApplied ? "Intervals.icu ha aplicado corrección de elevación" : "Ascenso total recibido de Intervals.icu"}"><span>${ascentLabel}</span><strong>${formatNumber(elevation.gainM)} <small>m</small></strong></div>` : "",
+        isNumber(temperature.averageC) ? `<div class="detail-item" title="Temperatura media registrada en la actividad"><span>🌡️ Temp. media</span><strong>${formatNumber(temperature.averageC, 1)} <small>°C</small></strong></div>` : "",
+        isNumber(dynamics.groundContactTimeMs) ? `<div class="detail-item" title="Tiempo medio de contacto con el suelo"><span>🦶 Contacto</span><strong>${formatNumber(dynamics.groundContactTimeMs)} <small>ms</small></strong></div>` : "",
+        isNumber(dynamics.verticalOscillationCm) ? `<div class="detail-item" title="Oscilación vertical media"><span>↕️ Oscilación</span><strong>${formatNumber(dynamics.verticalOscillationCm, 1)} <small>cm</small></strong></div>` : ""
       ].filter(Boolean).join("");
       const otherDetails = [
         isNumber(heart.maxBpm) ? `<div class="detail-item"><span>❤️ FC máxima</span><strong>${formatNumber(heart.maxBpm)} ppm</strong></div>` : "",
