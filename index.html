@@ -1480,6 +1480,436 @@
     }
   </style>
 
+
+  <style id="talos-v0290-functional-polish">
+    /* ============================================================
+       HOY · jerarquía visual mayor y bloques horizontales
+       ============================================================ */
+    #view-today .today-grid { gap: 10px; }
+    #view-today .readiness-card { padding-bottom: 13px; }
+    #view-today .metric-strip {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 8px !important;
+      overflow: visible !important;
+      margin-top: 11px;
+    }
+    #view-today .mini-metric {
+      min-width: 0;
+      min-height: 78px;
+      padding: 12px 9px !important;
+      border-radius: 17px;
+      background: rgba(255,255,255,.045);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    #view-today .mini-metric span {
+      font-size: .80rem !important;
+      font-weight: 650;
+      line-height: 1.15;
+      letter-spacing: -.01em;
+    }
+    #view-today .mini-metric strong {
+      margin-top: 5px;
+      font-size: 1.19rem !important;
+      line-height: 1.08;
+      font-weight: 720;
+      letter-spacing: -.025em;
+      overflow: visible;
+      white-space: normal;
+    }
+    #view-today .mini-metric span::first-letter { font-size: 1.12em; }
+
+    .today-current-session {
+      margin-top: 10px;
+      border: 1px solid rgba(10,132,255,.25);
+      border-radius: 18px;
+      background: rgba(10,132,255,.075);
+      overflow: hidden;
+    }
+    .today-current-row {
+      width: 100%;
+      min-height: 62px;
+      padding: 8px 10px;
+      display: grid;
+      grid-template-columns: auto minmax(0,1fr) auto;
+      align-items: center;
+      gap: 9px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      text-align: left;
+    }
+    .today-current-icon { font-size: 1.45rem; }
+    .today-current-copy { min-width: 0; }
+    .today-current-copy > span {
+      display: block;
+      color: var(--muted);
+      font-size: .70rem;
+      font-weight: 650;
+    }
+    .today-current-copy strong {
+      display: block;
+      margin-top: 2px;
+      color: #fff;
+      font-size: .95rem;
+      line-height: 1.16;
+      letter-spacing: -.018em;
+    }
+    .today-current-copy small {
+      display: block;
+      margin-top: 3px;
+      color: var(--secondary);
+      font-size: .73rem;
+    }
+    .today-current-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #d8ffe3;
+      font-size: .72rem;
+      font-weight: 720;
+      white-space: nowrap;
+    }
+    .today-current-status.review { color: #ffe5ad; }
+    .today-current-detail {
+      padding: 0 11px 10px;
+      border-top: 1px solid rgba(255,255,255,.065);
+    }
+    .today-current-detail p {
+      margin: 9px 0 6px;
+      color: var(--secondary);
+      font-size: .78rem;
+      line-height: 1.42;
+    }
+
+    .today-wide-card {
+      padding: 12px 13px;
+      border: 1px solid rgba(255,255,255,.075);
+      border-radius: 22px;
+      background: rgba(28,28,30,.40);
+      box-shadow: var(--shadow-card);
+      -webkit-backdrop-filter: blur(34px) saturate(190%);
+      backdrop-filter: blur(34px) saturate(190%);
+    }
+    .today-wide-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+    .today-wide-head strong {
+      color: #fff;
+      font-size: .92rem;
+      font-weight: 710;
+      letter-spacing: -.018em;
+    }
+    .today-wide-head span {
+      color: var(--muted);
+      font-size: .72rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .today-vfc-row {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,2fr);
+      gap: 6px;
+    }
+    .today-form-row {
+      display: grid;
+      grid-template-columns: repeat(4,minmax(0,1fr));
+      gap: 6px;
+    }
+    .today-wide-value {
+      min-width: 0;
+      padding: 8px 5px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.035);
+      text-align: center;
+    }
+    .today-wide-value > span {
+      display: block;
+      color: var(--muted);
+      font-size: .66rem;
+      line-height: 1.1;
+    }
+    .today-wide-value > strong {
+      display: block;
+      margin-top: 4px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.08;
+      white-space: normal;
+    }
+    .today-wide-value > strong small { font-size: .63rem; color: var(--muted); }
+    .today-sleep-quality-large strong {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .today-sleep-quality-large .quality-word { font-size: 1rem; }
+    .today-sleep-quality-large .sleep-score-inline { color:#fff; font-size:.82rem; font-style:normal; }
+
+    #view-today .upcoming-card {
+      padding: 12px 13px;
+      border-radius: 22px;
+    }
+    #view-today .upcoming-head strong { font-size: .95rem; }
+    #view-today .upcoming-head span { font-size: .68rem; }
+    #view-today .upcoming-row {
+      min-height: 58px;
+      grid-template-columns: 48px 30px minmax(0,1fr) 18px;
+      gap: 6px;
+    }
+    #view-today .upcoming-date { font-size: .72rem; font-weight: 700; }
+    #view-today .upcoming-icon { font-size: 1.25rem; }
+    #view-today .upcoming-copy strong { font-size: .88rem; line-height: 1.14; }
+    #view-today .upcoming-copy span { font-size: .70rem; margin-top: 3px; }
+    #view-today .upcoming-detail { font-size: .76rem; }
+
+    #view-today .sleep-need-compact {
+      min-height: 54px;
+      padding: 10px 13px;
+      border-radius: 18px;
+    }
+    #view-today .sleep-need-compact span {
+      font-size: .79rem;
+      font-weight: 650;
+    }
+    #view-today .sleep-need-compact strong {
+      font-size: 1.08rem;
+      font-weight: 720;
+    }
+
+    #view-today .form-card { padding: 12px 13px; }
+    #view-today .form-card .data-title h3 { font-size: .94rem; }
+    #view-today .form-card .data-title span { font-size: .68rem; }
+    #view-today .feelings { gap: 7px; }
+    #view-today .feeling-field label { font-size: .72rem; }
+    #view-today .feeling-field select {
+      min-height: 42px;
+      font-size: .78rem;
+      padding-inline: 8px;
+    }
+
+    /* ============================================================
+       ACTIVIDADES · títulos a 2 líneas + 3 métricas
+       ============================================================ */
+    #activityList.activity-list-virtual .activity-card {
+      height: 104px !important;
+      min-height: 104px !important;
+    }
+    #activityList .activity-copy strong {
+      display: -webkit-box !important;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      max-height: 2.26em;
+      overflow: hidden !important;
+      text-overflow: clip !important;
+      white-space: normal !important;
+      overflow-wrap: anywhere;
+      font-size: .92rem !important;
+      line-height: 1.13;
+    }
+    #activityList .activity-copy > span:first-child { font-size: .60rem; }
+    #activityList .activity-chips { margin-top: 2px; }
+    #activityList .activity-stats {
+      gap: 5px !important;
+      align-items: center;
+    }
+    #activityList .activity-stat { min-width: 42px; }
+    #activityList .activity-stat span { font-size: .48rem !important; }
+    #activityList .activity-stat strong {
+      margin-top: 2px;
+      font-size: .99rem !important;
+      line-height: 1.02;
+    }
+    #activityList .activity-stat small {
+      margin-top: 2px;
+      font-size: .43rem !important;
+    }
+    #activityDialog .dialog-header {
+      align-items: flex-start;
+      min-width: 0;
+    }
+    #activityDialog .dialog-header h2 {
+      min-width: 0;
+      max-width: calc(100% - 46px);
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      max-height: 2.30em;
+      overflow: hidden;
+      white-space: normal !important;
+      text-overflow: clip !important;
+      overflow-wrap: anywhere;
+      line-height: 1.15;
+    }
+    #activityDialog .dialog-content,
+    #activityDialog .activity-hero,
+    #activityDialog .detail-grid,
+    #activityDialog .section-heading,
+    #activityDialog .interval-row { min-width: 0; max-width: 100%; overflow-x: hidden; }
+    #activityDialog .activity-hero.distance-pace-hero .hero-stat strong { font-size: 1.05rem; }
+
+    /* ============================================================
+       PLAN
+       ============================================================ */
+    .planning-actions.has-current-plan {
+      display: grid !important;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 6px;
+    }
+    .planning-actions.has-current-plan > button {
+      width: 100%;
+      min-width: 0;
+      padding-inline: 5px;
+      font-size: .68rem;
+      line-height: 1.08;
+    }
+    .draft-day-intensity { text-transform: none !important; }
+    @media (max-width: 520px) {
+      #planSettingsDialog #planTargetDate {
+        width: 154px !important;
+        max-width: 154px !important;
+      }
+      #planSettingsDialog .plan-field:has(#planTargetDate) {
+        align-items: flex-start;
+      }
+      .planning-actions.has-current-plan > button {
+        min-height: 42px;
+        font-size: .62rem;
+      }
+    }
+
+    /* ============================================================
+       EVOLUCIÓN
+       ============================================================ */
+    .forecast-card .forecast-pace {
+      display: block;
+      margin-top: 4px;
+      color: #cfe9ff;
+      font-size: .56rem;
+      font-weight: 650;
+    }
+    .forecast-card .forecast-trend {
+      display: block;
+      width: 100%;
+      height: 28px;
+      margin-top: 5px;
+    }
+    .forecast-card .forecast-trend polyline {
+      fill: none;
+      stroke: #64d2ff;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .forecast-card .forecast-trend .forecast-last { fill:#64d2ff; }
+    .evolution-analysis-card .analysis-summary {
+      margin: 0;
+      color: var(--secondary);
+      font-size: .78rem;
+      line-height: 1.42;
+    }
+    .evolution-analysis-points {
+      display: grid;
+      gap: 5px;
+      margin-top: 8px;
+    }
+    .evolution-analysis-point {
+      padding: 7px 9px;
+      border-radius: 13px;
+      background: rgba(255,255,255,.035);
+      color: var(--secondary);
+      font-size: .70rem;
+      line-height: 1.32;
+    }
+    .sleep-chart-note {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .60rem;
+      text-align: right;
+    }
+
+    /* ============================================================
+       ZAPATILLAS · formulario compacto
+       ============================================================ */
+    #shoeDialog .dialog-shell { width: min(500px,100%); }
+    #shoeForm { gap: 6px; }
+    #shoeForm .shoe-form-grid { display:grid; gap:6px; }
+    #shoeForm .shoe-form-pair {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 6px;
+    }
+    #shoeForm .plan-field { gap: 4px; }
+    #shoeForm .plan-field label { font-size: .66rem; }
+    #shoeForm input,
+    #shoeForm select {
+      min-height: 38px;
+      padding-block: 0;
+      font-size: .76rem;
+    }
+    #shoeForm .shoe-first-use {
+      max-width: 166px;
+    }
+    #shoeForm #shoeFirstUse {
+      width: 166px;
+      max-width: 166px;
+    }
+    #shoeForm .availability-fieldset {
+      padding: 7px 8px 8px;
+      margin-top: 1px;
+    }
+    #shoeForm .availability-fieldset legend { font-size: .65rem; }
+    #shoeForm .shoe-use-grid {
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 4px;
+      margin-top: 4px;
+    }
+    #shoeForm .shoe-use-grid label {
+      min-height: 27px;
+      padding: 3px 5px;
+      gap: 4px;
+      border-radius: 9px;
+      font-size: .57rem;
+      line-height: 1.08;
+    }
+    #shoeForm .shoe-use-grid input {
+      width: 13px;
+      height: 13px;
+      min-height: 13px;
+      margin: 0;
+    }
+    #shoeForm .dialog-note {
+      margin-block: 5px;
+      font-size: .60rem;
+      line-height: 1.3;
+    }
+    #shoeForm .dialog-actions { margin-top: 5px; }
+
+    @media (max-width: 430px) {
+      #view-today .mini-metric { min-height: 74px; padding: 10px 8px !important; }
+      #view-today .mini-metric span { font-size: .76rem !important; }
+      #view-today .mini-metric strong { font-size: 1.12rem !important; }
+      .today-wide-card { padding: 11px 10px; }
+      .today-wide-head strong { font-size: .88rem; }
+      .today-wide-value { padding-inline: 3px; }
+      .today-wide-value > span { font-size: .61rem; }
+      .today-wide-value > strong { font-size: .91rem; }
+      #activityList .activity-copy { padding-inline: 6px; }
+      #activityList .activity-stat { min-width: 38px; }
+      #activityList .activity-stat strong { font-size: .91rem !important; }
+      #shoeForm .shoe-use-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -1709,15 +2139,19 @@
       <div class="dialog-header"><h2 id="shoeDialogTitle">Zapatilla</h2><button class="icon-button" type="button" data-close-dialog="shoeDialog" aria-label="Cerrar">✕</button></div>
       <form class="dialog-content plan-form" id="shoeForm">
         <input id="shoeId" type="hidden">
-        <div class="plan-form-grid">
+        <div class="shoe-form-grid">
           <div class="plan-field"><label for="shoeName">Nombre</label><input id="shoeName" type="text" maxlength="80" required></div>
           <div class="plan-field"><label for="shoeCategory">Uso principal</label><select id="shoeCategory" required>
             <option value="daily">Rodaje diario</option><option value="quality">Calidad</option><option value="race">Competición</option><option value="trail">Trail</option>
           </select></div>
-          <div class="plan-field"><label for="shoeBaselineKm">Kilómetros actuales / base</label><input id="shoeBaselineKm" type="number" min="0" max="5000" step="0.1" required></div>
-          <div class="plan-field"><label for="shoeMaxKm">Referencia de vida útil</label><input id="shoeMaxKm" type="number" min="50" max="3000" step="10" required></div>
-          <div class="plan-field"><label for="shoeFirstUse">Primer uso · opcional</label><input id="shoeFirstUse" type="date"></div>
-          <div class="plan-field"><label for="shoeStatus">Estado</label><select id="shoeStatus"><option value="active">Activa</option><option value="retired">Retirada</option></select></div>
+          <div class="shoe-form-pair shoe-km-pair">
+            <div class="plan-field"><label for="shoeBaselineKm">Kilómetros actuales</label><input id="shoeBaselineKm" type="number" min="0" max="5000" step="0.1" required></div>
+            <div class="plan-field"><label for="shoeMaxKm">Vida útil</label><input id="shoeMaxKm" type="number" min="50" max="3000" step="10" required></div>
+          </div>
+          <div class="shoe-form-pair shoe-meta-pair">
+            <div class="plan-field shoe-first-use"><label for="shoeFirstUse">Primer uso</label><input id="shoeFirstUse" type="date"></div>
+            <div class="plan-field"><label for="shoeStatus">Estado</label><select id="shoeStatus"><option value="active">Activa</option><option value="retired">Retirada</option></select></div>
+          </div>
         </div>
         <fieldset class="availability-fieldset">
           <legend>Entrenamientos recomendados</legend>
@@ -1749,7 +2183,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "0.28.8";
+    const APP_VERSION = "0.29.0";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -1788,7 +2222,7 @@
         rows: [],
         start: 0,
         end: 30,
-        rowStride: 96,
+        rowStride: 112,
         scrollRaf: 0
       },
       planPreferences: null,
@@ -3355,10 +3789,10 @@
         <div class="planning-explanation-toggle-row"><button class="planning-explanation-toggle" type="button" data-plan-explanations aria-expanded="false">Ver base</button></div>
         <div class="planning-reasons hidden" data-plan-reasons>${reasons.map(reason => `<span class="planning-reason">${escapeHtml(reason)}</span>`).join("")}</div>
         ${latestWeekly ? `<div class="planning-weekly-memory"><strong>🧠 Última semana · ${latestWeekly.score}/100</strong><span>${latestWeekly.adherencePercent}% cumplimiento · ${formatNumber(latestWeekly.actualDistanceKm,1)}/${formatNumber(latestWeekly.plannedDistanceKm,1)} km${latestWeekly.flags?.length ? ` · ${escapeHtml(latestWeekly.flags[0])}` : ""}</span></div>` : ""}
-        <div class="planning-actions">
+        <div class="planning-actions ${currentRecord ? "has-current-plan" : ""}">
           <button class="secondary-button" type="button" data-plan-configure>Configurar plan</button>
           ${canAdaptCurrentWeek ? `<button class="secondary-button" type="button" data-plan-adapt ${state.adaptingPlan ? "disabled" : ""}>${state.adaptingPlan ? "Revisando…" : "Revisar semana actual"}</button>` : ""}
-          ${ready && state.planPreferences && !record?.draft ? `<button class="primary-button" type="button" data-plan-generate ${state.generatingPlan ? "disabled" : ""}>${record?.accepted ? "Regenerar" : "Generar semana"}</button>` : ""}
+          ${ready && state.planPreferences && !record?.draft ? `<button class="primary-button" type="button" data-plan-generate ${state.generatingPlan ? "disabled" : ""}>${record?.accepted ? "Regenerar semana" : "Generar semana"}</button>` : ""}
         </div>`;
       $("[data-plan-configure]", node)?.addEventListener("click", openPlanSettingsDialog);
       $("[data-plan-adapt]", node)?.addEventListener("click", adaptCurrentWeek);
@@ -3370,6 +3804,49 @@
         event.currentTarget.textContent = opening ? "Ocultar base" : "Ver base";
         event.currentTarget.setAttribute("aria-expanded", String(opening));
       });
+    }
+
+
+    function intensityLabel(value) {
+      return ({
+        rest: "Descanso",
+        easy: "Suave",
+        moderate: "Moderada",
+        hard: "Exigente"
+      })[String(value || "").toLowerCase()] || (value ? String(value).charAt(0).toUpperCase() + String(value).slice(1) : "");
+    }
+
+    function activityUsesDistanceTimePace(activity) {
+      return ["run", "hike", "walk"].includes(activitySportGroup(activity));
+    }
+
+    function plannedExecutionStatus(day, activities = null) {
+      if (!day || day.sport === "rest") return { activity: null, matched: false, compliance: null, correct: false, icon: "", label: "" };
+      const rows = activities || state.activities.filter(activity => activityDateKey(activity) === day.date);
+      const activity = planActivityMatch(day, rows);
+      if (!activity) return { activity: null, matched: false, compliance: null, correct: false, icon: "", label: "" };
+
+      const scores = [];
+      const actualDistanceKm = isNumber(activity.distanceM) ? activity.distanceM / 1000 : null;
+      const actualDurationMin = isNumber(activityDuration(activity)) ? activityDuration(activity) / 60 : null;
+      if (isNumber(day.distanceKm) && day.distanceKm > 0 && isNumber(actualDistanceKm)) {
+        scores.push(clamp(100 - Math.abs(actualDistanceKm - day.distanceKm) / day.distanceKm * 100, 0, 100));
+      }
+      if (isNumber(day.durationMin) && day.durationMin > 0 && isNumber(actualDurationMin)) {
+        scores.push(clamp(100 - Math.abs(actualDurationMin - day.durationMin) / day.durationMin * 100, 0, 100));
+      }
+      const compliance = scores.length ? Math.round(average(scores)) : 100;
+      const analysis = activityAnalysisRecord(activity.id)?.analysis || null;
+      const warningVerdict = ["below_plan", "above_plan", "caution"].includes(analysis?.verdict);
+      const correct = compliance >= 85 && !warningVerdict;
+      return {
+        activity,
+        matched: true,
+        compliance,
+        correct,
+        icon: correct ? "✅" : warningVerdict || compliance < 75 ? "⚠️" : "✓",
+        label: correct ? "Correcto" : warningVerdict ? "Revisado" : "Realizado"
+      };
     }
 
     function planSportIcon(sport, title = "") {
@@ -3418,7 +3895,7 @@
                 <span class="draft-day-name">${formatDate(day.date, { weekday: "short", day: "numeric" })}</span>
                 <span class="draft-day-sport">${planSportIcon(day.sport, day.title)}</span>
                 <span class="draft-day-copy"><strong>${escapeHtml(day.title)}</strong><span>${escapeHtml(planDayMetric(day))}${shoeRecommendationLine(day) ? ` · ${escapeHtml(shoeRecommendationLine(day))}` : ""}</span></span>
-                <span class="draft-day-intensity ${escapeHtml(day.intensity)}">${escapeHtml(day.intensity)}</span>
+                <span class="draft-day-intensity ${escapeHtml(day.intensity)}">${escapeHtml(intensityLabel(day.intensity))}</span>
               </summary>
               <div class="draft-day-body"><p>${escapeHtml(day.description)}</p><p>${escapeHtml(day.rationale)}</p>${shoeRecommendationMarkup(day)}${day.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${planStepTarget(step) ? ` · ${escapeHtml(planStepTarget(step))}` : ""}</li>`).join("")}</ol>` : ""}</div>
             </details>`).join("")}</div>
@@ -3550,11 +4027,15 @@
           body: JSON.stringify({ snapshot, preferences: state.planPreferences, acceptedPlan: record.accepted.plan, asOfDate: todayKey() })
         });
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok || !payload.ok || !payload.plan) throw new Error(payload.error || "No se pudo adaptar la semana actual.");
-        if (!payload.changed) {
+        if (!response.ok || !payload.ok) {
+          const detail = Array.isArray(payload.validationErrors) && payload.validationErrors.length ? ` ${payload.validationErrors[0]}` : "";
+          throw new Error(`${payload.error || "No se pudo adaptar la semana actual."}${detail}`);
+        }
+        if (payload.changed === false) {
           showToast(payload.message || "El plan actual sigue siendo adecuado; no necesita cambios.");
           return;
         }
+        if (!payload.plan) throw new Error("La adaptación respondió sin un plan válido.");
         record.draft = {
           plan: payload.plan,
           generatedAt: payload.generatedAt || new Date().toISOString(),
@@ -3650,6 +4131,10 @@
       return unique;
     }
 
+    function planStepsMarkup(day) {
+      return day?.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${planStepTarget(step) ? ` · ${escapeHtml(planStepTarget(step))}` : ""}</li>`).join("")}</ol>` : "";
+    }
+
     function upcomingPlanMarkup(fromDate) {
       const rows = upcomingPlanSessions(fromDate, 3);
       if (!rows.length) return `<article class="upcoming-card"><div class="upcoming-head"><strong>Próximos entrenamientos</strong><span>Plan aceptado</span></div><div class="plan-empty">No hay próximos entrenamientos en un plan aceptado.</div></article>`;
@@ -3658,24 +4143,45 @@
         <div class="upcoming-list">${rows.map(day => {
           const date = dateFromKey(day.date);
           const weekday = date ? new Intl.DateTimeFormat("es-ES", { weekday:"short", day:"numeric" }).format(date).replace(".", "") : day.date;
-          const matched = planActivityMatch(day, state.activities.filter(activity => activityDateKey(activity) === day.date));
+          const execution = plannedExecutionStatus(day);
           const detailId = `upcoming-${day.date}-${String(day.sessionType || day.sport || "session").replace(/[^a-z0-9_-]/gi, "-")}`;
-          const steps = day.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${planStepTarget(step) ? ` · ${escapeHtml(planStepTarget(step))}` : ""}</li>`).join("")}</ol>` : "";
           return `<div class="upcoming-item">
             <button type="button" class="upcoming-row" data-toggle-upcoming="${escapeHtml(detailId)}" aria-expanded="false" aria-controls="${escapeHtml(detailId)}">
               <span class="upcoming-date">${escapeHtml(weekday)}</span>
               <span class="upcoming-icon" aria-hidden="true">${planSportIcon(day.sport, day.title)}</span>
-              <span class="upcoming-copy"><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><span>${escapeHtml(planDayMetric(day))}${day.intensity ? ` · ${escapeHtml(day.intensity)}` : ""}${matched ? " · realizado" : ""}</span></span>
+              <span class="upcoming-copy"><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><span>${escapeHtml(planDayMetric(day))}${day.intensity ? ` · ${escapeHtml(intensityLabel(day.intensity))}` : ""}${execution.matched ? ` · ${execution.icon} ${escapeHtml(execution.label)}` : ""}</span></span>
               <span class="upcoming-open" aria-hidden="true">›</span>
             </button>
             <div class="upcoming-detail hidden" id="${escapeHtml(detailId)}" data-upcoming-detail="${escapeHtml(detailId)}">
               ${day.description ? `<p>${escapeHtml(day.description)}</p>` : ""}
-              ${steps}
+              ${planStepsMarkup(day)}
               ${shoeRecommendationMarkup(day)}
             </div>
           </div>`;
         }).join("")}</div>
       </article>`;
+    }
+
+    function todayCurrentTrainingMarkup(date) {
+      const day = acceptedPlanDayForDate(date);
+      if (!day || day.sport === "rest") return "";
+      const execution = plannedExecutionStatus(day);
+      const detailId = `today-session-${date}`;
+      const status = execution.matched
+        ? `<span class="today-current-status ${execution.correct ? "" : "review"}">${execution.icon} ${escapeHtml(execution.label)}</span>`
+        : `<span class="today-current-status review">Hoy</span>`;
+      return `<div class="today-current-session">
+        <button class="today-current-row" type="button" data-toggle-upcoming="${detailId}" aria-expanded="false" aria-controls="${detailId}">
+          <span class="today-current-icon">${planSportIcon(day.sport, day.title)}</span>
+          <span class="today-current-copy"><span>Entrenamiento de hoy</span><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><small>${escapeHtml(planDayMetric(day))}${day.intensity ? ` · ${escapeHtml(intensityLabel(day.intensity))}` : ""}</small></span>
+          ${status}
+        </button>
+        <div class="today-current-detail hidden" id="${detailId}" data-upcoming-detail="${detailId}">
+          ${day.description ? `<p>${escapeHtml(day.description)}</p>` : ""}
+          ${planStepsMarkup(day)}
+          ${shoeRecommendationMarkup(day)}
+        </div>
+      </div>`;
     }
 
     function renderToday() {
@@ -3692,20 +4198,26 @@
       const recovery = current?.recovery || {};
       const load = current?.load || {};
       const body = current?.body || {};
-      const hrvRecent = median(state.wellness.filter(item => item.date <= (current?.date || todayKey())).slice(-7).map(item => item.recovery?.hrvRmssdMs));
+      const hrvRows = state.wellness
+        .filter(item => item.date <= (current?.date || todayKey()) && isNumber(item.recovery?.hrvRmssdMs))
+        .sort((a,b) => a.date.localeCompare(b.date))
+        .slice(-7);
+      const hrvRecent = median(hrvRows.map(item => item.recovery?.hrvRmssdMs));
       const scoreText = readiness.score === null ? "—" : readiness.score;
       const sleepQuality = qualityLabel(recovery.sleepQualityLabel);
       const sleepQualityClass = qualityClass(recovery.sleepQualityLabel);
       const subjective = state.subjective || {};
       const feelingsMarkup = isToday ? `
           <article class="card data-card form-card">
-            <div class="data-title"><h3>Cómo te encuentras hoy</h3><span>Opcional</span></div>
+            <div class="data-title"><h3>¿Cómo te encuentras hoy?</h3><span>Opcional</span></div>
             <div class="feelings">
               ${feelingSelect("energy", "⚡ Energía", subjective.energy, ["Sin registrar", "Muy baja", "Baja", "Normal", "Buena", "Muy buena"])}
               ${feelingSelect("legs", "🦵 Piernas", subjective.legs, ["Sin registrar", "Muy cargadas", "Cargadas", "Normales", "Sueltas", "Muy sueltas"])}
               ${feelingSelect("discomfort", "🩹 Molestias", subjective.discomfort, ["Sin registrar", "Ninguna", "Leve", "Moderada", "Alta", "Limitante"])}
             </div>
           </article>` : "";
+
+      const upcomingStart = isToday ? addDaysToKey(todayKey(), 1) : currentDate;
 
       $("#todayContent").innerHTML = `
         <div class="today-day-nav" aria-label="Navegar por los últimos siete días">
@@ -3725,31 +4237,30 @@
               <div class="mini-metric"><span>❤️ Reposo</span><strong>${isNumber(recovery.restingHeartRateBpm) ? `${formatNumber(recovery.restingHeartRateBpm)} ppm` : "—"}</strong></div>
               <div class="mini-metric"><span>👟 Pasos</span><strong>${isNumber(body.steps) ? formatNumber(body.steps) : "—"}</strong></div>
             </div>
+            ${isToday ? todayCurrentTrainingMarkup(currentDate) : ""}
           </article>
 
+          <article class="today-wide-card">
+            <div class="today-wide-head"><strong>〽️ Variabilidad de la frecuencia cardiaca</strong></div>
+            <div class="today-vfc-row">
+              <div class="today-wide-value"><span>Última noche</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} <small>ms</small>` : "—"}</strong></div>
+              <div class="today-wide-value"><span>Media 7 días</span><strong>${isNumber(hrvRecent) ? `${formatNumber(hrvRecent)} <small>ms</small>` : "—"}</strong></div>
+              <div class="today-wide-value today-sleep-quality-large"><span>Calidad del sueño</span><strong>${recovery.sleepQualityLabel ? `<em class="quality-word ${sleepQualityClass}">${escapeHtml(sleepQuality)}</em>` : "—"}${isNumber(recovery.sleepScore) ? `<em class="sleep-score-inline">${formatNumber(recovery.sleepScore)}/100</em>` : ""}</strong></div>
+            </div>
+          </article>
+
+          <article class="today-wide-card">
+            <div class="today-wide-head"><strong>📈 Estado de forma</strong><span>${escapeHtml(form.label)}</span></div>
+            <div class="today-form-row">
+              <div class="today-wide-value"><span>Forma</span><strong>${formatNumber(load.ctl, 1)}</strong></div>
+              <div class="today-wide-value"><span>Fatiga</span><strong>${formatNumber(load.atl, 1)}</strong></div>
+              <div class="today-wide-value"><span>Frescura</span><strong>${isNumber(load.form) ? `${load.form >= 0 ? "+" : ""}${formatNumber(load.form, 1)}` : "—"}</strong></div>
+              <div class="today-wide-value"><span>Tendencia</span><strong>${isNumber(load.rampRate) ? `${load.rampRate >= 0 ? "+" : ""}${formatNumber(load.rampRate, 1)}` : "—"}</strong></div>
+            </div>
+          </article>
+
+          ${upcomingPlanMarkup(upcomingStart)}
           <div class="sleep-need-compact"><span>🌙 Necesidad de sueño · próxima noche</span><strong>${formatSleep(sleepNeed.seconds)}</strong></div>
-
-          <div class="today-compact-pair">
-            <article class="today-mini-card">
-              <div class="today-mini-head"><strong>〽️ VFC</strong><span>tendencia</span></div>
-              <div class="today-mini-grid">
-                <div class="today-mini-value"><span>Noche</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} <small>ms</small>` : "—"}</strong></div>
-                <div class="today-mini-value"><span>7 días</span><strong>${isNumber(hrvRecent) ? `${formatNumber(hrvRecent)} <small>ms</small>` : "—"}</strong></div>
-                <div class="today-mini-value today-sleep-quality"><span>Calidad del sueño</span><strong>${recovery.sleepQualityLabel ? `<em class="quality-word ${sleepQualityClass}">${escapeHtml(sleepQuality)}</em>` : "—"}${isNumber(recovery.sleepScore) ? `<em class="sleep-score-inline">${formatNumber(recovery.sleepScore)}</em>` : ""}</strong></div>
-              </div>
-            </article>
-            <article class="today-mini-card">
-              <div class="today-mini-head"><strong>📈 Estado de forma</strong><span>${escapeHtml(form.label)}</span></div>
-              <div class="today-mini-grid">
-                <div class="today-mini-value"><span>Forma</span><strong>${formatNumber(load.ctl, 1)}</strong></div>
-                <div class="today-mini-value"><span>Fatiga</span><strong>${formatNumber(load.atl, 1)}</strong></div>
-                <div class="today-mini-value"><span>Frescura</span><strong>${isNumber(load.form) ? `${load.form >= 0 ? "+" : ""}${formatNumber(load.form, 1)}` : "—"}</strong></div>
-                <div class="today-mini-value"><span>Tendencia</span><strong>${isNumber(load.rampRate) ? `${load.rampRate >= 0 ? "+" : ""}${formatNumber(load.rampRate, 1)}` : "—"}</strong></div>
-              </div>
-            </article>
-          </div>
-
-          ${upcomingPlanMarkup(isToday ? todayKey() : currentDate)}
           ${feelingsMarkup}
         </div>`;
 
@@ -3937,9 +4448,10 @@
     }
 
     function activityCardMetrics(activity) {
-      if (isRunningActivity(activity)) {
+      if (activityUsesDistanceTimePace(activity)) {
         return [
           ["Distancia", isNumber(activity.distanceM) ? formatNumber(activity.distanceM / 1000, 2) : "—", "km"],
+          ["Tiempo", formatDuration(activityDuration(activity)), ""],
           ["Ritmo", formatPace(activity.movingPaceSecPerKm), isNumber(activity.movingPaceSecPerKm) ? "min/km" : ""]
         ];
       }
@@ -3950,8 +4462,8 @@
     }
 
     function activityCompactSummary(activity) {
-      return isRunningActivity(activity)
-        ? `${formatDistance(activity.distanceM)} · ${formatPace(activity.movingPaceSecPerKm)} min/km`
+      return activityUsesDistanceTimePace(activity)
+        ? `${formatDistance(activity.distanceM)} · ${formatDuration(activityDuration(activity))} · ${formatPace(activity.movingPaceSecPerKm)} min/km`
         : `${formatDuration(activityDuration(activity))} · ${isNumber(activity.heartRate?.averageBpm) ? `${formatNumber(activity.heartRate.averageBpm)} ppm` : "FC —"}`;
     }
 
@@ -3960,7 +4472,7 @@
     const ACTIVITY_VIRTUAL_CHUNK = 30;
     const ACTIVITY_VIRTUAL_MAX = 90;
     const ACTIVITY_VIRTUAL_BUFFER = 14;
-    const ACTIVITY_VIRTUAL_ROW_STRIDE = 96;
+    const ACTIVITY_VIRTUAL_ROW_STRIDE = 112;
 
     function activityCardMarkup(activity) {
       const metrics = activityCardMetrics(activity);
@@ -4267,7 +4779,6 @@
       const wellness = state.wellness.find(item => item.date === date);
       const recovery = wellness?.recovery || {};
       const load = wellness?.load || {};
-      const body = wellness?.body || {};
       const activities = state.activities.filter(item => activityDateKey(item) === date);
       const planned = state.calendar.filter(item => String(item.startLocal || "").slice(0, 10) === date);
       const localPlanned = state.plans.flatMap(record => record.accepted?.plan?.days || []).filter(day => day.date === date);
@@ -4285,34 +4796,42 @@
           <span class="copy"><strong>${escapeHtml(activity.name)}</strong><span>${activityCompactSummary(activity)}</span></span>
           <span class="open" aria-hidden="true">›</span>
         </button>`).join("");
-      const plannedMarkup = planned.map(event => {
-        const matched = calendarEventMatch(event, activities);
-        return `<div class="plan-activity-button">
+
+      const unmatchedCalendar = planned.map(event => ({ event, matched: calendarEventMatch(event, activities) })).filter(row => !row.matched);
+      const plannedMarkup = unmatchedCalendar.map(({event}) => `<div class="plan-activity-button">
           <span class="sport" aria-hidden="true">${activityIcon(`${event.type || ""} ${event.category || ""}`, event.name)}</span>
-          <span class="copy"><strong>${escapeHtml(event.name || event.type || "Entrenamiento")}</strong><span>${isNumber(event.distanceM) ? formatDistance(event.distanceM) : "Planificado"}${isNumber(event.movingTimeSec) ? ` · ${formatDuration(event.movingTimeSec)}` : ""}${matched ? " · realizado" : ""}</span></span>
-          <span class="open" aria-hidden="true">${matched ? "✓" : ""}</span>
-        </div>`;
-      }).join("");
-      const localPlannedMarkup = localPlanned.map(day => {
-        const matched = planActivityMatch(day, activities);
-        return `<details class="planned-session" ${day.sport !== "rest" ? "open" : ""}>
+          <span class="copy"><strong>${escapeHtml(event.name || event.type || "Entrenamiento")}</strong><span>${isNumber(event.distanceM) ? formatDistance(event.distanceM) : "Planificado"}${isNumber(event.movingTimeSec) ? ` · ${formatDuration(event.movingTimeSec)}` : ""}</span></span>
+          <span class="open" aria-hidden="true"></span>
+        </div>`).join("");
+
+      const localRows = localPlanned.map(day => ({ day, execution: plannedExecutionStatus(day, activities) }));
+      const localUnfinished = localRows.filter(row => !row.execution.correct);
+      const localPlannedMarkup = localUnfinished.map(({day, execution}) => `<details class="planned-session">
           <summary class="plan-activity-button">
             <span class="sport" aria-hidden="true">${planSportIcon(day.sport, day.title)}</span>
-            <span class="copy"><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><span>${escapeHtml(planDayMetric(day))}${day.intensity ? ` · ${escapeHtml(day.intensity)}` : ""}${matched ? " · realizado" : ""}</span></span>
-            <span class="open" aria-hidden="true">${matched ? "✓" : "›"}</span>
+            <span class="copy"><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><span>${escapeHtml(planDayMetric(day))}${day.intensity ? ` · ${escapeHtml(intensityLabel(day.intensity))}` : ""}${execution.matched ? ` · ${execution.icon} ${escapeHtml(execution.label)}` : ""}</span></span>
+            <span class="open" aria-hidden="true">›</span>
           </summary>
           <div class="planned-session-body">
             ${day.description ? `<p>${escapeHtml(day.description)}</p>` : ""}
             ${day.rationale ? `<p>${escapeHtml(day.rationale)}</p>` : ""}
             ${shoeRecommendationMarkup(day)}
-            ${day.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${planStepTarget(step) ? ` · ${escapeHtml(planStepTarget(step))}` : ""}</li>`).join("")}</ol>` : ""}
+            ${planStepsMarkup(day)}
           </div>
-        </details>`;
-      }).join("");
+        </details>`).join("");
+
+      const hasAnyPlan = planned.length || localPlanned.length;
+      const hasVisiblePlan = unmatchedCalendar.length || localUnfinished.length;
+      const planSection = hasVisiblePlan
+        ? `<div class="plan-day-section"><h4>Entrenamiento previsto</h4>${localPlannedMarkup}${plannedMarkup}</div>`
+        : hasAnyPlan && activities.length
+          ? ""
+          : `<p class="plan-empty">No hay entrenamiento previsto este día.</p>`;
+
       return `<article class="plan-day-detail">
         <div class="day-health-grid">${metrics.map(([label,value]) => `<div class="day-health-metric"><span>${label}</span><strong>${value}</strong></div>`).join("")}</div>
         ${activities.length ? `<div class="plan-day-section"><h4>Actividad realizada</h4>${activityMarkup}</div>` : ""}
-        ${planned.length || localPlanned.length ? `<div class="plan-day-section"><h4>Entrenamiento previsto</h4>${localPlannedMarkup}${plannedMarkup}</div>` : `<p class="plan-empty">No hay entrenamiento previsto este día.</p>`}
+        ${planSection}
       </article>`;
     }
 
@@ -4653,6 +5172,168 @@
       return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolución de forma y fatiga">${grid.join("")}<polyline points="${ctl}" fill="none" stroke="#0a84ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${atl}" fill="none" stroke="#ff9f0a" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" opacity=".92"/>${ticks}<text x="10" y="${top-8}" fill="rgba(235,235,245,.62)" font-size="12.5" font-weight="650">carga</text></svg>`;
     }
 
+
+    function evolutionSleepSeries(range) {
+      const end = todayKey();
+      const start = evolutionRangeStart(range, end);
+      const monthly = ["6m","1y","all"].includes(range);
+      const rows = state.wellness
+        .filter(item => item.date >= start && item.date <= end && isNumber(item.recovery?.sleepSeconds))
+        .sort((a,b) => a.date.localeCompare(b.date));
+
+      if (!monthly) {
+        const byDate = new Map(rows.map(item => [item.date, item.recovery.sleepSeconds / 3600]));
+        const result = [];
+        let cursor = start;
+        while (cursor <= end) {
+          result.push({
+            key: cursor,
+            label: formatDate(cursor,{day:"numeric",month:"short"}),
+            value: byDate.has(cursor) ? byDate.get(cursor) : null
+          });
+          cursor = addDaysToKey(cursor,1);
+        }
+        return result;
+      }
+
+      const buckets = new Map();
+      for (const row of rows) {
+        const key = monthBucketKey(row.date);
+        const values = buckets.get(key) || [];
+        values.push(row.recovery.sleepSeconds / 3600);
+        buckets.set(key, values);
+      }
+      const result = [];
+      let cursor = monthBucketKey(start);
+      const endMonth = monthBucketKey(end);
+      while (cursor <= endMonth) {
+        const values = buckets.get(cursor) || [];
+        result.push({
+          key: cursor,
+          label: monthBucketLabel(cursor, range === "all"),
+          value: values.length ? average(values) : null
+        });
+        const next = nextMonthBucket(cursor);
+        if (next === cursor) break;
+        cursor = next;
+      }
+      return result;
+    }
+
+    function sleepChartSvg(rows, range) {
+      if (!rows.length || !rows.some(row => isNumber(row.value))) return '<div class="chart-empty">Sin datos de sueño en este periodo.</div>';
+      const width=640,height=216,top=22,bottom=46,left=54,right=12,plotW=width-left-right,plotH=height-top-bottom;
+      const maxObserved = Math.max(...rows.map(row => isNumber(row.value) ? row.value : 0));
+      const axisMax = Math.max(10, Math.ceil(maxObserved / 2) * 2);
+      const step = 2;
+      const slot = plotW / Math.max(1, rows.length);
+      const barW = Math.max(2, Math.min(22,slot*.66));
+      const grid = [];
+      for (let value=0; value<=axisMax; value+=step) {
+        const y = top + plotH - value/axisMax*plotH;
+        grid.push(`<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${value===0?'.14':'.055'})"/>`);
+        grid.push(`<text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.68)" font-size="13.5" font-weight="600" text-anchor="end">${value}</text>`);
+      }
+      const bars = rows.map((row,index) => {
+        if (!isNumber(row.value)) return "";
+        const h = row.value/axisMax*plotH;
+        const x = left + index*slot + (slot-barW)/2;
+        const y = top + plotH - h;
+        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="${Math.min(3,barW/2).toFixed(1)}" fill="#64d2ff" opacity="${index===rows.length-1?'.95':'.62'}"/>`;
+      }).join("");
+      const ticks = chartTickIndexes(rows.length,range).map(index => {
+        const x=left+index*slot+slot/2;
+        return `<text x="${x.toFixed(1)}" y="${height-12}" fill="rgba(235,235,245,.68)" font-size="13" font-weight="600" text-anchor="middle">${escapeHtml(rows[index].label)}</text>`;
+      }).join("");
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Duración del sueño">${grid.join("")}${bars}${ticks}<text x="10" y="${top+2}" fill="rgba(235,235,245,.62)" font-size="12.5" font-weight="650">h</text></svg>`;
+    }
+
+    function forecastTrendReferenceDates(range) {
+      const series = evolutionDistanceSeries(range);
+      let keys = series.map(row => row.key);
+      if (["6m","1y","all"].includes(range)) {
+        keys = keys.map(key => {
+          const [year,month] = key.split("-").map(Number);
+          const last = new Date(year,month,0,12);
+          const dateKey = `${last.getFullYear()}-${String(last.getMonth()+1).padStart(2,"0")}-${String(last.getDate()).padStart(2,"0")}`;
+          return dateKey > todayKey() ? todayKey() : dateKey;
+        });
+      }
+      const maxPoints = range === "7d" ? 7 : range === "30d" ? 7 : range === "6m" ? 7 : range === "1y" ? 13 : 10;
+      if (keys.length <= maxPoints) return [...new Set(keys)];
+      const indexes = chartTickIndexes(keys.length, range === "30d" ? "30d" : "all");
+      return [...new Set(indexes.map(index => keys[index]).slice(-maxPoints))];
+    }
+
+    function buildForecastTrend(range) {
+      const goals = ["5k","10k","half_marathon","marathon"];
+      const result = Object.fromEntries(goals.map(goal => [goal,[]]));
+      const dates = forecastTrendReferenceDates(range);
+      for (const date of dates) {
+        const historical = state.activities.filter(activity => activityDateKey(activity) && activityDateKey(activity) <= date);
+        const memory = buildPerformanceMemory(historical,date);
+        for (const goal of goals) {
+          const forecast = buildPerformanceForecast(memory,{goal},date,state.weeklyReviews);
+          if (forecast?.available && isNumber(forecast.predictedTimeSec)) result[goal].push({date,value:forecast.predictedTimeSec});
+        }
+      }
+      return result;
+    }
+
+    function forecastSparkline(points) {
+      if (!Array.isArray(points) || points.length < 2) return "";
+      const width=120,height=28,left=2,right=2,top=3,bottom=3;
+      const values=points.map(point=>point.value).filter(isNumber);
+      if (values.length<2) return "";
+      let min=Math.min(...values),max=Math.max(...values);
+      if (max<=min) { max=min+1; }
+      const coords=points.map((point,index)=>{
+        const x=left+index/Math.max(1,points.length-1)*(width-left-right);
+        const y=top+(point.value-min)/(max-min)*(height-top-bottom);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(" ");
+      const last=coords.split(" ").at(-1)?.split(",") || [0,0];
+      return `<svg class="forecast-trend" viewBox="0 0 ${width} ${height}" aria-label="Evolución del pronóstico"><polyline points="${coords}"/><circle class="forecast-last" cx="${last[0]}" cy="${last[1]}" r="2.4"/></svg>`;
+    }
+
+    function evolutionAnalysisMarkup(range, runs) {
+      const start = evolutionRangeStart(range);
+      const spanDays = Math.max(1, daysBetweenKeys(start,todayKey())+1);
+      const currentKm = runs.reduce((sum,activity)=>sum+(isNumber(activity.distanceM)?activity.distanceM/1000:0),0);
+      const previousEnd = addDaysToKey(start,-1);
+      const previousStart = addDaysToKey(previousEnd,-(spanDays-1));
+      const previousKm = range === "all" ? null : state.activities
+        .filter(activity => isRunningActivity(activity) && activityDateKey(activity) >= previousStart && activityDateKey(activity) <= previousEnd)
+        .reduce((sum,activity)=>sum+(isNumber(activity.distanceM)?activity.distanceM/1000:0),0);
+      const sleepRows = state.wellness.filter(item => item.date>=start && item.date<=todayKey() && isNumber(item.recovery?.sleepSeconds));
+      const averageSleep = sleepRows.length ? average(sleepRows.map(item=>item.recovery.sleepSeconds)) : null;
+      const latestWellness = [...state.wellness].filter(item=>item.date<=todayKey()).sort((a,b)=>a.date.localeCompare(b.date)).at(-1);
+      const latestAnalysis = [...state.analyses]
+        .filter(item => item.activityDate >= start && item.activityDate <= todayKey())
+        .sort((a,b)=>String(a.generatedAt||"").localeCompare(String(b.generatedAt||"")))
+        .at(-1);
+      const observations = [];
+      if (isNumber(previousKm) && previousKm > 0) {
+        const delta=(currentKm/previousKm-1)*100;
+        observations.push(`Volumen ${delta>=0?"+":""}${formatNumber(delta,0)} % respecto al periodo anterior equivalente.`);
+      } else {
+        observations.push(`${formatNumber(currentKm,1)} km de carrera acumulados en ${runs.length} sesiones.`);
+      }
+      if (isNumber(averageSleep)) observations.push(`Sueño medio: ${formatSleep(averageSleep)}.`);
+      if (latestWellness && (isNumber(latestWellness.load?.ctl)||isNumber(latestWellness.load?.atl))) {
+        observations.push(`Estado actual: Forma ${formatNumber(latestWellness.load?.ctl,1)} · Fatiga ${formatNumber(latestWellness.load?.atl,1)}.`);
+      }
+      if (latestAnalysis?.analysis?.summary) observations.push(`Última sesión analizada: ${latestAnalysis.analysis.summary}`);
+      const summary = runs.length
+        ? "TɅLOS resume el periodo seleccionado usando volumen, sueño, carga y las sesiones analizadas."
+        : "Todavía no hay carrera registrada en el periodo seleccionado; el análisis se apoya en sueño y carga disponibles.";
+      return `<article class="evolution-card evolution-analysis-card">
+        <div class="evolution-card-head"><strong>🧠 Análisis TɅLOS</strong><span>motor local · 0 €</span></div>
+        <p class="analysis-summary">${escapeHtml(summary)}</p>
+        <div class="evolution-analysis-points">${observations.slice(0,4).map(item=>`<div class="evolution-analysis-point">${escapeHtml(item)}</div>`).join("")}</div>
+      </article>`;
+    }
+
     function shoeInventoryMarkup() {
       return `<article class="evolution-card evolution-shoes">
         <div class="evolution-card-head"><strong>👟 Zapatillas de correr</strong><span>${state.shoes.filter(shoe=>shoe.status === "active").length} activas</span></div>
@@ -4686,8 +5367,12 @@
       const spanDays = Math.max(1, daysBetweenKeys(start,todayKey()) + 1);
       const weeklyAverage = km / Math.max(1, spanDays/7);
       const distanceRows = evolutionDistanceSeries(range);
+      const sleepRows = evolutionSleepSeries(range);
       const memory = buildPerformanceMemory(state.activities.filter(activity => activityDateKey(activity) <= todayKey()), todayKey());
-      const forecasts = ["5k","10k","half_marathon","marathon"].map(goal => buildPerformanceForecast(memory,{goal},todayKey(),state.weeklyReviews));
+      const goals = ["5k","10k","half_marathon","marathon"];
+      const forecasts = goals.map(goal => buildPerformanceForecast(memory,{goal},todayKey(),state.weeklyReviews));
+      const forecastTrend = buildForecastTrend(range);
+
       node.innerHTML = `<div class="evolution-wrap">
         <div class="evolution-toolbar">${[["7d","7 días"],["30d","1 mes"],["6m","6 meses"],["1y","1 año"],["all","Todo"]].map(([value,label])=>`<button type="button" class="evolution-range ${range===value?"active":""}" data-evolution-range="${value}">${label}</button>`).join("")}</div>
         <div class="evolution-stats">
@@ -4696,24 +5381,44 @@
           <div class="evolution-stat"><span>MEDIA / SEM.</span><strong>${formatNumber(weeklyAverage,1)}</strong></div>
           <div class="evolution-stat"><span>MÁS LARGA</span><strong>${formatNumber(longest,1)} km</strong></div>
         </div>
+
+        ${evolutionAnalysisMarkup(range,runs)}
+
         <article class="evolution-card evolution-distance-card">
           <div class="evolution-card-head"><strong>🏃 Kilómetros recorridos</strong></div>
           <div class="evolution-chart">${barChartSvg(distanceRows,"#0a84ff",range)}</div>
         </article>
+
+        <article class="evolution-card evolution-sleep-card">
+          <div class="evolution-card-head"><strong>💤 Sueño</strong></div>
+          <div class="evolution-chart">${sleepChartSvg(sleepRows,range)}</div>
+          <div class="sleep-chart-note">${["6m","1y","all"].includes(range) ? "Media mensual" : "Duración diaria"}</div>
+        </article>
+
         <article class="evolution-card evolution-load-card">
           <div class="evolution-card-head"><strong>📈 Estado de forma</strong></div>
           <div class="evolution-chart">${loadChartSvg(range)}</div>
           <div class="chart-legend"><span><i class="chart-dot" style="background:#0a84ff"></i>Forma</span><span><i class="chart-dot" style="background:#ff9f0a"></i>Fatiga</span></div>
         </article>
+
         <article class="evolution-card">
-          <div class="evolution-card-head"><strong>🎯 Pronóstico de carrera</strong><span>estimación actual</span></div>
+          <div class="evolution-card-head"><strong>🎯 Pronóstico de carrera</strong><span>estimación actual + evolución</span></div>
           <div class="forecast-grid">${forecasts.map((forecast,index) => {
             const labels=["5 km","10 km","Media","Maratón"];
-            return `<div class="forecast-card"><span>${labels[index]}</span><strong>${forecast?.available ? escapeHtml(formatTargetTime(forecast.predictedTimeSec)) : "—"}</strong><small>${forecast?.available ? `${escapeHtml(formatTargetTime(forecast.rangeLowSec))}–${escapeHtml(formatTargetTime(forecast.rangeHighSec))}` : "Sin referencia"}</small></div>`;
+            const goal=goals[index];
+            return `<div class="forecast-card">
+              <span>${labels[index]}</span>
+              <strong>${forecast?.available ? escapeHtml(formatTargetTime(forecast.predictedTimeSec)) : "—"}</strong>
+              <em class="forecast-pace">${forecast?.available && isNumber(forecast.predictedPaceSecPerKm) ? `${escapeHtml(formatPace(forecast.predictedPaceSecPerKm))} min/km` : "—"}</em>
+              <small>${forecast?.available ? `${escapeHtml(formatTargetTime(forecast.rangeLowSec))}–${escapeHtml(formatTargetTime(forecast.rangeHighSec))}` : "Sin referencia"}</small>
+              ${forecastSparkline(forecastTrend[goal])}
+            </div>`;
           }).join("")}</div>
         </article>
+
         ${shoeInventoryMarkup()}
       </div>`;
+
       $$('[data-evolution-range]',node).forEach(button => button.addEventListener("click",()=>{ state.evolutionRange=button.dataset.evolutionRange; renderEvolution(); }));
       bindShoeInventoryActions(node);
     }
@@ -5030,13 +5735,7 @@
       const structured = explicitWarmup || explicitCooldown || meaningfulRecovery || shortWork.length >= 2;
 
       if (!structured) {
-        const rows = source.map((interval, index) => ({
-          ...interval,
-          displaySection: "laps",
-          displayLabel: `Km ${index + 1}`,
-          displayDistanceM: normalizedIntervalDisplayDistance(interval, true)
-        }));
-        return { sections: [{ key: "laps", title: "Vueltas por kilómetro", icon: "🟣", rows }], count: rows.length, structured: false };
+        return { sections: [], count: 0, structured: false };
       }
 
       const averagePace = activity?.movingPaceSecPerKm;
@@ -5234,10 +5933,11 @@
       const otherIntervals = !running && intervals.length ? `
         <div class="section-heading"><h2>Bloques e intervalos</h2><p>${intervals.length}</p></div>
         <div class="interval-list">${intervals.map((interval, index) => `<div class="interval-row"><div class="interval-copy"><strong>${index + 1}</strong><span>${formatDuration(interval.movingSec ?? interval.elapsedSec)}</span><span>${isNumber(interval.heartRate?.averageBpm) ? `${formatNumber(interval.heartRate.averageBpm)} ppm` : "FC —"}</span><span>${isNumber(interval.distanceM) && interval.distanceM > 0 ? formatIntervalDistance(normalizedIntervalDisplayDistance(interval, false)) : escapeHtml(interval.label || interval.type || "Bloque")}</span></div></div>`).join("")}</div>` : "";
-      const heroMarkup = running ? `
+      const distancePaceActivity = activityUsesDistanceTimePace(activity);
+      const heroMarkup = distancePaceActivity ? `
           <div class="hero-stat"><span>Distancia</span><strong>${isNumber(activity.distanceM) ? formatNumber(activity.distanceM / 1000, 2) : "—"} <small>km</small></strong></div>
-          <div class="hero-stat"><span>Ritmo mov.</span><strong>${formatPace(activity.movingPaceSecPerKm)} <small>/km</small></strong></div>
-          <div class="hero-stat"><span>Tiempo</span><strong>${formatDuration(duration)}</strong></div>` : `
+          <div class="hero-stat"><span>Tiempo</span><strong>${formatDuration(duration)}</strong></div>
+          <div class="hero-stat"><span>Ritmo mov.</span><strong>${formatPace(activity.movingPaceSecPerKm)} <small>/km</small></strong></div>` : `
           <div class="hero-stat"><span>Duración</span><strong>${formatDuration(duration)}</strong></div>
           <div class="hero-stat"><span>FC media</span><strong>${formatNumber(heart.averageBpm)} <small>ppm</small></strong></div>
           <div class="hero-stat"><span>Calorías</span><strong>${formatNumber(activity.caloriesKcal)} <small>kcal</small></strong></div>`;
@@ -5265,7 +5965,7 @@
       return `
         <div class="activity-detail-date">${escapeHtml(formatFullDate(activityDateKey(activity)))}</div>
         ${activityClassificationMarkup(activity)}
-        <div class="activity-hero">
+        <div class="activity-hero ${distancePaceActivity ? "distance-pace-hero" : ""}">
           ${heroMarkup}
         </div>
         ${hasRoute ? '<div class="route-wrap"><div id="routeMap"></div><div class="map-message" id="mapMessage">Preparando el recorrido…</div></div>' : ""}
