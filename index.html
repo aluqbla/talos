@@ -2424,6 +2424,500 @@
     }
   </style>
 
+
+  <style id="talos-v111-today">
+    /* ============================================================
+       HOY v1.1.1 · diseño definitivo de la pestaña
+       ============================================================ */
+
+    #view-today .today-grid {
+      grid-template-columns: 1fr !important;
+      gap: 10px !important;
+    }
+
+    /* Estado TɅLOS: protagonista, limpio y sin texto redundante. */
+    #view-today .readiness-card {
+      grid-column: 1 / -1;
+      padding: 15px 16px !important;
+      border-radius: 24px;
+    }
+    #view-today .readiness-head {
+      min-height: 98px;
+      gap: 15px;
+    }
+    #view-today .score-ring {
+      flex-basis: 88px;
+      width: 88px;
+      height: 88px;
+      box-shadow: 0 0 26px color-mix(in srgb, var(--score-color) 18%, transparent);
+    }
+    #view-today .score-ring::before {
+      inset: 7px;
+      background: #0d0d0f;
+    }
+    #view-today .score-value {
+      font-size: 28px;
+      font-weight: 760;
+    }
+    #view-today .score-copy .eyebrow {
+      margin-bottom: 4px;
+      font-size: .64rem;
+      letter-spacing: .085em;
+    }
+    #view-today .score-copy h2 {
+      font-size: clamp(1.55rem, 6vw, 2.1rem);
+      line-height: 1;
+      font-weight: 690;
+    }
+    #view-today .score-copy p.today-readiness-note {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: .72rem;
+    }
+
+    /* Seis métricas principales: 3 × 2, Liquid Glass neutro. */
+    .today-primary-metrics {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+    }
+    .today-primary-metric {
+      --metric-accent: var(--blue);
+      position: relative;
+      min-width: 0;
+      min-height: 104px;
+      padding: 10px 8px 9px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.085);
+      border-radius: 20px;
+      background: rgba(28,28,30,.46);
+      box-shadow: 0 10px 28px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.08);
+      -webkit-backdrop-filter: blur(34px) saturate(190%);
+      backdrop-filter: blur(34px) saturate(190%);
+    }
+    .today-primary-metric::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: 0;
+      height: 1px;
+      background: color-mix(in srgb, var(--metric-accent) 70%, transparent);
+      opacity: .55;
+    }
+    .today-primary-metric.metric-sleep { --metric-accent:#64d2ff; }
+    .today-primary-metric.metric-hrv { --metric-accent:#ff453a; }
+    .today-primary-metric.metric-rhr { --metric-accent:#ff6961; }
+    .today-primary-metric.metric-vo2 { --metric-accent:#30d158; }
+    .today-primary-metric.metric-steps { --metric-accent:#ffd60a; }
+    .today-primary-metric.metric-atl { --metric-accent:#bf5af2; }
+
+    .today-metric-head {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+    }
+    .today-metric-icon {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 9px;
+      background: color-mix(in srgb, var(--metric-accent) 13%, rgba(255,255,255,.025));
+      font-size: .87rem;
+      line-height: 1;
+    }
+    .today-metric-label {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: .63rem;
+      font-weight: 650;
+      line-height: 1.1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .today-metric-value {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 3px;
+      min-width: 0;
+      margin-top: 10px;
+      color: #fff;
+      font-size: clamp(1.08rem, 4.5vw, 1.35rem);
+      line-height: 1;
+      font-weight: 730;
+      letter-spacing: -.035em;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .today-metric-value small {
+      color: var(--muted);
+      font-size: .54rem;
+      font-weight: 620;
+      letter-spacing: 0;
+    }
+    .today-metric-context {
+      min-height: 1.15em;
+      margin-top: 6px;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: .55rem;
+      font-weight: 580;
+      line-height: 1.15;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .today-metric-context.good { color:#74e69a; }
+    .today-metric-context.warn { color:#ffd17a; }
+    .today-metric-context.bad { color:#ff9792; }
+
+    /* Sueño: información complementaria, no repetición del total dormido. */
+    .today-sleep-card {
+      grid-column: 1 / -1;
+      padding: 12px 13px;
+      border: 1px solid rgba(255,255,255,.075);
+      border-radius: 22px;
+      background: rgba(28,28,30,.40);
+      box-shadow: var(--shadow-card);
+      -webkit-backdrop-filter: blur(34px) saturate(190%);
+      backdrop-filter: blur(34px) saturate(190%);
+    }
+    .today-sleep-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .today-sleep-head strong {
+      font-size:.92rem;
+      font-weight:690;
+      letter-spacing:-.018em;
+    }
+    .today-sleep-head span {
+      color:var(--muted);
+      font-size:.65rem;
+    }
+    .today-sleep-grid {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:6px;
+    }
+    .today-sleep-stat {
+      min-width:0;
+      padding:8px 5px;
+      border-radius:14px;
+      background:rgba(255,255,255,.035);
+      text-align:center;
+    }
+    .today-sleep-stat span {
+      display:block;
+      overflow:hidden;
+      color:var(--muted);
+      font-size:.61rem;
+      line-height:1.1;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+    .today-sleep-stat strong {
+      display:block;
+      margin-top:4px;
+      overflow:hidden;
+      color:#fff;
+      font-size:.88rem;
+      font-weight:690;
+      line-height:1.12;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+    .today-sleep-stat strong small {
+      color:var(--muted);
+      font-size:.55rem;
+      font-weight:600;
+    }
+
+    /* Entrenamiento del día: segundo foco visual después del readiness. */
+    .today-session-card {
+      grid-column:1/-1;
+      overflow:hidden;
+      border:1px solid rgba(10,132,255,.22);
+      border-radius:24px;
+      background:rgba(28,28,30,.46);
+      box-shadow:0 12px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.09);
+      -webkit-backdrop-filter:blur(36px) saturate(195%);
+      backdrop-filter:blur(36px) saturate(195%);
+    }
+    .today-session-card.rest,
+    .today-session-card.empty {
+      border-color:rgba(255,255,255,.085);
+    }
+    .today-current-session {
+      margin-top:0 !important;
+      border:0 !important;
+      border-radius:0 !important;
+      background:transparent !important;
+    }
+    .today-current-row {
+      min-height:76px !important;
+      padding:11px 13px !important;
+      grid-template-columns:38px minmax(0,1fr) auto !important;
+      gap:10px !important;
+    }
+    .today-current-icon {
+      display:grid;
+      place-items:center;
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      background:rgba(10,132,255,.13);
+      font-size:1.35rem !important;
+    }
+    .today-session-card.rest .today-current-icon,
+    .today-session-card.empty .today-current-icon {
+      background:rgba(255,255,255,.05);
+    }
+    .today-current-copy > span {
+      color:var(--blue) !important;
+      font-size:.64rem !important;
+      font-weight:700 !important;
+      letter-spacing:.045em;
+      text-transform:uppercase;
+    }
+    .today-session-card.rest .today-current-copy > span,
+    .today-session-card.empty .today-current-copy > span {
+      color:var(--muted) !important;
+    }
+    .today-current-copy strong {
+      margin-top:3px !important;
+      font-size:1.02rem !important;
+      font-weight:690 !important;
+    }
+    .today-current-copy small {
+      margin-top:4px !important;
+      color:var(--secondary) !important;
+      font-size:.72rem !important;
+    }
+    .today-current-status {
+      min-height:26px;
+      padding:0 8px;
+      border-radius:999px;
+      background:rgba(48,209,88,.10);
+      border:1px solid rgba(48,209,88,.15);
+      font-size:.65rem !important;
+    }
+    .today-current-status.review {
+      color:#ffe5ad !important;
+      background:rgba(255,214,10,.08);
+      border-color:rgba(255,214,10,.14);
+    }
+    .today-current-detail {
+      padding:0 13px 12px !important;
+    }
+
+    /* Sensaciones: discretas, porque son una entrada y no un resultado. */
+    #view-today .form-card {
+      grid-column:1/-1;
+      padding:11px 12px !important;
+      border-radius:20px !important;
+      box-shadow:none;
+    }
+    #view-today .form-card .data-title {
+      margin-bottom:7px;
+    }
+    #view-today .form-card .data-title h3 {
+      font-size:.84rem !important;
+      font-weight:680;
+    }
+    #view-today .form-card .data-title span {
+      font-size:.60rem !important;
+    }
+    #view-today .feelings {
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:6px !important;
+    }
+    #view-today .feeling-field label {
+      margin:0 0 4px;
+      color:var(--muted);
+      font-size:.62rem !important;
+      font-weight:620;
+    }
+    #view-today .feeling-field select {
+      min-height:38px !important;
+      padding:0 25px 0 8px !important;
+      border-radius:14px !important;
+      font-size:.69rem !important;
+      box-shadow:none !important;
+    }
+
+    /* Próximos: vista previa compacta; Plan conserva el detalle completo. */
+    #view-today .upcoming-card {
+      grid-column:1/-1;
+      padding:11px 12px !important;
+      border-radius:22px !important;
+      box-shadow:none;
+    }
+    #view-today .upcoming-head {
+      margin-bottom:3px;
+    }
+    #view-today .upcoming-head strong {
+      font-size:.86rem !important;
+    }
+    #view-today .upcoming-head span {
+      font-size:.60rem !important;
+    }
+    #view-today .upcoming-row {
+      min-height:49px !important;
+      grid-template-columns:44px 25px minmax(0,1fr) 16px !important;
+      padding:5px 1px !important;
+    }
+    #view-today .upcoming-date { font-size:.65rem !important; }
+    #view-today .upcoming-icon { font-size:1.08rem !important; }
+    #view-today .upcoming-copy strong { font-size:.78rem !important; }
+    #view-today .upcoming-copy span { font-size:.64rem !important; }
+
+    /* La necesidad de sueño desaparece de Hoy. */
+    #view-today .sleep-need,
+    #view-today .sleep-need-compact {
+      display:none !important;
+    }
+
+    @media (max-width:520px) {
+      #view-today .readiness-card { padding:13px 14px !important; }
+      #view-today .readiness-head { min-height:88px; gap:12px; }
+      #view-today .score-ring { flex-basis:80px; width:80px; height:80px; }
+      #view-today .score-value { font-size:25px; }
+
+      .today-primary-metrics { gap:6px; }
+      .today-primary-metric {
+        min-height:98px;
+        padding:9px 6px 8px;
+        border-radius:18px;
+      }
+      .today-metric-icon { width:22px; height:22px; border-radius:8px; font-size:.80rem; }
+      .today-metric-label { font-size:.57rem; }
+      .today-metric-value { margin-top:9px; font-size:clamp(.98rem,4.8vw,1.18rem); }
+      .today-metric-value small { font-size:.48rem; }
+      .today-metric-context { margin-top:5px; font-size:.50rem; }
+
+      .today-sleep-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .today-current-status { font-size:.58rem !important; }
+    }
+
+    @media (max-width:360px) {
+      .today-primary-metrics { gap:5px; }
+      .today-primary-metric {
+        min-height:94px;
+        padding-inline:5px;
+        border-radius:17px;
+      }
+      .today-metric-head { gap:3px; }
+      .today-metric-label { font-size:.53rem; }
+      .today-metric-value { font-size:.94rem; }
+      .today-metric-context { font-size:.47rem; }
+      #view-today .feelings { gap:4px !important; }
+      #view-today .feeling-field select { padding-left:5px !important; font-size:.63rem !important; }
+    }
+
+    @media (prefers-reduced-transparency: reduce) {
+      .today-primary-metric,
+      .today-sleep-card,
+      .today-session-card {
+        -webkit-backdrop-filter:none;
+        backdrop-filter:none;
+        background:rgba(44,44,46,.92);
+      }
+    }
+  </style>
+
+
+  <style id="talos-v112-today-refine">
+    /* Hoy v1.1.2 · Estado + sesión integrados */
+    #view-today .readiness-card {
+      overflow:hidden;
+      padding-bottom:0 !important;
+    }
+    #view-today .readiness-head {
+      padding-bottom:12px;
+    }
+    .today-readiness-reasons {
+      display:flex;
+      flex-wrap:wrap;
+      gap:5px;
+      margin-top:8px;
+    }
+    .today-readiness-reasons span {
+      display:inline-flex;
+      align-items:center;
+      min-height:24px;
+      padding:0 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.075);
+      background:rgba(255,255,255,.035);
+      color:var(--muted);
+      font-size:.59rem;
+      font-weight:620;
+      line-height:1;
+      white-space:nowrap;
+    }
+    .today-readiness-reasons span.good {
+      color:#9aefb5;
+      border-color:rgba(48,209,88,.14);
+      background:rgba(48,209,88,.065);
+    }
+    .today-readiness-reasons span.warn {
+      color:#ffe0a1;
+      border-color:rgba(255,214,10,.13);
+      background:rgba(255,214,10,.055);
+    }
+
+    #view-today .today-readiness-session {
+      margin:0 -16px;
+      border-top:1px solid rgba(255,255,255,.075);
+      background:rgba(255,255,255,.018);
+    }
+    #view-today .today-readiness-session .today-current-row {
+      width:100%;
+      min-height:78px !important;
+      padding:12px 16px !important;
+      border:0;
+      background:transparent;
+      color:inherit;
+      text-align:left;
+    }
+    #view-today .today-readiness-session .today-current-row.static {
+      cursor:default;
+    }
+    #view-today .today-readiness-session .today-current-detail {
+      padding:0 16px 14px !important;
+    }
+    #view-today .today-readiness-session.rest .today-current-icon,
+    #view-today .today-readiness-session.empty .today-current-icon {
+      background:rgba(255,255,255,.05);
+    }
+    #view-today .today-readiness-session.rest .today-current-copy > span,
+    #view-today .today-readiness-session.empty .today-current-copy > span {
+      color:var(--muted) !important;
+    }
+
+    #view-today .today-sleep-card {
+      display:none !important;
+    }
+
+    @media (max-width:520px) {
+      #view-today .today-readiness-session { margin:0 -14px; }
+      #view-today .today-readiness-session .today-current-row { padding-inline:14px !important; }
+      #view-today .today-readiness-session .today-current-detail { padding-inline:14px !important; }
+      .today-readiness-reasons { gap:4px; }
+      .today-readiness-reasons span { min-height:22px; padding:0 7px; font-size:.54rem; }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -2764,7 +3258,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "1.1.0";
+    const APP_VERSION = "1.1.2";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-3";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
@@ -3537,7 +4031,16 @@
 
     async function persistSyncPayload(payload, { reload = true } = {}) {
       const sync = normalizeSyncEnvelope(payload);
-      const activities = sync.activities;
+      const existingActivitiesById = new Map(state.activities.map(item => [String(item.id), item]));
+      const activities = sync.activities.map(item => {
+        const previous = existingActivitiesById.get(String(item.id));
+        if (!isNumber(item.vo2max) && isNumber(previous?.vo2max)) {
+          item.vo2max = previous.vo2max;
+          item.vo2maxSource = previous.vo2maxSource || "garmin_fit";
+        }
+        if (!item.vo2maxCheckedAt && previous?.vo2maxCheckedAt) item.vo2maxCheckedAt = previous.vo2maxCheckedAt;
+        return item;
+      });
       const wellness = sync.wellness;
       const calendar = sync.calendar;
       const knownActivities = new Set(state.activities.map(item => item.id));
@@ -6790,8 +7293,129 @@
       return day?.steps?.length ? `<ol class="draft-steps">${day.steps.map(step => `<li><strong>${escapeHtml(step.label)}</strong> · ${step.repetitions > 1 ? `${step.repetitions} × ` : ""}${step.durationMin > 0 ? `${formatNumber(step.durationMin)} min` : `${formatNumber(step.distanceKm, 2)} km`}${planStepTarget(step) ? ` · ${escapeHtml(planStepTarget(step))}` : ""}</li>`).join("")}</ol>` : "";
     }
 
+
+    function todayMetricContext(value, baseline, { unit = "", lowerIsBetter = false, neutralPercent = 4 } = {}) {
+      if (!isNumber(value) || !isNumber(baseline) || baseline <= 0) return { text:"", tone:"" };
+      const deltaPercent = ((value / baseline) - 1) * 100;
+      if (Math.abs(deltaPercent) < neutralPercent) return { text:"En tu base", tone:"" };
+      const directionGood = lowerIsBetter ? deltaPercent < 0 : deltaPercent > 0;
+      const sign = deltaPercent > 0 ? "+" : "";
+      return {
+        text:`${sign}${formatNumber(deltaPercent,0)}% vs base${unit ? ` ${unit}` : ""}`,
+        tone:directionGood ? "good" : "warn"
+      };
+    }
+
+    function todayAcuteLoadContext(load = {}) {
+      if (!isNumber(load.atl)) return { text:"", tone:"" };
+      if (!isNumber(load.ctl) || load.ctl <= 0) return { text:"Carga reciente", tone:"" };
+      const ratio = load.atl / load.ctl;
+      if (ratio <= .8) return { text:"Baja vs forma", tone:"good" };
+      if (ratio <= 1.15) return { text:"Equilibrada", tone:"good" };
+      if (ratio <= 1.45) return { text:"Alta", tone:"warn" };
+      return { text:"Muy alta", tone:"bad" };
+    }
+
+    function formatVo2Max(value) {
+      return isNumber(value)
+        ? new Intl.NumberFormat("es-ES", { minimumFractionDigits:0, maximumFractionDigits:2 }).format(value)
+        : "—";
+    }
+
+    function relativeDayContext(sourceDate, referenceDate) {
+      if (!dateFromKey(sourceDate) || !dateFromKey(referenceDate)) return "";
+      const days = Math.max(0, daysBetweenKeys(sourceDate, referenceDate));
+      return days === 0 ? "hoy" : days === 1 ? "ayer" : `hace ${days} días`;
+    }
+
+    function latestVo2MaxForDate(referenceDate, currentWellness = null) {
+      const candidates = [];
+      state.wellness.forEach(item => {
+        if (item.date <= referenceDate && isNumber(item.body?.vo2max)) {
+          candidates.push({ value:item.body.vo2max, date:item.date, source:"wellness" });
+        }
+      });
+      state.activities.forEach(activity => {
+        const date = activityDateKey(activity);
+        if (date && date <= referenceDate && isRunningActivity(activity) && isNumber(activity.vo2max)) {
+          candidates.push({
+            value:activity.vo2max,
+            date,
+            source:activity.vo2maxSource || "activity",
+            activityId:String(activity.id)
+          });
+        }
+      });
+      candidates.sort((a,b) => a.date.localeCompare(b.date));
+      const latest = candidates.at(-1) || null;
+      if (!latest && isNumber(currentWellness?.body?.vo2max)) {
+        return { value:currentWellness.body.vo2max, date:referenceDate, source:"wellness" };
+      }
+      return latest;
+    }
+
+    function todayVo2Context(referenceDate, vo2) {
+      if (!vo2 || !isNumber(vo2.value)) return { text:"", tone:"" };
+      const when = relativeDayContext(vo2.date, referenceDate);
+      const source = vo2.source === "garmin_fit"
+        ? "Última carrera"
+        : vo2.source === "wellness"
+          ? "Garmin"
+          : "Actividad";
+      return { text:[source, when].filter(Boolean).join(" · "), tone:"" };
+    }
+
+    async function hydrateRecentActivityVo2Max(referenceDate = todayKey()) {
+      if (!navigator.onLine || !state.hasToken) return false;
+      const existing = latestVo2MaxForDate(referenceDate);
+
+      const token = await connectionGet("accessToken").catch(() => "");
+      if (!token) return false;
+      const candidates = state.activities
+        .filter(activity => {
+          const date = activityDateKey(activity);
+          return date
+            && date <= referenceDate
+            && (!existing?.date || date > existing.date)
+            && isRunningActivity(activity)
+            && activity.originalFile?.available !== false;
+        })
+        .sort((a,b) => activityDateKey(b).localeCompare(activityDateKey(a)))
+        .slice(0, 5);
+      if (!candidates.length) return false;
+
+      for (const activity of candidates) {
+        if (isNumber(activity.vo2max)) return false;
+        if (activity.vo2maxCheckedAt) continue;
+        activity.vo2maxCheckedAt = new Date().toISOString();
+        try {
+          const { response, payload } = await workerRequest(`/activity/${encodeURIComponent(activity.id)}/vo2max`, {
+            token, timeoutMs:18000, retries:0
+          });
+          if (response.ok && payload?.ok && isNumber(payload.vo2max)) {
+            activity.vo2max = payload.vo2max;
+            activity.vo2maxSource = payload.source || "garmin_fit";
+            await storePut(DATA_STORES.activities, normalizeActivity(activity));
+            return true;
+          }
+        } catch (error) {
+          console.warn("No se pudo recuperar VO₂ máx. de la actividad", activity.id, error);
+        }
+        await storePut(DATA_STORES.activities, normalizeActivity(activity));
+      }
+      return false;
+    }
+
+    function todayMetricMarkup({ className="", icon="", label="", value="—", unit="", context="", tone="" }) {
+      return `<div class="today-primary-metric ${escapeHtml(className)}">
+        <div class="today-metric-head"><span class="today-metric-icon" aria-hidden="true">${icon}</span><span class="today-metric-label">${escapeHtml(label)}</span></div>
+        <div class="today-metric-value">${value}${unit ? `<small>${escapeHtml(unit)}</small>` : ""}</div>
+        <div class="today-metric-context ${escapeHtml(tone)}">${context ? escapeHtml(context) : "&nbsp;"}</div>
+      </div>`;
+    }
+
     function upcomingPlanMarkup(fromDate) {
-      const rows = upcomingPlanSessions(fromDate, 3);
+      const rows = upcomingPlanSessions(fromDate, 2);
       if (!rows.length) return `<article class="upcoming-card"><div class="upcoming-head"><strong>Próximos entrenamientos</strong><span>Plan aceptado</span></div><div class="plan-empty">No hay próximos entrenamientos en un plan aceptado.</div></article>`;
       return `<article class="upcoming-card">
         <div class="upcoming-head"><strong>Próximos entrenamientos</strong><span>${rows.length} siguientes</span></div>
@@ -6819,16 +7443,38 @@
 
     function todayCurrentTrainingMarkup(date) {
       const day = acceptedPlanDayForDate(date);
-      if (!day || day.sport === "rest") return "";
+      const isCurrentDay = date === todayKey();
+      const kicker = isCurrentDay ? "Entrenamiento de hoy" : "Entrenamiento del día";
+
+      if (!day) {
+        return `<div class="today-readiness-session empty">
+          <div class="today-current-row static">
+            <span class="today-current-icon">○</span>
+            <span class="today-current-copy"><span>${kicker}</span><strong>Sin sesión planificada</strong><small>No hay un entrenamiento aceptado para este día.</small></span>
+          </div>
+        </div>`;
+      }
+
+      if (day.sport === "rest") {
+        return `<div class="today-readiness-session rest">
+          <div class="today-current-row static">
+            <span class="today-current-icon">🌙</span>
+            <span class="today-current-copy"><span>${kicker}</span><strong>${escapeHtml(day.title || "Descanso")}</strong><small>${day.description ? escapeHtml(day.description) : "Recuperación y asimilación del entrenamiento."}</small></span>
+            <span class="today-current-status">Descanso</span>
+          </div>
+        </div>`;
+      }
+
       const execution = plannedExecutionStatus(day);
       const detailId = `today-session-${date}`;
       const status = execution.matched
         ? `<span class="today-current-status ${execution.correct ? "" : "review"}">${execution.icon} ${escapeHtml(execution.label)}</span>`
-        : `<span class="today-current-status review">Hoy</span>`;
-      return `<div class="today-current-session">
+        : `<span class="today-current-status review">${isCurrentDay ? "Hoy" : "Plan"}</span>`;
+
+      return `<div class="today-readiness-session">
         <button class="today-current-row" type="button" data-toggle-upcoming="${detailId}" aria-expanded="false" aria-controls="${detailId}">
           <span class="today-current-icon">${planSportIcon(day.sport, day.title)}</span>
-          <span class="today-current-copy"><span>Entrenamiento de hoy</span><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><small>${escapeHtml(planDayMetric(day))}${day.intensity ? ` · ${escapeHtml(intensityLabel(day.intensity))}` : ""}</small></span>
+          <span class="today-current-copy"><span>${kicker}</span><strong>${escapeHtml(day.title || "Entrenamiento TɅLOS")}</strong><small>${escapeHtml(planDayMetric(day))}${day.intensity ? ` · ${escapeHtml(intensityLabel(day.intensity))}` : ""}</small></span>
           ${status}
         </button>
         <div class="today-current-detail hidden" id="${detailId}" data-upcoming-detail="${detailId}">
@@ -6847,24 +7493,81 @@
       const current = wellness || { date: currentDate, recovery: {}, load: {}, body: {} };
       const isToday = selectedIndex === 0;
       state.selectedTodayDate = currentDate;
+
       const readiness = calculateReadiness(current);
-      const sleepNeed = calculateSleepNeed(current, readiness);
-      const form = calculateForm(current);
       const recovery = current?.recovery || {};
       const load = current?.load || {};
       const body = current?.body || {};
-      const hrvRows = state.wellness
-        .filter(item => item.date <= (current?.date || todayKey()) && isNumber(item.recovery?.hrvRmssdMs))
-        .sort((a,b) => a.date.localeCompare(b.date))
-        .slice(-7);
-      const hrvRecent = median(hrvRows.map(item => item.recovery?.hrvRmssdMs));
       const scoreText = readiness.score === null ? "—" : readiness.score;
       const sleepQuality = qualityLabel(recovery.sleepQualityLabel);
-      const sleepQualityClass = qualityClass(recovery.sleepQualityLabel);
+
+      const hrvContext = todayMetricContext(recovery.hrvRmssdMs, readiness.hrvBase);
+      const rhrContext = todayMetricContext(recovery.restingHeartRateBpm, readiness.restingBase, { lowerIsBetter:true, neutralPercent:2.5 });
+      const vo2 = latestVo2MaxForDate(currentDate, current);
+      const vo2Context = todayVo2Context(currentDate, vo2);
+      const atlContext = todayAcuteLoadContext(load);
+      const sleepContext = recovery.sleepQualityLabel
+        ? `${sleepQuality}${isNumber(recovery.sleepScore) ? ` · ${formatNumber(recovery.sleepScore)}/100` : ""}`
+        : isNumber(recovery.sleepScore) ? `${formatNumber(recovery.sleepScore)}/100` : "";
+      const stepsContext = isNumber(body.steps) ? (isToday ? "Actividad de hoy" : "Actividad diaria") : "";
+
+      const primaryMetrics = [
+        todayMetricMarkup({
+          className:"metric-sleep",
+          icon:"💤",
+          label:"Sueño",
+          value:formatSleep(recovery.sleepSeconds),
+          context:sleepContext,
+          tone:recovery.sleepQualityLabel === "excellent" || recovery.sleepQualityLabel === "good" ? "good" : recovery.sleepQualityLabel === "poor" ? "warn" : ""
+        }),
+        todayMetricMarkup({
+          className:"metric-hrv",
+          icon:"❤️",
+          label:"VFC",
+          value:isNumber(recovery.hrvRmssdMs) ? formatNumber(recovery.hrvRmssdMs) : "—",
+          unit:isNumber(recovery.hrvRmssdMs) ? "ms" : "",
+          context:hrvContext.text,
+          tone:hrvContext.tone
+        }),
+        todayMetricMarkup({
+          className:"metric-rhr",
+          icon:"🫀",
+          label:"FC reposo",
+          value:isNumber(recovery.restingHeartRateBpm) ? formatNumber(recovery.restingHeartRateBpm) : "—",
+          unit:isNumber(recovery.restingHeartRateBpm) ? "ppm" : "",
+          context:rhrContext.text,
+          tone:rhrContext.tone
+        }),
+        todayMetricMarkup({
+          className:"metric-vo2",
+          icon:"🫁",
+          label:"VO₂ máx.",
+          value:isNumber(vo2?.value) ? formatVo2Max(vo2.value) : "—",
+          unit:isNumber(vo2?.value) ? "ml/kg/min" : "",
+          context:vo2Context.text,
+          tone:vo2Context.tone
+        }),
+        todayMetricMarkup({
+          className:"metric-steps",
+          icon:"👟",
+          label:"Pasos",
+          value:isNumber(body.steps) ? formatNumber(body.steps) : "—",
+          context:stepsContext
+        }),
+        todayMetricMarkup({
+          className:"metric-atl",
+          icon:"⚡",
+          label:"Carga aguda",
+          value:isNumber(load.atl) ? formatNumber(load.atl,1) : "—",
+          context:atlContext.text,
+          tone:atlContext.tone
+        })
+      ].join("");
+
       const subjective = state.subjective || {};
       const feelingsMarkup = isToday ? `
           <article class="card data-card form-card">
-            <div class="data-title"><h3>¿Cómo te encuentras hoy?</h3><span>Opcional</span></div>
+            <div class="data-title"><h3>¿Cómo te encuentras?</h3><span>Opcional</span></div>
             <div class="feelings">
               ${feelingSelect("energy", "⚡ Energía", subjective.energy, ["Sin registrar", "Muy baja", "Baja", "Normal", "Buena", "Muy buena"])}
               ${feelingSelect("legs", "🦵 Piernas", subjective.legs, ["Sin registrar", "Muy cargadas", "Cargadas", "Normales", "Sueltas", "Muy sueltas"])}
@@ -6872,7 +7575,7 @@
             </div>
           </article>` : "";
 
-      const upcomingStart = isToday ? addDaysToKey(todayKey(), 1) : currentDate;
+      const upcomingStart = isToday ? addDaysToKey(todayKey(), 1) : addDaysToKey(currentDate, 1);
 
       $("#todayContent").innerHTML = `
         <div class="today-day-nav" aria-label="Navegar por los últimos siete días">
@@ -6880,43 +7583,28 @@
           <div class="today-day-nav-copy"><span>${isToday ? "Hoy" : selectedIndex === 1 ? "Ayer" : `Hace ${selectedIndex} días`}</span><strong>${formatFullDate(currentDate)}</strong></div>
           <button class="day-nav-button" type="button" data-today-index="${selectedIndex - 1}" aria-label="Ver el día siguiente" ${isToday ? "disabled" : ""}>›</button>
         </div>
+
         <div class="grid today-grid">
           <article class="card readiness-card">
             <div class="readiness-head">
               <div class="score-ring" style="--score:${readiness.score || 0};--score-color:${readiness.color}"><span class="score-value">${scoreText}</span></div>
-              <div class="score-copy"><p class="eyebrow">Disponibilidad del día</p><h2>${escapeHtml(readiness.label)}</h2><p>${wellness ? "Datos sincronizados" : "Sin datos sincronizados para este día"}</p></div>
+              <div class="score-copy">
+                <p class="eyebrow">Estado TɅLOS</p>
+                <h2>${escapeHtml(readiness.label)}</h2>
+                ${wellness
+                  ? `<div class="today-readiness-reasons">${readiness.reasons.slice(0,3).map(reason => `<span class="${reason.good ? "good" : "warn"}">${escapeHtml(reason.text)}</span>`).join("")}</div>`
+                  : `<p class="today-readiness-note">Sin datos sincronizados para este día.</p>`}
+              </div>
             </div>
-            <div class="metric-strip">
-              <div class="mini-metric"><span>💤 Sueño</span><strong>${formatSleep(recovery.sleepSeconds)}</strong></div>
-              <div class="mini-metric"><span>〽️ VFC</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"}</strong></div>
-              <div class="mini-metric"><span>❤️ Reposo</span><strong>${isNumber(recovery.restingHeartRateBpm) ? `${formatNumber(recovery.restingHeartRateBpm)} ppm` : "—"}</strong></div>
-              <div class="mini-metric"><span>👟 Pasos</span><strong>${isNumber(body.steps) ? formatNumber(body.steps) : "—"}</strong></div>
-            </div>
-            ${isToday ? todayCurrentTrainingMarkup(currentDate) : ""}
+            ${todayCurrentTrainingMarkup(currentDate)}
           </article>
 
-          <article class="today-wide-card">
-            <div class="today-wide-head"><strong>〽️ Variabilidad de la frecuencia cardiaca</strong></div>
-            <div class="today-vfc-row">
-              <div class="today-wide-value"><span>Última noche</span><strong>${isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} <small>ms</small>` : "—"}</strong></div>
-              <div class="today-wide-value"><span>Media 7 días</span><strong>${isNumber(hrvRecent) ? `${formatNumber(hrvRecent)} <small>ms</small>` : "—"}</strong></div>
-              <div class="today-wide-value today-sleep-quality-large"><span>Calidad del sueño</span><strong>${recovery.sleepQualityLabel ? `<em class="quality-word ${sleepQualityClass}">${escapeHtml(sleepQuality)}</em>` : "—"}${isNumber(recovery.sleepScore) ? `<em class="sleep-score-inline">${formatNumber(recovery.sleepScore)}/100</em>` : ""}</strong></div>
-            </div>
-          </article>
+          <section class="today-primary-metrics" aria-label="Métricas principales del día">
+            ${primaryMetrics}
+          </section>
 
-          <article class="today-wide-card">
-            <div class="today-wide-head"><strong>📈 Estado de forma</strong><span>${escapeHtml(form.label)}</span></div>
-            <div class="today-form-row">
-              <div class="today-wide-value"><span>Forma</span><strong>${formatNumber(load.ctl, 1)}</strong></div>
-              <div class="today-wide-value"><span>Fatiga</span><strong>${formatNumber(load.atl, 1)}</strong></div>
-              <div class="today-wide-value"><span>Frescura</span><strong>${isNumber(load.form) ? `${load.form >= 0 ? "+" : ""}${formatNumber(load.form, 1)}` : "—"}</strong></div>
-              <div class="today-wide-value"><span>Tendencia</span><strong>${isNumber(load.rampRate) ? `${load.rampRate >= 0 ? "+" : ""}${formatNumber(load.rampRate, 1)}` : "—"}</strong></div>
-            </div>
-          </article>
-
-          ${upcomingPlanMarkup(upcomingStart)}
-          <div class="sleep-need-compact"><span>🌙 Necesidad de sueño · próxima noche</span><strong>${formatSleep(sleepNeed.seconds)}</strong></div>
           ${feelingsMarkup}
+          ${upcomingPlanMarkup(upcomingStart)}
         </div>`;
 
       $$('[data-feeling]', $("#todayContent")).forEach(select => select.addEventListener("change", saveSubjective));
@@ -8254,6 +8942,7 @@
         if (!response.ok || !payload.ok) throw new Error(payload.error || (payload.warnings || []).join(" ") || `No se pudo actualizar (HTTP ${response.status}).`);
         const result = await persistSyncPayload(payload);
         state.hasToken = true;
+        await hydrateRecentActivityVo2Max(todayKey());
         await autoAnalyzeRecentPlannedActivities();
         renderAll();
         const summary = `${result.activityCount} actividades y ${result.wellnessCount} días revisados`;
