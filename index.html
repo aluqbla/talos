@@ -2102,6 +2102,328 @@
     }
   </style>
 
+
+  <style id="talos-v110-cuaderno-foundation">
+    /* Base visual inspirada en Cuaderno de bitácora · TɅLOS v1.1.0 */
+    :root {
+      --bg:#000000;
+      --bg-elevated:#101014;
+      --bg-grouped:rgba(28,28,30,.46);
+      --bg-secondary:rgba(44,44,46,.42);
+      --glass:rgba(45,45,52,.22);
+      --glass-strong:rgba(58,58,66,.34);
+      --glass-clear:rgba(255,255,255,.035);
+      --separator:rgba(84,84,88,.52);
+      --separator-soft:rgba(255,255,255,.075);
+      --panel:var(--bg-grouped);
+      --panel-strong:var(--bg-secondary);
+      --line:var(--separator-soft);
+      --text:#ffffff;
+      --secondary:#ebebf5;
+      --muted:rgba(235,235,245,.60);
+      --muted-2:rgba(235,235,245,.34);
+      --blue:#0a84ff;
+      --cyan:#64d2ff;
+      --green:#30d158;
+      --amber:#ffd60a;
+      --red:#ff453a;
+      --purple:#bf5af2;
+      --radius:24px;
+      --r-card:24px;
+      --r-control:18px;
+      --r-small:13px;
+      --shadow-card:0 12px 38px rgba(0,0,0,.34);
+      --shadow-glass:0 18px 54px rgba(0,0,0,.46), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.035);
+      --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;
+    }
+
+    html, body {
+      min-height:100%;
+      background:#000 !important;
+      background-color:#000 !important;
+      background-image:none !important;
+      color:var(--text);
+    }
+    html { color-scheme:dark; }
+    body {
+      font-family:var(--font);
+      font-size:14px;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+    .app, .views, .view, .view.active {
+      background:#000 !important;
+      background-image:none !important;
+    }
+    .app {
+      width:min(980px,100%);
+      padding-inline:14px;
+      padding-bottom:calc(104px + var(--safe-bottom));
+    }
+
+    /* Cabecera negra: sin halo ni degradado de color. */
+    .topbar {
+      min-height:calc(68px + var(--safe-top));
+      padding:var(--safe-top) 0 9px;
+      background:rgba(0,0,0,.90) !important;
+      background-image:none !important;
+      border-bottom:1px solid rgba(255,255,255,.035);
+      box-shadow:0 8px 24px rgba(0,0,0,.20);
+      -webkit-backdrop-filter:blur(34px) saturate(190%);
+      backdrop-filter:blur(34px) saturate(190%);
+    }
+    .brand-mark {
+      height:33px;
+      color:#fff;
+      filter:drop-shadow(0 2px 12px rgba(255,255,255,.08));
+    }
+
+    /* Jerarquía común. */
+    .section-heading { margin:12px 2px 10px; align-items:flex-end; }
+    .section-heading h2 {
+      font-size:clamp(1.18rem,3.5vw,1.36rem);
+      line-height:1.15;
+      font-weight:650;
+      letter-spacing:-.025em;
+    }
+    .section-heading p { color:var(--muted); font-size:.76rem; line-height:1.35; }
+    .eyebrow { color:var(--muted); letter-spacing:.065em; }
+
+    /* Superficies Liquid Glass neutras; se eliminan degradados decorativos. */
+    .card,
+    .activity-card,
+    .shoe-card,
+    .today-plan-card,
+    .today-mini-card,
+    .today-wide-card,
+    .planning-card,
+    .plan-draft-card,
+    .calendar-card,
+    .evolution-card,
+    .forecast-card,
+    .upcoming-card,
+    .manage-card,
+    .manage-mini-card,
+    .activity-classification,
+    .shoe-assignment,
+    .activity-analysis,
+    .planning-weekly-memory,
+    .planning-forecast {
+      background:var(--bg-grouped) !important;
+      background-image:none !important;
+      border:1px solid var(--separator-soft) !important;
+      box-shadow:var(--shadow-card);
+      -webkit-backdrop-filter:blur(34px) saturate(190%);
+      backdrop-filter:blur(34px) saturate(190%);
+    }
+    .card, .manage-card, .evolution-card, .calendar-card { border-radius:var(--r-card); }
+
+    /* Los módulos interiores usan una capa más ligera para reducir ruido. */
+    .planning-metric,
+    .load-item,
+    .manage-stat,
+    .evolution-stat,
+    .detail-item,
+    .upcoming-row,
+    .draft-day,
+    .reason-chip,
+    .planning-reason,
+    .activity-chip,
+    .sleep-need,
+    .sleep-need-compact {
+      background:rgba(255,255,255,.035) !important;
+      background-image:none !important;
+      border-color:var(--separator-soft) !important;
+      box-shadow:none !important;
+    }
+    .sleep-need { border-color:rgba(255,255,255,.09) !important; }
+    .sleep-need-copy span, .sleep-need strong { color:var(--secondary); }
+
+    /* Lista virtual: misma superficie que el resto, sin degradado. */
+    #activityList.activity-list-virtual .activity-card {
+      background:rgba(28,28,30,.58) !important;
+      background-image:none !important;
+      border-color:rgba(255,255,255,.075) !important;
+      box-shadow:0 8px 22px rgba(0,0,0,.20) !important;
+    }
+
+    /* Controles comunes. */
+    .icon-button,
+    .secondary-button,
+    .danger-button,
+    .glass-select,
+    .glass-control,
+    .glass-date,
+    .feeling-field select,
+    .plan-field input,
+    .plan-field select,
+    .plan-field textarea,
+    .activity-type-field select,
+    dialog input,
+    dialog select,
+    dialog textarea {
+      background:var(--glass) !important;
+      background-image:none !important;
+      border:1px solid rgba(255,255,255,.17) !important;
+      box-shadow:var(--shadow-glass);
+      color:var(--text);
+      -webkit-backdrop-filter:blur(36px) saturate(195%);
+      backdrop-filter:blur(36px) saturate(195%);
+    }
+    .icon-button {
+      width:44px;
+      min-width:44px;
+      min-height:44px;
+      border-radius:17px;
+    }
+    .primary-button, .secondary-button, .danger-button {
+      min-height:44px;
+      border-radius:17px;
+      font-weight:620;
+    }
+    .primary-button {
+      color:#fff;
+      background:rgba(10,132,255,.72) !important;
+      background-image:none !important;
+      border:1px solid rgba(120,205,255,.38) !important;
+      box-shadow:var(--shadow-glass);
+    }
+    .secondary-button { color:#fff; }
+    .danger-button {
+      color:#ff9f9a;
+      background:rgba(255,69,58,.20) !important;
+      border-color:rgba(255,120,112,.30) !important;
+    }
+    .compact-button { min-height:38px; border-radius:14px; }
+    .glass-control { min-height:46px; border-radius:17px; }
+    .glass-select { min-height:44px; border-radius:17px; }
+    .glass-date { min-height:42px; border-radius:16px; }
+    .glass-control input { color:#fff; }
+    select option { background:#1c1c1e; color:#fff; }
+
+    /* Navegación flotante como Cuaderno de bitácora. */
+    .bottom-nav {
+      z-index:100;
+      bottom:calc(10px + env(safe-area-inset-bottom));
+      width:min(calc(100% - 20px),760px);
+      padding:7px 9px;
+      border-radius:30px;
+      background:rgba(39,39,46,.42) !important;
+      background-image:none !important;
+      border:1px solid rgba(255,255,255,.24);
+      box-shadow:0 20px 58px rgba(0,0,0,.66), inset 0 1px 0 rgba(255,255,255,.21), inset 0 -1px 0 rgba(255,255,255,.04);
+      -webkit-backdrop-filter:blur(46px) saturate(210%);
+      backdrop-filter:blur(46px) saturate(210%);
+    }
+    .nav-button {
+      min-height:54px;
+      border-radius:18px;
+      color:var(--muted);
+      background:transparent !important;
+      background-image:none !important;
+    }
+    .nav-button.active {
+      color:#fff;
+      background:rgba(255,255,255,.075) !important;
+      background-image:none !important;
+      box-shadow:none;
+    }
+    .nav-button::after { background:var(--blue); }
+    .nav-button .nav-emoji { font-size:1.24rem; filter:saturate(.76); }
+    .nav-button.active .nav-emoji { filter:none; }
+    .nav-button .nav-label { font-size:.62rem; font-weight:520; }
+
+    /* Diálogos / sheets. */
+    dialog {
+      border-radius:30px;
+      background:rgba(28,28,32,.70) !important;
+      background-image:none !important;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 24px 70px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.16);
+      -webkit-backdrop-filter:blur(48px) saturate(210%);
+      backdrop-filter:blur(48px) saturate(210%);
+    }
+    dialog::backdrop {
+      background:rgba(0,0,0,.50);
+      -webkit-backdrop-filter:blur(12px);
+      backdrop-filter:blur(12px);
+    }
+    .dialog-header {
+      background:rgba(28,28,32,.64) !important;
+      border-bottom:1px solid rgba(255,255,255,.07);
+    }
+    .map-message {
+      background:rgba(0,0,0,.78) !important;
+      background-image:none !important;
+    }
+
+    /* Microinteracciones discretas y consistentes. */
+    .card,
+    .activity-card,
+    .shoe-card,
+    .today-plan-card,
+    .today-mini-card,
+    .evolution-card,
+    .manage-card,
+    .upcoming-row,
+    .nav-button,
+    .icon-button,
+    .primary-button,
+    .secondary-button,
+    .danger-button {
+      transition:transform .16s ease, background-color .18s ease, border-color .18s ease, opacity .16s ease;
+    }
+    @media (hover:hover) and (pointer:fine) {
+      .activity-card:hover,
+      .shoe-card:hover,
+      .upcoming-row:hover { border-color:rgba(255,255,255,.14) !important; background:rgba(44,44,46,.48) !important; }
+      .secondary-button:hover:not(:disabled),
+      .icon-button:hover:not(:disabled),
+      .nav-button:hover:not(.active) { background:rgba(255,255,255,.085) !important; }
+      .primary-button:hover:not(:disabled) { background:rgba(10,132,255,.82) !important; }
+    }
+
+    /* iPhone: ancho útil completo, controles cómodos y sin zoom accidental. */
+    @media (max-width:700px) {
+      .app { width:100%; padding-inline:10px; }
+      .topbar { margin-inline:-2px; }
+      input, select, textarea { font-size:16px !important; }
+      .section-heading { margin-top:9px; }
+      .card, .manage-card, .evolution-card { border-radius:22px; }
+    }
+    @media (max-width:430px) {
+      .app { padding-inline:10px; }
+      .bottom-nav { width:calc(100% - 16px); padding-inline:6px; }
+      .nav-button .nav-label { font-size:.57rem !important; }
+      .nav-button .nav-emoji { font-size:1.16rem; }
+      .section-heading h2 { font-size:1.22rem; }
+    }
+    @media (max-width:360px) {
+      .bottom-nav { width:calc(100% - 12px); }
+      .nav-button .nav-label { font-size:.54rem !important; }
+      .nav-button .nav-emoji { font-size:1.1rem; }
+    }
+
+    @media (prefers-reduced-transparency:reduce) {
+      .card, .activity-card, .shoe-card, .bottom-nav, dialog,
+      .icon-button, .primary-button, .secondary-button, .danger-button,
+      .glass-select, .glass-control, .glass-date,
+      .today-plan-card, .today-mini-card, .evolution-card, .manage-card {
+        -webkit-backdrop-filter:none !important;
+        backdrop-filter:none !important;
+        background:rgba(28,28,30,.96) !important;
+      }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *, *::before, *::after {
+        animation-duration:.001ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.001ms !important;
+        scroll-behavior:auto !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -2442,7 +2764,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "1.0.0";
+    const APP_VERSION = "1.1.0";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-3";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
