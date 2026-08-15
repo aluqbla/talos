@@ -4595,7 +4595,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "1.2.2";
+    const APP_VERSION = "1.4.0";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-3";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
@@ -5554,8 +5554,9 @@
       return Math.round(valid.reduce((sum, part) => sum + clamp(part.score, 0, 100) * part.weight, 0) / totalWeight);
     }
 
-    function recoveryReferenceDateTime(dateKey) {
+    function recoveryReferenceDateTime(dateKey, referenceOverride = null) {
       if (!dateFromKey(dateKey)) return null;
+      if (referenceOverride instanceof Date && !Number.isNaN(referenceOverride.getTime())) return referenceOverride;
       if (dateKey === todayKey()) return new Date();
       const date = dateFromKey(dateKey);
       date.setHours(8, 0, 0, 0);
@@ -5622,104 +5623,246 @@
 
     function recoveryHoursForSeverity(severity, activity) {
       if (!isNumber(severity)) return 0;
-      let hours = severity >= 85 ? 48
-        : severity >= 75 ? 40
-          : severity >= 60 ? 30
-            : severity >= 45 ? 22
-              : 14;
-      if (activity?.flags?.race) hours += 12;
+      let hours = severity >= 90 ? 72
+        : severity >= 80 ? 60
+          : severity >= 70 ? 48
+            : severity >= 55 ? 36
+              : severity >= 40 ? 24
+                : 16;
+      if (activity?.flags?.race) hours += 24;
       const durationSec = activity?.movingSec || activity?.recordingSec || activity?.elapsedSec;
-      if (isNumber(durationSec) && durationSec >= 2 * 3600) hours += 8;
-      return clamp(hours, 12, 72);
+      if (isNumber(durationSec) && durationSec >= 2 * 3600) hours += 12;
+      return clamp(hours, 16, 120);
     }
 
-    function recoveryDebtSnapshot(referenceDate) {
-      const reference = recoveryReferenceDateTime(referenceDate);
-      if (!reference) return { debt:0, cap:null, sessions:[], dominant:null };
+    function recoveryActivityEndTime(activity) {
+      if (!activity) return null;
+      const local = activity?.start?.local;
+      const utc = activity?.start?.utc;
+      let activityTime = null;
+      if (local) {
+        const parsed = new Date(local);
+        if (!Number.isNaN(parsed.getTime())) activityTime = parsed;
+      }
+      if (!activityTime && utc) {
+        const parsed = new Date(utc);
+        if (!Number.isNaN(parsed.getTime())) activityTime = parsed;
+      }
+      if (!activityTime) {
+        const parsed = dateFromKey(activityDateKey(activity));
+        if (parsed) {
+          parsed.setHours(12,0,0,0);
+          activityTime = parsed;
+        }
+      }
+      if (!activityTime) return null;
+      const durationSec = activity.movingSec || activity.recordingSec || activity.elapsedSec || 0;
+      return new Date(activityTime.getTime() + Math.max(0, durationSec) * 1000);
+    }
 
+    function recoveryEvidenceTime(dateKey) {
+      const date = dateFromKey(dateKey);
+      if (!date) return null;
+      date.setHours(8,0,0,0);
+      return date;
+    }
+
+    function physiologicalRecoveryResponse(current) {
+      if (!current?.date) return { score:.35, label:"Sin evidencia", deterioration:.05, signals:[] };
+
+      const previous = state.wellness
+        .filter(item => item.date < current.date)
+        .sort((a,b) => a.date.localeCompare(b.date))
+        .slice(-28);
+      const prior = previous.at(-1) || null;
+
+      const hrv = current.recovery?.hrvRmssdMs;
+      const resting = current.recovery?.restingHeartRateBpm;
+      const sleepScore = current.recovery?.sleepScore;
+      const hrvBase = median(previous.map(item => item.recovery?.hrvRmssdMs));
+      const restingBase = median(previous.map(item => item.recovery?.restingHeartRateBpm));
+
+      let hrvResponse = null;
+      if (isNumber(hrv) && isNumber(hrvBase) && hrvBase > 0) {
+        const ratio = hrv / hrvBase;
+        hrvResponse = ratio < .82 ? 0
+          : ratio < .90 ? .18
+            : ratio < .96 ? .42
+              : ratio < 1.02 ? .68
+                : ratio < 1.08 ? .82
+                  : .92;
+        const priorHrv = prior?.recovery?.hrvRmssdMs;
+        if (isNumber(priorHrv) && priorHrv > 0) {
+          const trend = hrv / priorHrv - 1;
+          if (trend >= .05) hrvResponse += .10;
+          else if (trend <= -.05) hrvResponse -= .12;
+        }
+        hrvResponse = clamp(hrvResponse, 0, 1);
+      }
+
+      let restingResponse = null;
+      if (isNumber(resting) && isNumber(restingBase)) {
+        const delta = resting - restingBase;
+        restingResponse = delta >= 6 ? 0
+          : delta >= 4 ? .18
+            : delta >= 2 ? .42
+              : delta >= 0 ? .68
+                : .82;
+        const priorResting = prior?.recovery?.restingHeartRateBpm;
+        if (isNumber(priorResting)) {
+          if (resting <= priorResting - 2) restingResponse += .08;
+          else if (resting >= priorResting + 2) restingResponse -= .10;
+        }
+        restingResponse = clamp(restingResponse, 0, 1);
+      }
+
+      const sleepResponse = isNumber(sleepScore)
+        ? clamp((sleepScore - 45) / 50, 0, 1)
+        : null;
+
+      const recentSleepScores = [...previous.slice(-2), current]
+        .map(item => item.recovery?.sleepScore)
+        .filter(isNumber);
+      const sleepHistory = recentSleepScores.length ? average(recentSleepScores) : null;
+      const sleepHistoryResponse = isNumber(sleepHistory)
+        ? clamp((sleepHistory - 50) / 45, 0, 1)
+        : null;
+
+      /* Pesos fijos y valores prudentes si falta una señal:
+         la ausencia de datos no se convierte en recuperación. */
+      const parts = [
+        { value:isNumber(hrvResponse) ? hrvResponse : .35, weight:38, key:"hrv" },
+        { value:isNumber(restingResponse) ? restingResponse : .40, weight:27, key:"rhr" },
+        { value:isNumber(sleepResponse) ? sleepResponse : .40, weight:22, key:"sleep" },
+        { value:isNumber(sleepHistoryResponse) ? sleepHistoryResponse : .40, weight:13, key:"sleepHistory" }
+      ];
+      const totalWeight = parts.reduce((sum, item) => sum + item.weight, 0);
+      let response = parts.reduce((sum, item) => sum + item.value * item.weight, 0) / totalWeight;
+
+      const redFlags = [
+        isNumber(hrv) && isNumber(hrvBase) && hrvBase > 0 && hrv < hrvBase * .85,
+        isNumber(resting) && isNumber(restingBase) && resting >= restingBase + 5,
+        isNumber(sleepScore) && sleepScore < 60,
+        isNumber(sleepHistory) && sleepHistory < 65
+      ].filter(Boolean).length;
+
+      if (redFlags >= 3) response = Math.min(response, .10);
+      else if (redFlags >= 2) response = Math.min(response, .25);
+      else if (redFlags === 1) response = Math.min(response, .48);
+
+      const deterioration = response < .30
+        ? clamp((.30 - response) / .30 * .20, 0, .20)
+        : 0;
+
+      const label = response >= .78 ? "Recuperación confirmada"
+        : response >= .60 ? "Respuesta favorable"
+          : response >= .42 ? "Respuesta neutra"
+            : response >= .25 ? "Recuperación no confirmada"
+              : "Respuesta desfavorable";
+
+      return {
+        score:clamp(response, 0, 1),
+        label,
+        deterioration,
+        redFlags,
+        hrvResponse,
+        restingResponse,
+        sleepResponse,
+        sleepHistoryResponse
+      };
+    }
+
+    function activityBaseRecoveryPenalty(stress) {
+      if (!stress || !isNumber(stress.severity)) return 0;
+      return clamp((stress.severity - 20) / 80 * 62, 0, 62);
+    }
+
+    function physiologyConfirmedRecoverySnapshot(current) {
+      const referenceDate = current?.date;
+      const evidenceTime = recoveryEvidenceTime(referenceDate);
+      if (!referenceDate || !evidenceTime) {
+        return { penalty:0, debt:0, response:null, sessions:[], dominant:null, confirmedRecovery:0 };
+      }
+
+      const response = physiologicalRecoveryResponse(current);
       const sessions = [];
+
       for (const activity of state.activities) {
-        const local = activity?.start?.local;
-        const utc = activity?.start?.utc;
         const activityDate = activityDateKey(activity);
         if (!activityDate || activityDate > referenceDate) continue;
 
-        let activityTime = null;
-        if (local) {
-          const parsed = new Date(local);
-          if (!Number.isNaN(parsed.getTime())) activityTime = parsed;
-        }
-        if (!activityTime && utc) {
-          const parsed = new Date(utc);
-          if (!Number.isNaN(parsed.getTime())) activityTime = parsed;
-        }
-        if (!activityTime) {
-          const parsed = dateFromKey(activityDate);
-          if (parsed) {
-            parsed.setHours(12,0,0,0);
-            activityTime = parsed;
-          }
-        }
-        if (!activityTime || activityTime > reference) continue;
+        const endTime = recoveryActivityEndTime(activity);
+        if (!endTime) continue;
 
-        const ageHours = (reference.getTime() - activityTime.getTime()) / 3600000;
-        if (ageHours < 0 || ageHours > 72) continue;
+        /* Para actividades anteriores, el instante de evaluación queda fijado
+           por la última evidencia fisiológica (08:00 del día). Sólo una actividad
+           nueva de hoy puede entrar después de esa hora. */
+        const postMorningToday = referenceDate === todayKey() && endTime >= evidenceTime;
+        const evaluationTime = postMorningToday ? new Date() : evidenceTime;
+        if (endTime > evaluationTime) continue;
+
+        const hoursSinceEnd = (evaluationTime.getTime() - endTime.getTime()) / 3600000;
+        if (hoursSinceEnd < 0 || hoursSinceEnd > 120) continue;
 
         const stress = activityRecoverySeverity(activity);
         if (!stress || stress.severity < 20) continue;
 
         const recoveryHours = recoveryHoursForSeverity(stress.severity, activity);
-        const remaining = clamp(1 - ageHours / Math.max(1, recoveryHours), 0, 1);
-        if (remaining <= 0) continue;
+        const basePenalty = activityBaseRecoveryPenalty(stress);
+        if (basePenalty <= 0) continue;
 
-        const debt = stress.severity * Math.pow(remaining, .8);
+        /* Si la actividad ocurrió después de la medición fisiológica de hoy,
+           no existe evidencia postentrenamiento: conserva el 100 % de la penalización. */
+        const hasPostActivityEvidence = endTime < evidenceTime;
+        const evidenceAgeHours = hasPostActivityEvidence
+          ? Math.max(0, (evidenceTime.getTime() - endTime.getTime()) / 3600000)
+          : 0;
+
+        /* El tiempo sólo marca cuánto PODRÍA haberse recuperado como máximo.
+           La recuperación que se hace efectiva exige confirmación fisiológica. */
+        const potentialRecovery = hasPostActivityEvidence
+          ? clamp(evidenceAgeHours / Math.max(1, recoveryHours), 0, 1)
+          : 0;
+        const confirmation = hasPostActivityEvidence
+          ? clamp((response.score - .25) / .65, 0, 1)
+          : 0;
+        const confirmedFraction = potentialRecovery * confirmation;
+
+        /* Una respuesta claramente desfavorable puede aumentar la deuda
+           a pesar de haber transcurrido tiempo. */
+        const deterioration = hasPostActivityEvidence ? response.deterioration : 0;
+        const residualPenalty = basePenalty * (1 - confirmedFraction) * (1 + deterioration);
+
         sessions.push({
           activity,
-          ageHours,
-          recoveryHours,
-          remaining,
-          debt,
           severity:stress.severity,
+          trainingLoad:stress.trainingLoad,
           intensity:stress.intensity,
-          trainingLoad:stress.trainingLoad
+          recoveryHours,
+          basePenalty,
+          potentialRecovery,
+          confirmation,
+          confirmedFraction,
+          deterioration,
+          residualPenalty,
+          hasPostActivityEvidence
         });
       }
 
-      sessions.sort((a,b) => b.debt - a.debt);
-      const totalDebt = clamp(sessions.reduce((sum, item) => sum + item.debt, 0), 0, 100);
-      let cap = totalDebt >= 70 ? 25
-        : totalDebt >= 55 ? 35
-          : totalDebt >= 40 ? 50
-            : totalDebt >= 25 ? 65
-              : totalDebt >= 15 ? 75
-                : null;
-
-      for (const session of sessions) {
-        let sessionCap = null;
-        if (session.severity >= 85) {
-          sessionCap = session.ageHours < 18 ? 35
-            : session.ageHours < 30 ? 45
-              : session.ageHours < 42 ? 55
-                : session.ageHours < session.recoveryHours ? 65
-                  : null;
-        } else if (session.severity >= 75) {
-          sessionCap = session.ageHours < 18 ? 45
-            : session.ageHours < 30 ? 55
-              : session.ageHours < session.recoveryHours ? 65
-                : null;
-        } else if (session.severity >= 60) {
-          sessionCap = session.ageHours < 18 ? 55
-            : session.ageHours < session.recoveryHours ? 70
-              : null;
-        }
-        if (isNumber(sessionCap)) cap = isNumber(cap) ? Math.min(cap, sessionCap) : sessionCap;
-      }
+      sessions.sort((a,b) => b.residualPenalty - a.residualPenalty);
+      const totalPenalty = clamp(sessions.reduce((sum, item) => sum + item.residualPenalty, 0), 0, 78);
+      const totalBasePenalty = sessions.reduce((sum, item) => sum + item.basePenalty, 0);
+      const confirmedRecovery = totalBasePenalty > 0
+        ? clamp(1 - totalPenalty / totalBasePenalty, -0.20, 1)
+        : 0;
 
       return {
-        debt:totalDebt,
-        cap,
+        penalty:totalPenalty,
+        debt:totalPenalty,
+        response,
         sessions,
-        dominant:sessions[0] || null
+        dominant:sessions[0] || null,
+        confirmedRecovery
       };
     }
 
@@ -5728,7 +5871,7 @@
     }
 
     function calculateReadiness(current) {
-      if (!current) return { score:null, rawScore:null, label:"Sin datos", color:"var(--muted)", reasons:[], recoveryDebt:0, recoveryCap:null };
+      if (!current) return { score:null, rawScore:null, label:"Sin datos", color:"var(--muted)", reasons:[], recoveryDebt:0, recoveryPenalty:0, recoveryResponse:null, recoveryResponseLabel:null, confirmedRecovery:0, recoveryCap:null };
 
       const previous = state.wellness
         .filter(item => item.date < current.date)
@@ -5804,23 +5947,28 @@
         { score:readinessFactorScore(subjectiveScore, 65), weight:10 }
       ]);
 
-      const debt = recoveryDebtSnapshot(current.date);
-      let cap = debt.cap;
+      const recoveryState = physiologyConfirmedRecoverySnapshot(current);
+      const recoveryPenalty = recoveryState.penalty;
 
-      /* Otras señales capaces de limitar la disponibilidad. */
+      /* La carga reciente sólo se libera cuando existe evidencia fisiológica
+         compatible con recuperación. El reloj nunca concede puntos por sí solo. */
+      let safetyCap = null;
       if (isNumber(sleepScore)) {
         const sleepCap = sleepScore < 50 ? 45 : sleepScore < 65 ? 60 : null;
-        if (isNumber(sleepCap)) cap = isNumber(cap) ? Math.min(cap, sleepCap) : sleepCap;
+        if (isNumber(sleepCap)) safetyCap = isNumber(safetyCap) ? Math.min(safetyCap, sleepCap) : sleepCap;
       }
       if (isNumber(hrv) && isNumber(hrvBase) && hrvBase > 0 && hrv < hrvBase * .80) {
-        cap = isNumber(cap) ? Math.min(cap, 60) : 60;
+        safetyCap = isNumber(safetyCap) ? Math.min(safetyCap, 60) : 60;
       }
       if (isNumber(resting) && isNumber(restingBase) && resting >= restingBase + 6) {
-        cap = isNumber(cap) ? Math.min(cap, 55) : 55;
+        safetyCap = isNumber(safetyCap) ? Math.min(safetyCap, 55) : 55;
       }
-      if (isNumber(subjectiveCap)) cap = isNumber(cap) ? Math.min(cap, subjectiveCap) : subjectiveCap;
+      if (isNumber(subjectiveCap)) safetyCap = isNumber(safetyCap) ? Math.min(safetyCap, subjectiveCap) : subjectiveCap;
 
-      const score = rawScore === null ? null : Math.round(isNumber(cap) ? Math.min(rawScore, cap) : rawScore);
+      const dynamicScore = rawScore === null ? null : clamp(rawScore - recoveryPenalty, 0, 100);
+      const score = dynamicScore === null
+        ? null
+        : Math.round(isNumber(safetyCap) ? Math.min(dynamicScore, safetyCap) : dynamicScore);
       const label = score === null ? "Sin datos" : score >= 85 ? "Excelente" : score >= 70 ? "Preparado" : score >= 55 ? "Moderado" : score >= 40 ? "Precaución" : "Recuperación";
       const color = score === null ? "var(--muted)" : score >= 80 ? "var(--green)" : score >= 65 ? "var(--blue)" : score >= 50 ? "var(--amber)" : "var(--red)";
 
@@ -5831,13 +5979,12 @@
       }
       if (isNumber(sleepScore)) reasons.push({ text:`Sueño ${Math.round(sleepScore)}/100`, good:sleepScore >= 75 });
       if (isNumber(resting) && isNumber(restingBase)) reasons.push({ text:`FC reposo ${resting <= restingBase + 1 ? "normal" : "elevada"}`, good:resting <= restingBase + 1 });
-      if (debt.dominant) {
-        const hours = Math.round(debt.dominant.ageHours);
+      if (recoveryState.dominant) {
         reasons.push({
-          text:`Recuperación pendiente · sesión exigente hace ${hours} h`,
-          good:false
+          text:`${recoveryState.response?.label || "Recuperación pendiente"} · carga reciente`,
+          good:(recoveryState.response?.score || 0) >= .60
         });
-      } else if (debt.debt >= 15) {
+      } else if (recoveryState.penalty >= 10) {
         reasons.push({ text:"Recuperación pendiente por carga reciente", good:false });
       }
 
@@ -5850,9 +5997,13 @@
         hrvBase,
         restingBase,
         hrvRecent,
-        recoveryDebt:debt.debt,
-        recoveryCap:cap,
-        recoverySessions:debt.sessions.length
+        recoveryDebt:recoveryState.debt,
+        recoveryPenalty,
+        recoveryResponse:recoveryState.response?.score ?? null,
+        recoveryResponseLabel:recoveryState.response?.label || null,
+        confirmedRecovery:recoveryState.confirmedRecovery,
+        recoveryCap:safetyCap,
+        recoverySessions:recoveryState.sessions.length
       };
     }
 
@@ -11118,6 +11269,7 @@
       renderActiveView({ resetActivities: false });
       syncControlState();
     }
+
 
     function setView(view) {
       if (!VIEW_LABELS[view]) return;
