@@ -4205,26 +4205,42 @@
   </style>
 
 
-  <style id="talos-v121-today-state-date">
-    /* Fecha de Hoy: máximo tamaño práctico para fechas largas en iPhone. */
+  <style id="talos-v122-today-date-larger">
+    /* Fecha de Hoy: más grande, manteniendo una sola línea en iPhone. */
+    .today-day-nav {
+      grid-template-columns:36px minmax(0,1fr) 36px !important;
+      gap:7px !important;
+    }
+    .today-day-nav .day-nav-button {
+      width:36px !important;
+      height:36px !important;
+    }
     .today-day-nav-copy strong {
-      font-size:clamp(15.5px, 4.15vw, 17px) !important;
-      font-weight:700 !important;
-      line-height:1.06 !important;
-      letter-spacing:-.045em !important;
+      font-size:clamp(18px, 4.85vw, 19.5px) !important;
+      font-weight:720 !important;
+      line-height:1.02 !important;
+      letter-spacing:-.060em !important;
       text-overflow:clip !important;
       white-space:nowrap !important;
     }
     @media (max-width:390px) {
+      .today-day-nav {
+        grid-template-columns:34px minmax(0,1fr) 34px !important;
+        gap:6px !important;
+      }
+      .today-day-nav .day-nav-button {
+        width:34px !important;
+        height:34px !important;
+      }
       .today-day-nav-copy strong {
-        font-size:clamp(15px, 4.10vw, 16px) !important;
-        letter-spacing:-.052em !important;
+        font-size:clamp(17.5px, 4.75vw, 18.5px) !important;
+        letter-spacing:-.066em !important;
       }
     }
     @media (max-width:360px) {
       .today-day-nav-copy strong {
-        font-size:14.5px !important;
-        letter-spacing:-.058em !important;
+        font-size:17px !important;
+        letter-spacing:-.072em !important;
       }
     }
   </style>
@@ -4579,7 +4595,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "1.2.1";
+    const APP_VERSION = "1.2.2";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-3";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
