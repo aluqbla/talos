@@ -3519,6 +3519,691 @@
     }
   </style>
 
+
+  <style id="talos-v115-today-refinement">
+    /* ============================================================
+       TɅLOS v1.1.5 · Hoy
+       ============================================================ */
+
+    /* Métricas: icono arriba, título centrado verticalmente con él. */
+    .today-primary-metric {
+      min-height:112px !important;
+      padding:6px 7px 9px !important;
+    }
+    .today-metric-head {
+      display:grid !important;
+      grid-template-columns:30px minmax(0,1fr) !important;
+      align-items:center !important;
+      gap:6px !important;
+      min-height:30px !important;
+      margin-top:0 !important;
+    }
+    .today-metric-icon {
+      width:30px !important;
+      height:30px !important;
+      border-radius:9px !important;
+      font-size:1.12rem !important;
+      align-self:start !important;
+    }
+    .today-metric-label {
+      display:block !important;
+      align-self:center !important;
+      padding:0 !important;
+      overflow:visible !important;
+      white-space:nowrap !important;
+      text-overflow:clip !important;
+      -webkit-line-clamp:unset !important;
+      font-size:clamp(.70rem,3.15vw,.82rem) !important;
+      font-weight:710 !important;
+      line-height:1 !important;
+      letter-spacing:-.032em !important;
+    }
+    .today-metric-value {
+      margin-top:8px !important;
+      font-size:clamp(1.10rem,5.25vw,1.42rem) !important;
+    }
+    .today-metric-context {
+      margin-top:7px !important;
+      font-size:clamp(.56rem,2.62vw,.67rem) !important;
+    }
+
+    /* Sensaciones: etiquetas grandes, respuestas algo menores para evitar cortes. */
+    #view-today .feeling-field select {
+      padding-left:7px !important;
+      padding-right:23px !important;
+      font-size:clamp(.58rem,2.55vw,.68rem) !important;
+      letter-spacing:-.015em;
+    }
+
+    /* Próximos vuelve a ser un bloque, pero sin relleno gris. */
+    #view-today .upcoming-card {
+      padding:12px 12px 10px !important;
+      border:1px solid rgba(255,255,255,.075) !important;
+      border-radius:22px !important;
+      background:rgba(0,0,0,.12) !important;
+      box-shadow:0 9px 26px rgba(0,0,0,.20) !important;
+      -webkit-backdrop-filter:none !important;
+      backdrop-filter:none !important;
+    }
+    #view-today .upcoming-row,
+    #view-today .upcoming-row:hover {
+      background:transparent !important;
+    }
+
+    /* Ficha de métrica: tamaño contenido, sin desplazamiento horizontal. */
+    #metricDetailDialog {
+      width:min(560px, calc(100% - 18px)) !important;
+      max-width:560px !important;
+      height:auto !important;
+      max-height:min(82dvh, 650px) !important;
+      overflow:visible !important;
+    }
+    #metricDetailDialog .metric-detail-shell {
+      width:100% !important;
+      height:auto !important;
+      max-height:min(82dvh, 650px) !important;
+      overflow-y:auto !important;
+      overflow-x:hidden !important;
+      border-radius:24px !important;
+    }
+    #metricDetailDialog .dialog-header {
+      min-height:42px !important;
+      padding:8px 10px 6px !important;
+    }
+    #metricDetailDialog .dialog-header h2 {
+      font-size:1.02rem !important;
+    }
+    #metricDetailDialog .dialog-header .icon-button {
+      width:34px !important;
+      height:34px !important;
+      min-width:34px !important;
+      min-height:34px !important;
+    }
+    #metricDetailDialog .metric-detail-content {
+      gap:7px !important;
+      padding:0 9px 9px !important;
+    }
+    #metricDetailDialog .metric-detail-toolbar {
+      position:static !important;
+      gap:3px !important;
+      padding:0 !important;
+      background:transparent !important;
+      -webkit-backdrop-filter:none !important;
+      backdrop-filter:none !important;
+    }
+    #metricDetailDialog .metric-range {
+      min-height:31px !important;
+      padding:0 3px !important;
+      border-radius:11px !important;
+      font-size:.54rem !important;
+    }
+    #metricDetailDialog .metric-detail-card h3 {
+      margin:2px 1px 2px !important;
+      font-size:.78rem !important;
+    }
+    #metricDetailDialog .metric-detail-chart {
+      width:100% !important;
+      overflow:hidden !important;
+      border-radius:0 !important;
+    }
+    #metricDetailDialog .metric-detail-chart svg {
+      display:block !important;
+      width:100% !important;
+      max-width:100% !important;
+      min-width:0 !important;
+      min-height:0 !important;
+      height:auto !important;
+    }
+    #metricDetailDialog .metric-detail-stats {
+      gap:4px !important;
+    }
+    #metricDetailDialog .metric-detail-stat {
+      padding:6px 7px !important;
+      border-radius:12px !important;
+    }
+    #metricDetailDialog .metric-detail-stat span {
+      font-size:.54rem !important;
+    }
+    #metricDetailDialog .metric-detail-stat strong {
+      margin-top:2px !important;
+      font-size:.75rem !important;
+    }
+    #metricDetailDialog .metric-detail-note {
+      padding:0 1px !important;
+      font-size:.57rem !important;
+      line-height:1.3 !important;
+    }
+    #metricDetailDialog .metric-detail-legend {
+      gap:7px !important;
+      margin-top:2px !important;
+      font-size:.52rem !important;
+    }
+
+    @media (max-width:430px) {
+      .today-primary-metric {
+        min-height:108px !important;
+        padding:5px 6px 8px !important;
+      }
+      .today-metric-head {
+        grid-template-columns:28px minmax(0,1fr) !important;
+        gap:4px !important;
+        min-height:28px !important;
+      }
+      .today-metric-icon {
+        width:28px !important;
+        height:28px !important;
+        font-size:1.05rem !important;
+      }
+      .today-metric-label {
+        font-size:clamp(.66rem,3.02vw,.75rem) !important;
+      }
+      .today-metric-value {
+        font-size:clamp(1.02rem,5.05vw,1.27rem) !important;
+      }
+      .today-metric-context {
+        font-size:clamp(.52rem,2.48vw,.61rem) !important;
+      }
+
+      #metricDetailDialog {
+        width:min(500px, calc(100% - 14px)) !important;
+        max-height:78dvh !important;
+      }
+      #metricDetailDialog .metric-detail-shell {
+        max-height:78dvh !important;
+      }
+      #metricDetailDialog .metric-detail-content {
+        padding-left:7px !important;
+        padding-right:7px !important;
+      }
+      #metricDetailDialog .metric-range {
+        min-height:29px !important;
+        font-size:.50rem !important;
+      }
+    }
+
+    @media (max-width:360px) {
+      .today-metric-head {
+        grid-template-columns:26px minmax(0,1fr) !important;
+        gap:3px !important;
+      }
+      .today-metric-icon {
+        width:26px !important;
+        height:26px !important;
+        font-size:.98rem !important;
+      }
+      .today-metric-label { font-size:.62rem !important; }
+      .today-metric-value { font-size:.98rem !important; }
+      .today-metric-context { font-size:.50rem !important; }
+
+      #view-today .feeling-field select {
+        padding-left:5px !important;
+        padding-right:20px !important;
+        font-size:.55rem !important;
+      }
+
+      #metricDetailDialog .metric-range { font-size:.47rem !important; }
+      #metricDetailDialog .metric-detail-stat strong { font-size:.70rem !important; }
+    }
+  </style>
+
+
+  <style id="talos-v116-today-refinement">
+    /* Próximos entrenamientos = mismo contenedor que ¿Cómo te encuentras? */
+    #view-today .upcoming-card {
+      padding:13px 12px !important;
+      border:1px solid var(--separator-soft) !important;
+      border-radius:20px !important;
+      background:var(--bg-grouped) !important;
+      box-shadow:var(--shadow-card) !important;
+      -webkit-backdrop-filter:blur(34px) saturate(190%) !important;
+      backdrop-filter:blur(34px) saturate(190%) !important;
+    }
+    #view-today .upcoming-row,
+    #view-today .upcoming-row:hover {
+      background:transparent !important;
+    }
+    #view-today .upcoming-row {
+      grid-template-columns:60px 30px minmax(0,1fr) 18px !important;
+    }
+    #view-today .upcoming-date {
+      font-size:clamp(.78rem,3.55vw,.90rem) !important;
+      font-weight:730 !important;
+      line-height:1 !important;
+      letter-spacing:-.025em;
+    }
+
+    /* Ficha de métricas: mismo tamaño/material que la ficha diaria de Plan. */
+    #metricDetailDialog {
+      width:min(470px, calc(100% - 24px)) !important;
+      max-width:470px !important;
+      min-height:0 !important;
+      height:auto !important;
+      max-height:calc(100dvh - max(24px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 28px) !important;
+      margin:auto !important;
+      padding:0 !important;
+      overflow:hidden !important;
+      border:1px solid rgba(255,255,255,.18) !important;
+      border-radius:24px !important;
+      background:rgba(28,28,32,.76) !important;
+      -webkit-backdrop-filter:blur(48px) saturate(210%) !important;
+      backdrop-filter:blur(48px) saturate(210%) !important;
+      box-shadow:0 24px 70px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.16) !important;
+    }
+    #metricDetailDialog::backdrop {
+      background:rgba(0,0,0,.38) !important;
+      -webkit-backdrop-filter:blur(12px) !important;
+      backdrop-filter:blur(12px) !important;
+    }
+    #metricDetailDialog .metric-detail-shell {
+      display:block !important;
+      width:100% !important;
+      min-height:0 !important;
+      height:auto !important;
+      max-height:calc(100dvh - max(24px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 28px) !important;
+      overflow:hidden !important;
+      border-radius:0 !important;
+    }
+    #metricDetailDialog .dialog-header {
+      position:static !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:space-between !important;
+      gap:8px !important;
+      min-height:44px !important;
+      padding:5px 7px !important;
+      border-bottom:1px solid rgba(255,255,255,.07) !important;
+      background:rgba(28,28,32,.58) !important;
+    }
+    #metricDetailDialog .dialog-header h2 {
+      margin:0 !important;
+      font-size:.93rem !important;
+      font-weight:680 !important;
+      line-height:1.12 !important;
+      letter-spacing:-.022em !important;
+    }
+    #metricDetailDialog .dialog-header .icon-button {
+      width:34px !important;
+      height:34px !important;
+      min-width:34px !important;
+      min-height:34px !important;
+      border-radius:13px !important;
+    }
+    #metricDetailDialog .metric-detail-content {
+      display:grid !important;
+      gap:7px !important;
+      min-height:0 !important;
+      height:auto !important;
+      max-height:calc(100dvh - max(24px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 88px) !important;
+      overflow-y:auto !important;
+      overflow-x:hidden !important;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      padding:5px 9px 7px !important;
+    }
+
+    /* Separación real entre el título de la métrica y los filtros. */
+    #metricDetailDialog .metric-detail-toolbar {
+      margin-top:7px !important;
+    }
+
+    @media (max-width:430px) {
+      #view-today .upcoming-row {
+        grid-template-columns:54px 28px minmax(0,1fr) 16px !important;
+      }
+      #view-today .upcoming-date {
+        font-size:clamp(.73rem,3.45vw,.84rem) !important;
+      }
+
+      #metricDetailDialog {
+        width:min(450px, calc(100% - 16px)) !important;
+        max-width:450px !important;
+        border-radius:22px !important;
+      }
+      #metricDetailDialog .dialog-header {
+        min-height:42px !important;
+        padding:4px 6px !important;
+      }
+      #metricDetailDialog .dialog-header h2 {
+        font-size:.89rem !important;
+      }
+      #metricDetailDialog .dialog-header .icon-button {
+        width:32px !important;
+        height:32px !important;
+        min-width:32px !important;
+        min-height:32px !important;
+      }
+      #metricDetailDialog .metric-detail-content {
+        padding:4px 7px 6px !important;
+      }
+      #metricDetailDialog .metric-detail-toolbar {
+        margin-top:6px !important;
+      }
+    }
+  </style>
+
+
+  <style id="talos-v117-today-fixes">
+    /* Ficha de métricas = ficha diaria de Plan, no <dialog> nativo. */
+    .metric-detail-overlay[hidden] { display:none !important; }
+    .metric-detail-popover {
+      width:min(470px, 100%) !important;
+      height:auto !important;
+      min-height:0 !important;
+      max-height:calc(100dvh - max(24px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 28px) !important;
+    }
+    .metric-detail-popover-header {
+      grid-template-columns:minmax(0,1fr) 34px !important;
+    }
+    .metric-detail-popover-header h2 {
+      text-align:left !important;
+      padding-left:3px;
+    }
+    .metric-detail-popover .metric-detail-content {
+      display:grid !important;
+      gap:6px !important;
+      height:auto !important;
+      min-height:0 !important;
+      max-height:calc(100dvh - max(24px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom)) - 88px) !important;
+      overflow-y:auto !important;
+      overflow-x:hidden !important;
+      padding:5px 8px 7px !important;
+    }
+    .metric-detail-popover .metric-detail-toolbar {
+      position:static !important;
+      margin:7px 0 0 !important;
+      padding:0 !important;
+      gap:3px !important;
+      background:transparent !important;
+      -webkit-backdrop-filter:none !important;
+      backdrop-filter:none !important;
+    }
+    .metric-detail-popover .metric-range {
+      min-height:29px !important;
+      padding:0 2px !important;
+      border-radius:10px !important;
+      font-size:.49rem !important;
+    }
+    .metric-detail-popover .metric-detail-card {
+      margin:0 !important;
+      padding:0 !important;
+      border:0 !important;
+      border-radius:0 !important;
+      background:transparent !important;
+      box-shadow:none !important;
+    }
+    .metric-detail-popover .metric-detail-card h3 {
+      margin:2px 1px !important;
+      font-size:.76rem !important;
+    }
+    .metric-detail-popover .metric-detail-chart {
+      width:100% !important;
+      overflow:hidden !important;
+      border-radius:0 !important;
+      background:transparent !important;
+    }
+    .metric-detail-popover .metric-detail-chart svg {
+      display:block !important;
+      width:100% !important;
+      max-width:100% !important;
+      min-width:0 !important;
+      min-height:0 !important;
+      height:auto !important;
+    }
+    .metric-detail-popover .metric-detail-stats {
+      gap:4px !important;
+    }
+    .metric-detail-popover .metric-detail-stat {
+      padding:6px 7px !important;
+      border-radius:11px !important;
+    }
+    .metric-detail-popover .metric-detail-stat span {
+      font-size:.52rem !important;
+    }
+    .metric-detail-popover .metric-detail-stat strong {
+      margin-top:2px !important;
+      font-size:.72rem !important;
+    }
+    .metric-detail-popover .metric-detail-note {
+      padding:0 1px !important;
+      font-size:.55rem !important;
+      line-height:1.28 !important;
+    }
+    .metric-detail-popover .metric-detail-legend {
+      gap:7px !important;
+      margin-top:2px !important;
+      font-size:.50rem !important;
+    }
+
+    /* El resumen de Sueño usa la asignación global definitiva. */
+    #view-today .today-sleep-context .quality-excellent { color:#64d2ff !important; }
+    #view-today .today-sleep-context .quality-good { color:#30d158 !important; }
+    #view-today .today-sleep-context .quality-fair { color:#ffd60a !important; }
+    #view-today .today-sleep-context .quality-poor { color:#ff453a !important; }
+
+    /* Nota inferior de Carga: más pequeña para que quepa completa. */
+    #view-today .today-primary-metric.metric-load .today-metric-context {
+      font-size:clamp(.43rem,2.02vw,.52rem) !important;
+      letter-spacing:-.018em;
+    }
+
+    @media (max-width:430px) {
+      .metric-detail-popover {
+        width:min(450px,100%) !important;
+        border-radius:22px !important;
+      }
+      .metric-detail-popover-header {
+        grid-template-columns:minmax(0,1fr) 32px !important;
+      }
+      .metric-detail-popover .metric-detail-content {
+        padding:4px 7px 6px !important;
+      }
+      .metric-detail-popover .metric-detail-toolbar {
+        margin-top:6px !important;
+      }
+      .metric-detail-popover .metric-range {
+        min-height:28px !important;
+        font-size:.46rem !important;
+      }
+    }
+  </style>
+
+
+  <style id="talos-v118-today-refinement">
+    /* Títulos de métricas: tamaño uniforme mandado por "FC reposo". */
+    @media (max-width:430px) {
+      .today-metric-label {
+        font-size:.88rem !important;
+        font-weight:720 !important;
+        letter-spacing:-.04em !important;
+      }
+    }
+    @media (max-width:360px) {
+      .today-metric-label {
+        font-size:.84rem !important;
+        letter-spacing:-.045em !important;
+      }
+    }
+
+    /* Filtros temporales: tamaño uniforme mandado por "6 meses". */
+    .metric-detail-popover .metric-range {
+      font-size:.72rem !important;
+      font-weight:680 !important;
+      letter-spacing:-.025em;
+      white-space:nowrap;
+    }
+    @media (max-width:430px) {
+      .metric-detail-popover .metric-range {
+        font-size:.68rem !important;
+      }
+    }
+    @media (max-width:360px) {
+      .metric-detail-popover .metric-range {
+        font-size:.64rem !important;
+      }
+    }
+
+    /* Explicación de Frescura dentro de Carga. */
+    .freshness-guide {
+      display:grid;
+      gap:5px;
+      margin-top:1px;
+    }
+    .freshness-guide-title {
+      margin:0 1px 1px;
+      color:var(--secondary);
+      font-size:.66rem;
+      font-weight:690;
+    }
+    .freshness-guide-row {
+      display:grid;
+      grid-template-columns:66px minmax(0,1fr);
+      gap:6px;
+      align-items:start;
+      padding:5px 6px;
+      border:1px solid rgba(255,255,255,.055);
+      border-radius:10px;
+      background:rgba(255,255,255,.025);
+    }
+    .freshness-guide-row.active {
+      border-color:rgba(10,132,255,.34);
+      background:rgba(10,132,255,.09);
+    }
+    .freshness-guide-range {
+      color:#fff;
+      font-size:.58rem;
+      font-weight:720;
+      line-height:1.2;
+      white-space:nowrap;
+    }
+    .freshness-guide-copy {
+      color:var(--muted);
+      font-size:.56rem;
+      font-weight:560;
+      line-height:1.28;
+    }
+    .freshness-guide-copy strong {
+      color:var(--secondary);
+      font-weight:680;
+    }
+    .freshness-guide-foot {
+      margin:1px 1px 0;
+      color:var(--muted);
+      font-size:.52rem;
+      line-height:1.26;
+    }
+  </style>
+
+
+  <style id="talos-v119-today-refinement">
+    /* Métricas principales: emoji sin cápsula/recuadro. */
+    .today-metric-icon {
+      background:transparent !important;
+      border-radius:0 !important;
+      box-shadow:none !important;
+    }
+
+    /* Título de las fichas de métricas, cercano al tamaño del Estado TɅLOS. */
+    .metric-detail-popover-header {
+      min-height:54px !important;
+    }
+    .metric-detail-popover-header h2 {
+      font-size:1.50rem !important;
+      font-weight:720 !important;
+      line-height:1 !important;
+      letter-spacing:-.04em !important;
+    }
+
+    /* Entrenamiento dentro del Estado TɅLOS. */
+    #view-today .today-readiness-session .today-current-copy strong {
+      font-size:1.02rem !important;
+      line-height:1.10 !important;
+      font-weight:710 !important;
+    }
+    #view-today .today-readiness-session .today-current-copy small {
+      margin-top:4px !important;
+      font-size:.75rem !important;
+      line-height:1.22 !important;
+      white-space:normal !important;
+      display:-webkit-box !important;
+      -webkit-box-orient:vertical;
+      -webkit-line-clamp:2;
+    }
+
+    /* Próximos entrenamientos: título y explicación mayores. */
+    #view-today .upcoming-row {
+      min-height:66px !important;
+    }
+    #view-today .upcoming-copy strong {
+      font-size:1.02rem !important;
+      line-height:1.10 !important;
+      font-weight:710 !important;
+      white-space:normal !important;
+      display:-webkit-box !important;
+      -webkit-box-orient:vertical;
+      -webkit-line-clamp:2;
+    }
+    #view-today .upcoming-copy span {
+      margin-top:4px !important;
+      font-size:.77rem !important;
+      line-height:1.20 !important;
+      white-space:normal !important;
+    }
+
+    /* Calidad del sueño dentro de la ficha: mismo cuerpo visual que los demás valores. */
+    .metric-detail-popover .metric-detail-stat strong {
+      font-size:.82rem !important;
+    }
+    .metric-detail-popover .metric-detail-stat strong > .quality-excellent,
+    .metric-detail-popover .metric-detail-stat strong > .quality-good,
+    .metric-detail-popover .metric-detail-stat strong > .quality-fair,
+    .metric-detail-popover .metric-detail-stat strong > .quality-poor {
+      font-size:1em !important;
+      font-weight:700 !important;
+      line-height:inherit !important;
+    }
+
+    @media (max-width:430px) {
+      .metric-detail-popover-header {
+        min-height:52px !important;
+      }
+      .metric-detail-popover-header h2 {
+        font-size:1.42rem !important;
+      }
+
+      #view-today .today-readiness-session .today-current-copy strong {
+        font-size:.95rem !important;
+      }
+      #view-today .today-readiness-session .today-current-copy small {
+        font-size:.70rem !important;
+      }
+
+      #view-today .upcoming-copy strong {
+        font-size:.96rem !important;
+      }
+      #view-today .upcoming-copy span {
+        font-size:.72rem !important;
+      }
+    }
+
+    @media (max-width:360px) {
+      .metric-detail-popover-header h2 {
+        font-size:1.34rem !important;
+      }
+      #view-today .today-readiness-session .today-current-copy strong {
+        font-size:.90rem !important;
+      }
+      #view-today .today-readiness-session .today-current-copy small {
+        font-size:.66rem !important;
+      }
+      #view-today .upcoming-copy strong {
+        font-size:.91rem !important;
+      }
+      #view-today .upcoming-copy span {
+        font-size:.68rem !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -3679,12 +4364,15 @@
     </div>
   </dialog>
 
-  <dialog id="metricDetailDialog">
-    <div class="dialog-shell metric-detail-shell">
-      <div class="dialog-header"><h2 id="metricDetailTitle">Métrica</h2><button class="icon-button" type="button" data-close-dialog="metricDetailDialog" aria-label="Cerrar">✕</button></div>
-      <div class="dialog-content metric-detail-content" id="metricDetailContent"></div>
-    </div>
-  </dialog>
+  <div class="plan-day-overlay metric-detail-overlay" id="metricDetailOverlay" hidden aria-hidden="true">
+    <section class="plan-day-popover metric-detail-popover" role="dialog" aria-modal="true" aria-labelledby="metricDetailTitle">
+      <div class="plan-day-popover-header metric-detail-popover-header">
+        <h2 id="metricDetailTitle">Métrica</h2>
+        <button class="plan-day-close" type="button" id="metricDetailClose" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="plan-day-popover-content metric-detail-content" id="metricDetailContent"></div>
+    </section>
+  </div>
 
   <div class="plan-day-overlay" id="planDayOverlay" hidden aria-hidden="true">
     <section class="plan-day-popover" role="dialog" aria-modal="true" aria-labelledby="planDayDialogTitle">
@@ -3866,7 +4554,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "1.1.4";
+    const APP_VERSION = "1.2.0";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-3";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
@@ -4825,52 +5513,306 @@
       return Math.round(valid.reduce((sum, part) => sum + clamp(part.score, 0, 100) * part.weight, 0) / totalWeight);
     }
 
+    function recoveryReferenceDateTime(dateKey) {
+      if (!dateFromKey(dateKey)) return null;
+      if (dateKey === todayKey()) return new Date();
+      const date = dateFromKey(dateKey);
+      date.setHours(8, 0, 0, 0);
+      return date;
+    }
+
+    function activityRecoverySeverity(activity) {
+      if (!activity) return null;
+      const load = activity.load || {};
+      const heart = activity.heartRate || {};
+      const trainingLoad = isNumber(load.trainingLoad) ? load.trainingLoad : isNumber(load.heartRateLoad) ? load.heartRateLoad : null;
+      let intensity = isNumber(load.intensity) ? load.intensity : null;
+      if (isNumber(intensity) && intensity > 0 && intensity <= 2) intensity *= 100;
+
+      const avgHr = heart.averageBpm;
+      const thresholdHr = heart.thresholdBpm;
+      const maxHr = heart.maxBpm;
+      const athleteMaxHr = heart.athleteMaxBpm;
+      const durationSec = activity.movingSec || activity.recordingSec || activity.elapsedSec || null;
+
+      const zoneTimes = safeArray(heart.zoneTimesSec).filter(isNumber);
+      const zoneTotal = zoneTimes.reduce((sum, value) => sum + Math.max(0, value), 0);
+      const highZoneSeconds = zoneTimes.length >= 4
+        ? zoneTimes.slice(3).reduce((sum, value) => sum + Math.max(0, value), 0)
+        : 0;
+      const highZoneShare = zoneTotal > 0 ? highZoneSeconds / zoneTotal : null;
+
+      const loadScore = isNumber(trainingLoad) ? clamp(trainingLoad / 80 * 100, 0, 100) : null;
+      const intensityScore = isNumber(intensity)
+        ? clamp(intensity, 0, 100)
+        : isNumber(avgHr) && isNumber(thresholdHr) && thresholdHr > 0
+          ? clamp(avgHr / thresholdHr * 100, 0, 100)
+          : null;
+      const zoneScore = isNumber(highZoneShare) ? clamp(highZoneShare / .55 * 100, 0, 100) : null;
+      const durationScore = isNumber(durationSec) ? clamp(durationSec / 5400 * 100, 0, 100) : null;
+      const maxHrScore = isNumber(maxHr) && isNumber(athleteMaxHr) && athleteMaxHr > 0
+        ? clamp(((maxHr / athleteMaxHr) - .75) / .24 * 100, 0, 100)
+        : null;
+
+      const components = [
+        { score:loadScore, weight:35 },
+        { score:intensityScore, weight:25 },
+        { score:zoneScore, weight:20 },
+        { score:durationScore, weight:10 },
+        { score:maxHrScore, weight:10 }
+      ].filter(item => isNumber(item.score));
+      if (!components.length) return null;
+
+      const totalWeight = components.reduce((sum, item) => sum + item.weight, 0);
+      let severity = components.reduce((sum, item) => sum + item.score * item.weight, 0) / totalWeight;
+
+      if (isNumber(intensity) && intensity >= 95 && isNumber(highZoneShare) && highZoneShare >= .45) severity += 5;
+      if (activity.flags?.race) severity += 8;
+      if (isNumber(durationSec) && durationSec >= 2 * 3600) severity += 4;
+
+      return {
+        severity:clamp(severity, 0, 100),
+        trainingLoad,
+        intensity,
+        highZoneShare,
+        durationSec
+      };
+    }
+
+    function recoveryHoursForSeverity(severity, activity) {
+      if (!isNumber(severity)) return 0;
+      let hours = severity >= 85 ? 48
+        : severity >= 75 ? 40
+          : severity >= 60 ? 30
+            : severity >= 45 ? 22
+              : 14;
+      if (activity?.flags?.race) hours += 12;
+      const durationSec = activity?.movingSec || activity?.recordingSec || activity?.elapsedSec;
+      if (isNumber(durationSec) && durationSec >= 2 * 3600) hours += 8;
+      return clamp(hours, 12, 72);
+    }
+
+    function recoveryDebtSnapshot(referenceDate) {
+      const reference = recoveryReferenceDateTime(referenceDate);
+      if (!reference) return { debt:0, cap:null, sessions:[], dominant:null };
+
+      const sessions = [];
+      for (const activity of state.activities) {
+        const local = activity?.start?.local;
+        const utc = activity?.start?.utc;
+        const activityDate = activityDateKey(activity);
+        if (!activityDate || activityDate > referenceDate) continue;
+
+        let activityTime = null;
+        if (local) {
+          const parsed = new Date(local);
+          if (!Number.isNaN(parsed.getTime())) activityTime = parsed;
+        }
+        if (!activityTime && utc) {
+          const parsed = new Date(utc);
+          if (!Number.isNaN(parsed.getTime())) activityTime = parsed;
+        }
+        if (!activityTime) {
+          const parsed = dateFromKey(activityDate);
+          if (parsed) {
+            parsed.setHours(12,0,0,0);
+            activityTime = parsed;
+          }
+        }
+        if (!activityTime || activityTime > reference) continue;
+
+        const ageHours = (reference.getTime() - activityTime.getTime()) / 3600000;
+        if (ageHours < 0 || ageHours > 72) continue;
+
+        const stress = activityRecoverySeverity(activity);
+        if (!stress || stress.severity < 20) continue;
+
+        const recoveryHours = recoveryHoursForSeverity(stress.severity, activity);
+        const remaining = clamp(1 - ageHours / Math.max(1, recoveryHours), 0, 1);
+        if (remaining <= 0) continue;
+
+        const debt = stress.severity * Math.pow(remaining, .8);
+        sessions.push({
+          activity,
+          ageHours,
+          recoveryHours,
+          remaining,
+          debt,
+          severity:stress.severity,
+          intensity:stress.intensity,
+          trainingLoad:stress.trainingLoad
+        });
+      }
+
+      sessions.sort((a,b) => b.debt - a.debt);
+      const totalDebt = clamp(sessions.reduce((sum, item) => sum + item.debt, 0), 0, 100);
+      let cap = totalDebt >= 70 ? 25
+        : totalDebt >= 55 ? 35
+          : totalDebt >= 40 ? 50
+            : totalDebt >= 25 ? 65
+              : totalDebt >= 15 ? 75
+                : null;
+
+      for (const session of sessions) {
+        let sessionCap = null;
+        if (session.severity >= 85) {
+          sessionCap = session.ageHours < 18 ? 35
+            : session.ageHours < 30 ? 45
+              : session.ageHours < 42 ? 55
+                : session.ageHours < session.recoveryHours ? 65
+                  : null;
+        } else if (session.severity >= 75) {
+          sessionCap = session.ageHours < 18 ? 45
+            : session.ageHours < 30 ? 55
+              : session.ageHours < session.recoveryHours ? 65
+                : null;
+        } else if (session.severity >= 60) {
+          sessionCap = session.ageHours < 18 ? 55
+            : session.ageHours < session.recoveryHours ? 70
+              : null;
+        }
+        if (isNumber(sessionCap)) cap = isNumber(cap) ? Math.min(cap, sessionCap) : sessionCap;
+      }
+
+      return {
+        debt:totalDebt,
+        cap,
+        sessions,
+        dominant:sessions[0] || null
+      };
+    }
+
+    function readinessFactorScore(score, fallback = 65) {
+      return isNumber(score) ? clamp(score, 0, 100) : fallback;
+    }
+
     function calculateReadiness(current) {
-      if (!current) return { score: null, label: "Sin datos", color: "var(--muted)", reasons: [] };
-      const previous = state.wellness.filter(item => item.date < current.date).slice(-28);
+      if (!current) return { score:null, rawScore:null, label:"Sin datos", color:"var(--muted)", reasons:[], recoveryDebt:0, recoveryCap:null };
+
+      const previous = state.wellness
+        .filter(item => item.date < current.date)
+        .sort((a,b) => a.date.localeCompare(b.date))
+        .slice(-28);
+      const recent7 = state.wellness
+        .filter(item => item.date <= current.date)
+        .sort((a,b) => a.date.localeCompare(b.date))
+        .slice(-7);
+
       const hrv = current.recovery?.hrvRmssdMs;
       const resting = current.recovery?.restingHeartRateBpm;
       const sleepScore = current.recovery?.sleepScore;
-      const sleepSeconds = current.recovery?.sleepSeconds;
       const hrvBase = median(previous.map(item => item.recovery?.hrvRmssdMs));
       const restingBase = median(previous.map(item => item.recovery?.restingHeartRateBpm));
-      const hrvScore = isNumber(hrv) && isNumber(hrvBase) && hrvBase > 0 ? clamp(70 + ((hrv / hrvBase) - 1) * 200, 20, 100) : null;
-      const restingScore = isNumber(resting) && isNumber(restingBase) && restingBase > 0 ? clamp(70 + ((restingBase - resting) / restingBase) * 400, 20, 100) : null;
-      const durationScore = isNumber(sleepSeconds) ? clamp(((sleepSeconds / 3600) - 4) * 25, 0, 100) : null;
-      const ctl = current.load?.ctl;
-      const atl = current.load?.atl;
-      let loadScore = null;
-      if (isNumber(ctl) && ctl > 0 && isNumber(atl)) {
-        const ratio = atl / ctl;
-        loadScore = ratio <= .8 ? 90 : ratio <= 1.15 ? 76 : ratio <= 1.45 ? 56 : ratio <= 1.8 ? 38 : 22;
+
+      /* VFC: tendencia corta frente a la referencia personal, no una sola noche. */
+      const hrvRecentValues = recent7.map(item => item.recovery?.hrvRmssdMs).filter(isNumber);
+      const hrvRecent = hrvRecentValues.length ? average(hrvRecentValues) : null;
+      let hrvScore = isNumber(hrvRecent) && isNumber(hrvBase) && hrvBase > 0
+        ? clamp(70 + ((hrvRecent / hrvBase) - 1) * 180, 25, 95)
+        : null;
+      if (isNumber(hrvScore) && isNumber(hrv) && isNumber(hrvBase) && hrv < hrvBase * .92) {
+        const shortfall = (hrvBase * .92 - hrv) / Math.max(1, hrvBase * .12);
+        hrvScore = clamp(hrvScore - clamp(shortfall, 0, 1) * 12, 20, 95);
       }
+
+      /* FC en reposo: principalmente una señal de penalización, no un premio. */
+      let restingScore = null;
+      if (isNumber(resting) && isNumber(restingBase)) {
+        const delta = resting - restingBase;
+        restingScore = delta <= 1 ? 78 : delta <= 2 ? 68 : delta <= 3 ? 55 : delta <= 5 ? 40 : 25;
+      }
+
+      /* Sueño: la puntuación de la última noche + tendencia; sin duplicar duración. */
+      const recentSleepScores = recent7.map(item => item.recovery?.sleepScore).filter(isNumber);
+      const sleepHistoryScore = recentSleepScores.length ? average(recentSleepScores) : null;
+
+      /* Carga: contexto de frescura, con peso secundario. */
+      const freshness = current.load?.form;
+      let loadScore = null;
+      if (isNumber(freshness)) {
+        loadScore = freshness < -30 ? 30
+          : freshness < -15 ? 50
+            : freshness < -5 ? 68
+              : freshness <= 10 ? 80
+                : freshness <= 25 ? 85
+                  : 72;
+      }
+
+      /* Sensaciones: modificador final. Ausencia = neutral-conservador, no redistribución. */
       let subjectiveScore = null;
+      let subjectiveCap = null;
       const subjective = current.date === todayKey() ? state.subjective : null;
       if (subjective && [subjective.energy, subjective.legs, subjective.discomfort].some(value => Number(value) > 0)) {
         const energy = Number(subjective.energy) || 3;
         const legs = Number(subjective.legs) || 3;
         const discomfort = Number(subjective.discomfort) || 1;
         subjectiveScore = clamp(((energy + legs + (6 - discomfort)) / 15) * 100, 0, 100);
+        if (discomfort >= 5) subjectiveCap = 20;
+        else if (discomfort >= 4) subjectiveCap = 35;
+        else if (energy <= 1 || legs <= 1) subjectiveCap = 50;
+        else if (energy <= 2 || legs <= 2) subjectiveCap = 65;
       }
-      const score = weightedScore([
-        { score: hrvScore, weight: 28 },
-        { score: restingScore, weight: 17 },
-        { score: sleepScore, weight: 23 },
-        { score: durationScore, weight: 15 },
-        { score: loadScore, weight: 12 },
-        { score: subjectiveScore, weight: 5 }
+
+      /* Los pesos no se redistribuyen cuando falta un dato: se usa un valor prudente. */
+      const rawScore = weightedScore([
+        { score:readinessFactorScore(hrvScore, 62), weight:22 },
+        { score:readinessFactorScore(sleepScore, 60), weight:28 },
+        { score:readinessFactorScore(sleepHistoryScore, 60), weight:13 },
+        { score:readinessFactorScore(restingScore, 65), weight:10 },
+        { score:readinessFactorScore(loadScore, 60), weight:12 },
+        { score:readinessFactorScore(subjectiveScore, 65), weight:10 }
       ]);
+
+      const debt = recoveryDebtSnapshot(current.date);
+      let cap = debt.cap;
+
+      /* Otras señales capaces de limitar la disponibilidad. */
+      if (isNumber(sleepScore)) {
+        const sleepCap = sleepScore < 50 ? 45 : sleepScore < 65 ? 60 : null;
+        if (isNumber(sleepCap)) cap = isNumber(cap) ? Math.min(cap, sleepCap) : sleepCap;
+      }
+      if (isNumber(hrv) && isNumber(hrvBase) && hrvBase > 0 && hrv < hrvBase * .80) {
+        cap = isNumber(cap) ? Math.min(cap, 60) : 60;
+      }
+      if (isNumber(resting) && isNumber(restingBase) && resting >= restingBase + 6) {
+        cap = isNumber(cap) ? Math.min(cap, 55) : 55;
+      }
+      if (isNumber(subjectiveCap)) cap = isNumber(cap) ? Math.min(cap, subjectiveCap) : subjectiveCap;
+
+      const score = rawScore === null ? null : Math.round(isNumber(cap) ? Math.min(rawScore, cap) : rawScore);
       const label = score === null ? "Sin datos" : score >= 85 ? "Preparado" : score >= 70 ? "Disponible" : score >= 55 ? "Moderado" : score >= 40 ? "Cauto" : "Recuperación";
       const color = score === null ? "var(--muted)" : score >= 80 ? "var(--green)" : score >= 65 ? "var(--blue)" : score >= 50 ? "var(--amber)" : "var(--red)";
+
       const reasons = [];
-      if (isNumber(hrv) && isNumber(hrvBase)) {
-        const delta = ((hrv / hrvBase) - 1) * 100;
-        reasons.push({ text: `VFC ${Math.abs(delta) < 5 ? "estable" : delta > 0 ? "sobre tu base" : "bajo tu base"}`, good: delta >= -5 });
+      if (isNumber(hrvRecent) && isNumber(hrvBase)) {
+        const delta = ((hrvRecent / hrvBase) - 1) * 100;
+        reasons.push({ text:`VFC 7 d ${Math.abs(delta) < 5 ? "estable" : delta > 0 ? "sobre tu base" : "bajo tu base"}`, good:delta >= -5 });
       }
-      if (isNumber(sleepScore)) reasons.push({ text: `Sueño ${Math.round(sleepScore)}/100`, good: sleepScore >= 75 });
-      if (isNumber(resting) && isNumber(restingBase)) reasons.push({ text: `FC reposo ${resting <= restingBase + 1 ? "normal" : "elevada"}`, good: resting <= restingBase + 1 });
-      if (isNumber(ctl) && isNumber(atl)) reasons.push({ text: atl <= ctl ? "Carga reciente baja" : "Fatiga acumulada", good: atl <= ctl * 1.15 });
-      return { score, label, color, reasons, hrvBase, restingBase };
+      if (isNumber(sleepScore)) reasons.push({ text:`Sueño ${Math.round(sleepScore)}/100`, good:sleepScore >= 75 });
+      if (isNumber(resting) && isNumber(restingBase)) reasons.push({ text:`FC reposo ${resting <= restingBase + 1 ? "normal" : "elevada"}`, good:resting <= restingBase + 1 });
+      if (debt.dominant) {
+        const hours = Math.round(debt.dominant.ageHours);
+        reasons.push({
+          text:`Recuperación pendiente · sesión exigente hace ${hours} h`,
+          good:false
+        });
+      } else if (debt.debt >= 15) {
+        reasons.push({ text:"Recuperación pendiente por carga reciente", good:false });
+      }
+
+      return {
+        score,
+        rawScore,
+        label,
+        color,
+        reasons,
+        hrvBase,
+        restingBase,
+        hrvRecent,
+        recoveryDebt:debt.debt,
+        recoveryCap:cap,
+        recoverySessions:debt.sessions.length
+      };
     }
 
     function formatSleepAdjustment(seconds) {
@@ -8034,21 +8976,42 @@
         };
       }
 
-      const calibrationStart = addDaysToKey(referenceDate,-20);
-      const values = state.wellness
-        .filter(item => item.date >= calibrationStart && item.date <= referenceDate && isNumber(item.recovery?.hrvRmssdMs))
-        .sort((a,b) => a.date.localeCompare(b.date))
-        .map(item => item.recovery.hrvRmssdMs);
+      const allRows = state.wellness
+        .filter(item => item.date <= referenceDate && isNumber(item.recovery?.hrvRmssdMs))
+        .sort((a,b) => a.date.localeCompare(b.date));
 
-      // Garmin necesita aproximadamente tres semanas de sueño consistente
-      // para establecer una referencia. TɅLOS no intenta copiar su algoritmo
-      // propietario: sólo exige un periodo comparable antes de crear su rango.
-      if (values.length < 12) return null;
+      const calibrationStart = addDaysToKey(referenceDate,-20);
+      const recentValid = allRows.filter(item => item.date >= calibrationStart);
+      if (recentValid.length < 12) return null;
+
+      let smoothLow = null;
+      let smoothHigh = null;
+      let lastSamples = 0;
+
+      for (const row of allRows) {
+        const windowStart = addDaysToKey(row.date,-96);
+        const historical = allRows
+          .filter(item => item.date >= windowStart && item.date < row.date)
+          .map(item => item.recovery.hrvRmssdMs)
+          .filter(isNumber);
+
+        if (historical.length < 12) continue;
+
+        const rawLow = percentile(historical,.26);
+        const rawHigh = percentile(historical,.94);
+        if (!isNumber(rawLow) || !isNumber(rawHigh)) continue;
+
+        smoothLow = smoothLow === null ? rawLow : smoothLow + .20 * (rawLow - smoothLow);
+        smoothHigh = smoothHigh === null ? rawHigh : smoothHigh + .20 * (rawHigh - smoothHigh);
+        lastSamples = historical.length;
+      }
+
+      if (!isNumber(smoothLow) || !isNumber(smoothHigh)) return null;
       return {
-        low:percentile(values,.20),
-        high:percentile(values,.80),
-        source:"talos21",
-        samples:values.length
+        low:Math.round(smoothLow),
+        high:Math.round(smoothHigh),
+        source:"talos-garmin-fit",
+        samples:lastSamples
       };
     }
 
@@ -8121,7 +9084,7 @@
 
     function metricRowsForRange(metricKey, range, referenceDate) {
       const start = metricRangeStart(range, referenceDate);
-      const monthly = ["6m","1y","all"].includes(range);
+      const monthlyBars = ["6m","1y","all"].includes(range);
 
       if (metricKey === "vo2") {
         const byDate = new Map();
@@ -8136,20 +9099,27 @@
             byDate.set(date,{ date, value:activity.vo2max });
           }
         });
-        let rows = [...byDate.values()].sort((a,b)=>a.date.localeCompare(b.date));
-        if (monthly) {
-          const buckets = new Map();
-          rows.forEach(row => buckets.set(monthBucketKey(row.date), row));
-          rows = [...buckets.entries()].map(([key,row]) => ({ ...row, key, label:monthBucketLabel(key, range === "all") }));
-        } else {
-          rows = rows.map(row => ({ ...row, key:row.date, label:formatDate(row.date,{day:"numeric",month:"short"}) }));
-        }
-        return compactSeries(rows,180);
+        return [...byDate.values()]
+          .sort((a,b)=>a.date.localeCompare(b.date))
+          .map(row => ({ ...row, key:row.date, label:formatDate(row.date,{day:"numeric",month:"short"}) }));
       }
 
       const source = state.wellness
         .filter(item => item.date >= start && item.date <= referenceDate)
         .sort((a,b)=>a.date.localeCompare(b.date));
+
+      if (metricKey === "load") {
+        return source
+          .filter(item => isNumber(item.load?.ctl) || isNumber(item.load?.atl) || isNumber(item.load?.form))
+          .map(item => ({
+            date:item.date,
+            key:item.date,
+            label:formatDate(item.date,{day:"numeric",month:"short"}),
+            fitness:item.load?.ctl,
+            fatigue:item.load?.atl,
+            freshness:isNumber(item.load?.form) ? item.load.form : isNumber(item.load?.ctl) && isNumber(item.load?.atl) ? item.load.ctl-item.load.atl : null
+          }));
+      }
 
       const accessor = {
         sleep:item => isNumber(item.recovery?.sleepSeconds) ? item.recovery.sleepSeconds / 3600 : null,
@@ -8158,21 +9128,10 @@
         steps:item => item.body?.steps
       }[metricKey];
 
-      if (metricKey === "load") {
-        let rows = source
-          .filter(item => isNumber(item.load?.ctl) || isNumber(item.load?.atl) || isNumber(item.load?.form))
-          .map(item => ({
-            date:item.date,
-            fitness:item.load?.ctl,
-            fatigue:item.load?.atl,
-            freshness:isNumber(item.load?.form) ? item.load.form : isNumber(item.load?.ctl) && isNumber(item.load?.atl) ? item.load.ctl-item.load.atl : null
-          }));
-        if (range === "all") rows = compactSeries(rows,220);
-        return rows;
-      }
-
       if (!accessor) return [];
-      if (!monthly) {
+
+      /* VFC y FC reposo: un punto por día en cualquier escala temporal. */
+      if (["hrv","rhr"].includes(metricKey) || !monthlyBars) {
         const byDate = new Map(source.map(item => [item.date,item]));
         const rows = [];
         let cursor = start;
@@ -8187,9 +9146,10 @@
           });
           cursor = addDaysToKey(cursor,1);
         }
-        return compactSeries(rows,180);
+        return rows;
       }
 
+      /* Sueño y Pasos: en 6 meses/1 año/Todo, una barra = media mensual. */
       const buckets = new Map();
       source.forEach(item => {
         const value = accessor(item);
@@ -8202,6 +9162,7 @@
         if (isNumber(item.recovery?.sleepScore)) row.sleepScores.push(item.recovery.sleepScore);
         buckets.set(key,row);
       });
+
       const result = [];
       let cursor = monthBucketKey(start);
       const endMonth = monthBucketKey(referenceDate);
@@ -8220,27 +9181,61 @@
         if (next === cursor) break;
         cursor = next;
       }
-      return compactSeries(result,180);
+      return result;
     }
 
-    function chartRenderWidth(rowCount, range, type = "line") {
-      if (rowCount <= 0) return 640;
-      if (range === "7d") return 640;
-      if (range === "30d") return Math.max(640, rowCount * (type === "bar" ? 38 : 42));
-      if (range === "6m") return Math.max(640, rowCount * 92);
-      if (range === "1y") return Math.max(680, rowCount * 64);
-      return Math.max(720, rowCount * (type === "bar" ? 48 : 52));
+    function chartRenderWidth() {
+      return 640;
     }
 
-    function chartValueLabel(value, kind = "number") {
+    function metricChartLabelSize(rowCount) {
+      if (rowCount <= 7) return 15;
+      if (rowCount <= 12) return 12.5;
+      if (rowCount <= 18) return 10.5;
+      if (rowCount <= 24) return 8.5;
+      return 6.2;
+    }
+
+    function metricChartAxisSize(rowCount) {
+      if (rowCount <= 12) return 13.5;
+      if (rowCount <= 24) return 11;
+      return 8.5;
+    }
+
+    function chartValueLabel(value, kind = "number", compact = false) {
       if (!isNumber(value)) return "";
       if (kind === "steps") return formatGroupedInteger(value);
       if (kind === "sleep") {
         const minutes = Math.round(value * 60);
-        return `${Math.floor(minutes/60)} h ${String(minutes%60).padStart(2,"0")}`;
+        const h = Math.floor(minutes/60);
+        const m = String(minutes%60).padStart(2,"0");
+        return compact ? `${h}h${m}` : `${h} h ${m}`;
       }
       if (kind === "vo2") return formatVo2Max(value);
       return formatNumber(value, Math.abs(value) < 10 ? 1 : 0);
+    }
+
+    function sampledValidIndexes(rows, range) {
+      const valid = rows
+        .map((row,index) => ({ row,index }))
+        .filter(item => isNumber(item.row.value) || isNumber(item.row.fitness) || isNumber(item.row.fatigue) || isNumber(item.row.freshness))
+        .map(item => item.index);
+      if (!valid.length) return new Set();
+
+      const maxLabels = range === "7d" ? 7
+        : range === "30d" ? 15
+          : range === "6m" ? 12
+            : range === "1y" ? 12
+              : 14;
+
+      if (valid.length <= maxLabels) return new Set(valid);
+
+      const chosen = new Set();
+      for (let i=0; i<maxLabels; i++) {
+        const position = Math.round(i * (valid.length - 1) / Math.max(1,maxLabels - 1));
+        chosen.add(valid[position]);
+      }
+      return chosen;
     }
 
     function metricNiceAxis(values, includeZero = false) {
@@ -8257,104 +9252,169 @@
     function metricLineChartSvg(rows, { color="#0a84ff", unit="", range="7d", averageLine=null, band=null, aria="Evolución de la métrica" } = {}) {
       const validRows = rows.filter(row => isNumber(row.value));
       if (!validRows.length) return '<div class="chart-empty">Sin datos en este periodo.</div>';
-      const width=640,height=258,left=58,right=18,top=48,bottom=46,plotW=width-left-right,plotH=height-top-bottom;
-      const renderWidth=chartRenderWidth(rows.length,range,"line");
+
+      const width=640,height=204,left=48,right=10,top=36,bottom=34,plotW=width-left-right,plotH=height-top-bottom;
+      const axisSize=metricChartAxisSize(rows.length);
+      const valueIndexes=sampledValidIndexes(rows,range);
+      const valueLabelSize=range === "7d" ? 14 : range === "30d" ? 10 : 8.2;
+
       const extra = [];
       if (isNumber(averageLine)) extra.push(averageLine);
       if (band && isNumber(band.low) && isNumber(band.high)) extra.push(band.low,band.high);
       const axis = metricNiceAxis([...validRows.map(row=>row.value),...extra],false);
       if (!axis) return '<div class="chart-empty">Sin datos en este periodo.</div>';
+
+      const firstDate = rows.find(row=>dateFromKey(row.date))?.date || null;
+      const lastDate = [...rows].reverse().find(row=>dateFromKey(row.date))?.date || null;
+      const totalDays = firstDate && lastDate ? Math.max(1,daysBetweenKeys(firstDate,lastDate)) : null;
+      const xFor = index => {
+        const date = rows[index]?.date;
+        if (totalDays && dateFromKey(date)) {
+          return left + clamp(daysBetweenKeys(firstDate,date) / totalDays,0,1) * plotW;
+        }
+        return left + index/Math.max(1,rows.length-1)*plotW;
+      };
       const yFor = value => top + (axis.max-value)/(axis.max-axis.min)*plotH;
-      const xFor = index => left + index/Math.max(1,rows.length-1)*plotW;
       const gridStep = (axis.max-axis.min)/4;
+
       const grid = Array.from({length:5},(_,i)=>{
         const value=axis.min+gridStep*i;
         const y=yFor(value);
-        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.055)"/><text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.68)" font-size="14.5" font-weight="620" text-anchor="end">${escapeHtml(formatNumber(value,Math.abs(value)<10?1:0))}</text>`;
+        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.05)"/><text x="${left-6}" y="${(y+4).toFixed(1)}" fill="rgba(235,235,245,.62)" font-size="${axisSize}" font-weight="600" text-anchor="end">${escapeHtml(formatNumber(value,Math.abs(value)<10?1:0))}</text>`;
       }).join("");
+
       const bandMarkup = band && isNumber(band.low) && isNumber(band.high)
-        ? `<rect x="${left}" y="${Math.min(yFor(band.high),yFor(band.low)).toFixed(1)}" width="${plotW}" height="${Math.abs(yFor(band.low)-yFor(band.high)).toFixed(1)}" rx="5" fill="rgba(48,209,88,.08)"/>`
+        ? `<rect x="${left}" y="${Math.min(yFor(band.high),yFor(band.low)).toFixed(1)}" width="${plotW}" height="${Math.abs(yFor(band.low)-yFor(band.high)).toFixed(1)}" rx="4" fill="rgba(48,209,88,.075)"/>`
         : "";
+
       const avgMarkup = isNumber(averageLine)
-        ? `<line x1="${left}" y1="${yFor(averageLine).toFixed(1)}" x2="${width-right}" y2="${yFor(averageLine).toFixed(1)}" stroke="rgba(235,235,245,.38)" stroke-width="1.5" stroke-dasharray="5 5"/>`
+        ? `<line x1="${left}" y1="${yFor(averageLine).toFixed(1)}" x2="${width-right}" y2="${yFor(averageLine).toFixed(1)}" stroke="rgba(235,235,245,.34)" stroke-width="1.2" stroke-dasharray="4 4"/>`
         : "";
-      let segments=[], current=[];
-      rows.forEach((row,index)=>{
-        if (isNumber(row.value)) current.push(`${xFor(index).toFixed(1)},${yFor(row.value).toFixed(1)}`);
-        else if (current.length) { segments.push(current); current=[]; }
-      });
-      if (current.length) segments.push(current);
-      const lines = segments.map(points => `<polyline points="${points.join(" ")}" fill="none" stroke="${color}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>`).join("");
-      const dots = rows.map((row,index)=>isNumber(row.value)?`<circle cx="${xFor(index).toFixed(1)}" cy="${yFor(row.value).toFixed(1)}" r="3.5" fill="${color}"/>`:"").join("");
-      const labelKind = unit === "VO₂" ? "vo2" : "number";
-      const values = rows.map((row,index)=>isNumber(row.value)
-        ? `<text x="${xFor(index).toFixed(1)}" y="${Math.max(16,yFor(row.value)-10).toFixed(1)}" fill="rgba(255,255,255,.92)" font-size="14" font-weight="720" text-anchor="middle">${escapeHtml(chartValueLabel(row.value,labelKind))}</text>`
+
+      /* Conecta valores existentes aunque haya días sin registro intermedios. */
+      const pointPairs = rows
+        .map((row,index) => isNumber(row.value) ? `${xFor(index).toFixed(1)},${yFor(row.value).toFixed(1)}` : null)
+        .filter(Boolean);
+      const lines = pointPairs.length > 1
+        ? `<polyline points="${pointPairs.join(" ")}" fill="none" stroke="${color}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`
+        : "";
+
+      const dots = rows.map((row,index)=>isNumber(row.value)
+        ? `<circle cx="${xFor(index).toFixed(1)}" cy="${yFor(row.value).toFixed(1)}" r="${rows.length>180?1.25:rows.length>30?1.7:2.8}" fill="${color}"/>`
         : "").join("");
-      const ticks = chartTickIndexes(rows.length,range).map(index => `<text x="${xFor(index).toFixed(1)}" y="${height-13}" fill="rgba(235,235,245,.72)" font-size="14" font-weight="620" text-anchor="middle">${escapeHtml(rows[index]?.label || "")}</text>`).join("");
-      return `<svg viewBox="0 0 ${width} ${height}" style="width:${renderWidth}px" role="img" aria-label="${escapeHtml(aria)}">${grid}${bandMarkup}${avgMarkup}${lines}${dots}${values}${ticks}${unit?`<text x="10" y="${top-8}" fill="rgba(235,235,245,.64)" font-size="13.5" font-weight="650">${escapeHtml(unit)}</text>`:""}</svg>`;
+
+      const labelKind = unit === "VO₂" ? "vo2" : "number";
+      const values = rows.map((row,index)=>{
+        if (!isNumber(row.value) || !valueIndexes.has(index)) return "";
+        return `<text x="${xFor(index).toFixed(1)}" y="${Math.max(valueLabelSize+1,yFor(row.value)-6).toFixed(1)}" fill="rgba(255,255,255,.91)" font-size="${valueLabelSize}" font-weight="700" text-anchor="middle">${escapeHtml(chartValueLabel(row.value,labelKind,true))}</text>`;
+      }).join("");
+
+      const ticks = chartTickIndexes(rows.length,range).map(index => `<text x="${xFor(index).toFixed(1)}" y="${height-10}" fill="rgba(235,235,245,.67)" font-size="${axisSize}" font-weight="600" text-anchor="middle">${escapeHtml(rows[index]?.label || "")}</text>`).join("");
+
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(aria)}">${grid}${bandMarkup}${avgMarkup}${lines}${dots}${values}${ticks}${unit?`<text x="6" y="${top-7}" fill="rgba(235,235,245,.58)" font-size="${axisSize}" font-weight="650">${escapeHtml(unit)}</text>`:""}</svg>`;
     }
 
     function metricBarChartSvg(rows, { range="7d", kind="steps" } = {}) {
       if (!rows.some(row=>isNumber(row.value))) return '<div class="chart-empty">Sin datos en este periodo.</div>';
-      const width=640,height=258,left=58,right=18,top=48,bottom=46,plotW=width-left-right,plotH=height-top-bottom;
-      const renderWidth=chartRenderWidth(rows.length,range,"bar");
+
+      const width=640,height=204,left=48,right=10,top=36,bottom=34,plotW=width-left-right,plotH=height-top-bottom;
+      const labelSize=metricChartLabelSize(rows.length);
+      const axisSize=metricChartAxisSize(rows.length);
       const maxValue=Math.max(1,...rows.map(row=>isNumber(row.value)?row.value:0));
       const axisMax=kind==="sleep" ? Math.max(10,Math.ceil(maxValue/2)*2) : Math.ceil(maxValue/niceChartStep(maxValue,4))*niceChartStep(maxValue,4);
-      const slot=plotW/Math.max(1,rows.length),barW=Math.max(3,Math.min(28,slot*.72));
+      const slot=plotW/Math.max(1,rows.length);
+      const barW=Math.max(3,Math.min(26,slot*.68));
+
       const grid=Array.from({length:5},(_,i)=>{
         const value=axisMax*i/4;
         const y=top+plotH-(value/axisMax)*plotH;
         const label=kind==="steps"?formatGroupedInteger(value):formatNumber(value, value<10?1:0);
-        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.055)"/><text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.68)" font-size="14.5" font-weight="620" text-anchor="end">${escapeHtml(label)}</text>`;
+        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.05)"/><text x="${left-6}" y="${(y+4).toFixed(1)}" fill="rgba(235,235,245,.62)" font-size="${axisSize}" font-weight="600" text-anchor="end">${escapeHtml(label)}</text>`;
       }).join("");
+
       const bars=rows.map((row,index)=>{
         if (!isNumber(row.value)) return "";
         const h=row.value/axisMax*plotH,x=left+index*slot+(slot-barW)/2,y=top+plotH-h;
         const color=kind==="sleep" ? sleepQualityColor(row.quality) : "#ffd60a";
-        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="${Math.min(4,barW/2).toFixed(1)}" fill="${color}" opacity=".86"/>`;
+        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="${Math.min(3.5,barW/2).toFixed(1)}" fill="${color}" opacity=".86"/>`;
       }).join("");
+
       const labels=rows.map((row,index)=>{
         if (!isNumber(row.value)) return "";
         const h=row.value/axisMax*plotH,x=left+index*slot+slot/2,y=top+plotH-h;
-        return `<text x="${x.toFixed(1)}" y="${Math.max(17,y-9).toFixed(1)}" fill="rgba(255,255,255,.93)" font-size="14" font-weight="720" text-anchor="middle">${escapeHtml(chartValueLabel(row.value,kind))}</text>`;
+        return `<text x="${x.toFixed(1)}" y="${Math.max(labelSize+1,y-5).toFixed(1)}" fill="rgba(255,255,255,.92)" font-size="${labelSize}" font-weight="700" text-anchor="middle">${escapeHtml(chartValueLabel(row.value,kind,true))}</text>`;
       }).join("");
+
       const ticks=chartTickIndexes(rows.length,range).map(index=>{
         const x=left+index*slot+slot/2;
-        return `<text x="${x.toFixed(1)}" y="${height-13}" fill="rgba(235,235,245,.72)" font-size="14" font-weight="620" text-anchor="middle">${escapeHtml(rows[index]?.label || "")}</text>`;
+        return `<text x="${x.toFixed(1)}" y="${height-10}" fill="rgba(235,235,245,.67)" font-size="${axisSize}" font-weight="600" text-anchor="middle">${escapeHtml(rows[index]?.label || "")}</text>`;
       }).join("");
-      return `<svg viewBox="0 0 ${width} ${height}" style="width:${renderWidth}px" role="img" aria-label="${kind==="sleep"?"Duración y calidad del sueño":"Pasos diarios"}">${grid}${bars}${labels}${ticks}<text x="10" y="${top-8}" fill="rgba(235,235,245,.64)" font-size="13.5" font-weight="650">${kind==="sleep"?"h":"pasos"}</text></svg>`;
+
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${kind==="sleep"?"Duración y calidad del sueño":"Pasos diarios"}">${grid}${bars}${labels}${ticks}<text x="6" y="${top-7}" fill="rgba(235,235,245,.58)" font-size="${axisSize}" font-weight="650">${kind==="sleep"?"h":"pasos"}</text></svg>`;
     }
 
     function metricLoadChartSvg(rows, range) {
       const values=rows.flatMap(row=>[row.fitness,row.fatigue,row.freshness]).filter(isNumber);
       if (rows.length<2 || !values.length) return '<div class="chart-empty">Aún no hay suficiente histórico de carga.</div>';
-      const width=640,height=270,left=58,right=18,top=54,bottom=48,plotW=width-left-right,plotH=height-top-bottom;
-      const renderWidth=chartRenderWidth(rows.length,range,"line");
+
+      const width=640,height=214,left=48,right=10,top=40,bottom=34,plotW=width-left-right,plotH=height-top-bottom;
+      const axisSize=metricChartAxisSize(rows.length);
+      const valueIndexes=sampledValidIndexes(rows,range);
+      const valueLabelSize=range === "7d" ? 12 : range === "30d" ? 8.5 : 6.8;
       const axis=metricNiceAxis(values,true);
+      const firstDate=rows.find(row=>dateFromKey(row.date))?.date || null;
+      const lastDate=[...rows].reverse().find(row=>dateFromKey(row.date))?.date || null;
+      const totalDays=firstDate&&lastDate?Math.max(1,daysBetweenKeys(firstDate,lastDate)):null;
+      const xFor=index=>{
+        const date=rows[index]?.date;
+        if (totalDays && dateFromKey(date)) return left+clamp(daysBetweenKeys(firstDate,date)/totalDays,0,1)*plotW;
+        return left+index/Math.max(1,rows.length-1)*plotW;
+      };
       const yFor=value=>top+(axis.max-value)/(axis.max-axis.min)*plotH;
-      const xFor=index=>left+index/Math.max(1,rows.length-1)*plotW;
+
       const grid=Array.from({length:5},(_,i)=>{
         const value=axis.min+(axis.max-axis.min)*i/4,y=yFor(value);
-        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${Math.abs(value)<1?'.13':'.055'})"/><text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.68)" font-size="14.5" font-weight="620" text-anchor="end">${escapeHtml(formatNumber(value,0))}</text>`;
+        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${Math.abs(value)<1?'.12':'.05'})"/><text x="${left-6}" y="${(y+4).toFixed(1)}" fill="rgba(235,235,245,.62)" font-size="${axisSize}" font-weight="600" text-anchor="end">${escapeHtml(formatNumber(value,0))}</text>`;
       }).join("");
-      const series=(key,color,widthPx,offset)=> {
+
+      const series=(key,color,widthPx,offset)=>{
         const points=rows.map((row,index)=>isNumber(row[key])?`${xFor(index).toFixed(1)},${yFor(row[key]).toFixed(1)}`:null).filter(Boolean).join(" ");
-        const dots=rows.map((row,index)=>isNumber(row[key])?`<circle cx="${xFor(index).toFixed(1)}" cy="${yFor(row[key]).toFixed(1)}" r="3" fill="${color}"/>`:"").join("");
-        const labels=rows.map((row,index)=>isNumber(row[key])
-          ? `<text x="${xFor(index).toFixed(1)}" y="${Math.max(15,Math.min(height-bottom-3,yFor(row[key])+offset)).toFixed(1)}" fill="${color}" font-size="12.8" font-weight="720" text-anchor="middle">${escapeHtml(formatNumber(row[key],1))}</text>`
+        const dots=rows.map((row,index)=>isNumber(row[key])
+          ? `<circle cx="${xFor(index).toFixed(1)}" cy="${yFor(row[key]).toFixed(1)}" r="${rows.length>180?1.1:rows.length>30?1.6:2.6}" fill="${color}"/>`
+          : "").join("");
+        const labels=rows.map((row,index)=>isNumber(row[key]) && valueIndexes.has(index)
+          ? `<text x="${xFor(index).toFixed(1)}" y="${Math.max(valueLabelSize+1,Math.min(height-bottom-2,yFor(row[key])+offset)).toFixed(1)}" fill="${color}" font-size="${valueLabelSize}" font-weight="700" text-anchor="middle">${escapeHtml(formatNumber(row[key],1))}</text>`
           : "").join("");
         return `${points?`<polyline points="${points}" fill="none" stroke="${color}" stroke-width="${widthPx}" stroke-linecap="round" stroke-linejoin="round"/>`:""}${dots}${labels}`;
       };
+
       const tickIndexes=loadChartTickIndexes(rows.map(row=>({date:row.date})),range);
       const ticks=tickIndexes.map(index=>{
-        const label=["6m","1y"].includes(range)?monthBucketLabel(monthBucketKey(rows[index].date),false):formatDate(rows[index].date,{day:"numeric",month:"short"});
-        return `<text x="${xFor(index).toFixed(1)}" y="${height-13}" fill="rgba(235,235,245,.72)" font-size="14" font-weight="620" text-anchor="middle">${escapeHtml(label)}</text>`;
+        const label=formatDate(rows[index].date,{day:"numeric",month:"short"});
+        return `<text x="${xFor(index).toFixed(1)}" y="${height-10}" fill="rgba(235,235,245,.67)" font-size="${axisSize}" font-weight="600" text-anchor="middle">${escapeHtml(label)}</text>`;
       }).join("");
-      return `<svg viewBox="0 0 ${width} ${height}" style="width:${renderWidth}px" role="img" aria-label="Evolución de forma, fatiga y frescura">${grid}${series("fitness","#0a84ff",3,-10)}${series("fatigue","#ff9f0a",2.7,17)}${series("freshness","#30d158",2.3,-10)}${ticks}</svg>`;
+
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolución de forma, fatiga y frescura">${grid}${series("fitness","#0a84ff",2.8,-7)}${series("fatigue","#ff9f0a",2.5,10)}${series("freshness","#30d158",2.2,-7)}${ticks}</svg>`;
     }
 
     function metricStat(label,value) {
       return `<div class="metric-detail-stat"><span>${escapeHtml(label)}</span><strong>${value}</strong></div>`;
+    }
+
+    function freshnessGuidanceMarkup(currentValue) {
+      const rows = [
+        { range:"< −30", active:isNumber(currentValue) && currentValue < -30, title:"Muy fatigado", copy:"Descanso o recuperación. Evita intensidad y sesiones largas exigentes." },
+        { range:"−30 a −15", active:isNumber(currentValue) && currentValue >= -30 && currentValue < -15, title:"Carga alta", copy:"Rodaje fácil o descanso. Calidad sólo si el plan y el Estado TɅLOS lo respaldan." },
+        { range:"−15 a −5", active:isNumber(currentValue) && currentValue >= -15 && currentValue < -5, title:"Carga productiva", copy:"Entrenamiento normal. Una sesión intensa planificada suele encajar si recuperas bien." },
+        { range:"−5 a +10", active:isNumber(currentValue) && currentValue >= -5 && currentValue <= 10, title:"Equilibrado", copy:"Buena zona para sesiones clave o intensidad cuando el resto de señales son favorables." },
+        { range:"+10 a +25", active:isNumber(currentValue) && currentValue > 10 && currentValue <= 25, title:"Fresco", copy:"Buen momento para competir o afrontar una sesión exigente ya prevista." },
+        { range:"> +25", active:isNumber(currentValue) && currentValue > 25, title:"Muy fresco", copy:"Frecuente tras descanso o taper. Puedes entrenar fuerte si toca; mantenido muchos días puede indicar poca carga." }
+      ];
+      return `<div class="freshness-guide">
+        <p class="freshness-guide-title">Cómo interpretar Frescura</p>
+        ${rows.map(row=>`<div class="freshness-guide-row ${row.active?"active":""}"><span class="freshness-guide-range">${row.range}</span><span class="freshness-guide-copy"><strong>${row.title}</strong> · ${row.copy}</span></div>`).join("")}
+        <p class="freshness-guide-foot">Orientación de carga: no sustituye el Estado TɅLOS ni el entrenamiento planificado.</p>
+      </div>`;
     }
 
     function metricDetailModel(metricKey, range, referenceDate) {
@@ -8399,8 +9459,8 @@
           note:guidance?.source==="received"
             ? "TɅLOS usa directamente los límites de referencia recibidos."
             : guidance
-              ? `Rango TɅLOS calculado con ${guidance.samples} noches válidas de las últimas tres semanas, usando percentiles 20–80.`
-              : "Todavía no hay suficientes noches válidas para crear un rango TɅLOS. Se exige un histórico aproximado de tres semanas."
+              ? `Rango TɅLOS estimado con ${guidance.samples} noches históricas y suavizado progresivo.`
+              : "Todavía no hay suficientes noches válidas para crear un rango TɅLOS."
         };
       }
 
@@ -8468,7 +9528,8 @@
           metricStat("Frescura media",freshness.length?`${average(freshness)>=0?"+":""}${escapeHtml(formatNumber(average(freshness),1))}`:"—"),
           metricStat("Tendencia",escapeHtml(latestSemantic.trendLabel))
         ].join(""),
-        note:"Forma refleja carga sostenida; Fatiga, carga reciente; Frescura, el equilibrio entre ambas. TɅLOS mantiene ocultos los nombres técnicos internos."
+        guidance:freshnessGuidanceMarkup(latestSemantic.freshness),
+        note:"Forma refleja carga sostenida; Fatiga, carga reciente; Frescura, el equilibrio entre ambas."
       };
     }
 
@@ -8484,6 +9545,7 @@
         <div class="metric-detail-toolbar">${[["7d","7 días"],["30d","1 mes"],["6m","6 meses"],["1y","1 año"],["all","Todo"]].map(([value,label])=>`<button type="button" class="metric-range ${range===value?"active":""}" data-metric-range="${value}">${label}</button>`).join("")}</div>
         <article class="metric-detail-card"><h3>Evolución · ${escapeHtml(evolutionPeriodLabel(range))}</h3><div class="metric-detail-chart">${model.chart}</div>${model.legend||""}</article>
         <div class="metric-detail-stats">${model.stats}</div>
+        ${model.guidance || ""}
         <div class="metric-detail-note">${escapeHtml(model.note)}</div>`;
       $$('[data-metric-range]',$("#metricDetailContent")).forEach(button=>button.addEventListener("click",()=>{
         state.metricDetail.range=button.dataset.metricRange;
@@ -8491,10 +9553,26 @@
       }));
     }
 
+    function closeMetricDetail() {
+      const overlay = $("#metricDetailOverlay");
+      if (!overlay || overlay.hidden) return;
+      overlay.hidden = true;
+      overlay.setAttribute("aria-hidden","true");
+      restoreDialogFocus();
+    }
+
     function openMetricDetail(key,referenceDate=todayKey()) {
+      const overlay = $("#metricDetailOverlay");
+      if (!overlay) return;
+      state.dialogOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       state.metricDetail={ key, range:"7d", referenceDate };
       renderMetricDetail();
-      openDialog($("#metricDetailDialog"));
+      lockPageForDialog();
+      overlay.hidden = false;
+      overlay.setAttribute("aria-hidden","false");
+      const content=$("#metricDetailContent");
+      if (content) content.scrollTop=0;
+      requestAnimationFrame(() => $("#metricDetailClose")?.focus({ preventScroll:true }));
     }
 
     function todayMetricMarkup({ metricKey="", className="", icon="", label="", value="—", unit="", context="", contextMarkup="", tone="" }) {
@@ -10990,6 +12068,10 @@
       });
       $("#shoeForm").addEventListener("submit", saveShoe);
       $$('[data-close-dialog]').forEach(button => button.addEventListener("click", () => closeDialog($(`#${button.dataset.closeDialog}`))));
+      $("#metricDetailClose")?.addEventListener("click", closeMetricDetail);
+      $("#metricDetailOverlay")?.addEventListener("click", event => {
+        if (event.target === $("#metricDetailOverlay")) closeMetricDetail();
+      });
       $("#planDayClose")?.addEventListener("click", closePlanDayDialog);
       $("#planDayPrev")?.addEventListener("click", () => navigatePlanDay(-1));
       $("#planDayNext")?.addEventListener("click", () => navigatePlanDay(1));
