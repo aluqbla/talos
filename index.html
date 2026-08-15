@@ -4204,6 +4204,31 @@
     }
   </style>
 
+
+  <style id="talos-v121-today-state-date">
+    /* Fecha de Hoy: máximo tamaño práctico para fechas largas en iPhone. */
+    .today-day-nav-copy strong {
+      font-size:clamp(15.5px, 4.15vw, 17px) !important;
+      font-weight:700 !important;
+      line-height:1.06 !important;
+      letter-spacing:-.045em !important;
+      text-overflow:clip !important;
+      white-space:nowrap !important;
+    }
+    @media (max-width:390px) {
+      .today-day-nav-copy strong {
+        font-size:clamp(15px, 4.10vw, 16px) !important;
+        letter-spacing:-.052em !important;
+      }
+    }
+    @media (max-width:360px) {
+      .today-day-nav-copy strong {
+        font-size:14.5px !important;
+        letter-spacing:-.058em !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -4554,7 +4579,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "1.2.0";
+    const APP_VERSION = "1.2.1";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-3";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
@@ -5780,7 +5805,7 @@
       if (isNumber(subjectiveCap)) cap = isNumber(cap) ? Math.min(cap, subjectiveCap) : subjectiveCap;
 
       const score = rawScore === null ? null : Math.round(isNumber(cap) ? Math.min(rawScore, cap) : rawScore);
-      const label = score === null ? "Sin datos" : score >= 85 ? "Preparado" : score >= 70 ? "Disponible" : score >= 55 ? "Moderado" : score >= 40 ? "Cauto" : "Recuperación";
+      const label = score === null ? "Sin datos" : score >= 85 ? "Excelente" : score >= 70 ? "Preparado" : score >= 55 ? "Moderado" : score >= 40 ? "Precaución" : "Recuperación";
       const color = score === null ? "var(--muted)" : score >= 80 ? "var(--green)" : score >= 65 ? "var(--blue)" : score >= 50 ? "var(--amber)" : "var(--red)";
 
       const reasons = [];
