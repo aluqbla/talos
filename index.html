@@ -3293,6 +3293,232 @@
     }
   </style>
 
+
+  <style id="talos-v114-today-refinement">
+    /* ============================================================
+       TɅLOS v1.1.4 · refinamiento Hoy + gráficas
+       ============================================================ */
+
+    /* Calidad del sueño: asignación única para TODA la aplicación. */
+    .quality-excellent { color:#64d2ff !important; }
+    .quality-good { color:#30d158 !important; }
+    .quality-fair { color:#ffd60a !important; }
+    .quality-poor { color:#ff453a !important; }
+
+    /* Navegación inferior: sin subrayado y máximo tamaño uniforme. */
+    .nav-button::after { display:none !important; content:none !important; }
+    .nav-button {
+      min-height:60px !important;
+      gap:3px !important;
+      padding:3px 1px !important;
+    }
+    .nav-button .nav-emoji {
+      font-size:clamp(1.32rem,5.7vw,1.52rem) !important;
+      line-height:1 !important;
+    }
+    .nav-button .nav-label {
+      max-width:100%;
+      overflow:hidden;
+      font-size:clamp(.61rem,2.65vw,.70rem) !important;
+      font-weight:590 !important;
+      line-height:1.04 !important;
+      letter-spacing:-.035em;
+      text-overflow:clip;
+      white-space:nowrap;
+    }
+
+    /* El botón Actualizar deja de mostrar el punto de estado. */
+    #syncTopButton .sync-indicator { display:none !important; }
+
+    /* Métricas principales: más grandes, sin chevrón. */
+    .today-primary-metric {
+      min-height:112px !important;
+      padding:8px 7px 9px !important;
+    }
+    .today-metric-open { display:none !important; }
+    .today-metric-head {
+      align-items:flex-start !important;
+      gap:6px !important;
+      min-height:31px;
+    }
+    .today-metric-icon {
+      width:28px !important;
+      height:28px !important;
+      border-radius:9px !important;
+      font-size:1.05rem !important;
+    }
+    .today-metric-label {
+      padding:1px 0 0 !important;
+      font-size:clamp(.64rem,2.9vw,.75rem) !important;
+      font-weight:690 !important;
+      line-height:1.03 !important;
+      letter-spacing:-.02em;
+    }
+    .today-metric-value {
+      margin-top:9px !important;
+      font-size:clamp(1.08rem,5.2vw,1.38rem) !important;
+      line-height:1 !important;
+    }
+    .today-metric-value small {
+      font-size:.52em !important;
+    }
+    .today-metric-context {
+      margin-top:7px !important;
+      font-size:clamp(.55rem,2.55vw,.66rem) !important;
+      line-height:1.14 !important;
+      font-weight:590 !important;
+    }
+
+    /* Próximos entrenamientos: sin tarjeta gris de fondo. */
+    #view-today .upcoming-card {
+      padding:8px 0 0 !important;
+      border:0 !important;
+      border-radius:0 !important;
+      background:transparent !important;
+      box-shadow:none !important;
+      -webkit-backdrop-filter:none !important;
+      backdrop-filter:none !important;
+    }
+    #view-today .upcoming-row {
+      background:transparent !important;
+    }
+    #view-today .upcoming-row:hover {
+      background:transparent !important;
+    }
+
+    /* Sensaciones más legibles. */
+    #view-today .form-card {
+      padding:13px 12px !important;
+    }
+    #view-today .form-card .data-title {
+      margin-bottom:10px !important;
+    }
+    #view-today .form-card .data-title h3,
+    #view-today .upcoming-head strong {
+      font-size:clamp(1.08rem,4.8vw,1.28rem) !important;
+      font-weight:720 !important;
+      letter-spacing:-.025em;
+    }
+    #view-today .feeling-field label {
+      margin-bottom:6px !important;
+      font-size:clamp(.72rem,3.3vw,.86rem) !important;
+      font-weight:660 !important;
+      color:var(--secondary) !important;
+    }
+    #view-today .feeling-field select {
+      min-height:43px !important;
+      font-size:clamp(.70rem,3vw,.82rem) !important;
+      font-weight:590;
+    }
+    #view-today .upcoming-head {
+      margin-bottom:7px !important;
+    }
+
+    /* Fichas de métricas: la gráfica ocupa todo el ancho, sin caja interior. */
+    #metricDetailDialog .metric-detail-content {
+      gap:12px !important;
+      padding-left:10px !important;
+      padding-right:10px !important;
+    }
+    #metricDetailDialog .metric-detail-card {
+      margin:0 !important;
+      padding:0 !important;
+      border:0 !important;
+      border-radius:0 !important;
+      background:transparent !important;
+      box-shadow:none !important;
+      -webkit-backdrop-filter:none !important;
+      backdrop-filter:none !important;
+    }
+    #metricDetailDialog .metric-detail-card h3 {
+      margin:5px 2px 5px !important;
+      font-size:1.02rem !important;
+    }
+    #metricDetailDialog .metric-detail-chart {
+      width:100%;
+      overflow-x:auto !important;
+      overflow-y:hidden;
+      border-radius:0 !important;
+      background:transparent !important;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;
+    }
+    #metricDetailDialog .metric-detail-chart svg {
+      display:block;
+      max-width:none !important;
+      min-height:245px !important;
+      height:auto !important;
+    }
+    #metricDetailDialog .metric-detail-stats {
+      margin-top:1px;
+    }
+    #metricDetailDialog .metric-detail-stat span {
+      font-size:.65rem !important;
+    }
+    #metricDetailDialog .metric-detail-stat strong {
+      font-size:.94rem !important;
+    }
+    #metricDetailDialog .metric-detail-note {
+      padding:0 2px 3px;
+      font-size:.69rem !important;
+    }
+
+    /* Evolución: permitir gráficas anchas para mantener etiquetas legibles. */
+    .evolution-chart {
+      overflow-x:auto !important;
+      overflow-y:hidden !important;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;
+    }
+    .evolution-chart svg {
+      max-width:none !important;
+      min-height:225px !important;
+    }
+
+    @media (max-width:430px) {
+      .bottom-nav { padding-inline:5px !important; }
+      .nav-button { min-height:58px !important; }
+
+      .today-primary-metric {
+        min-height:108px !important;
+        padding-inline:6px !important;
+      }
+      .today-metric-head { gap:4px !important; }
+      .today-metric-icon {
+        width:26px !important;
+        height:26px !important;
+        font-size:1rem !important;
+      }
+      .today-metric-label {
+        font-size:clamp(.60rem,2.8vw,.69rem) !important;
+      }
+      .today-metric-value {
+        font-size:clamp(1rem,5vw,1.24rem) !important;
+      }
+      .today-metric-context {
+        font-size:clamp(.52rem,2.45vw,.61rem) !important;
+      }
+    }
+
+    @media (max-width:360px) {
+      .nav-button .nav-label { font-size:.59rem !important; }
+      .nav-button .nav-emoji { font-size:1.27rem !important; }
+
+      .today-primary-metric {
+        min-height:105px !important;
+        padding-inline:5px !important;
+      }
+      .today-metric-icon {
+        width:24px !important;
+        height:24px !important;
+        font-size:.92rem !important;
+      }
+      .today-metric-label { font-size:.58rem !important; }
+      .today-metric-value { font-size:.96rem !important; }
+      .today-metric-context { font-size:.50rem !important; }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -3640,7 +3866,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "1.1.3";
+    const APP_VERSION = "1.1.4";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-3";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
@@ -7807,16 +8033,22 @@
           source:"received"
         };
       }
+
+      const calibrationStart = addDaysToKey(referenceDate,-20);
       const values = state.wellness
-        .filter(item => item.date <= referenceDate && isNumber(item.recovery?.hrvRmssdMs))
+        .filter(item => item.date >= calibrationStart && item.date <= referenceDate && isNumber(item.recovery?.hrvRmssdMs))
         .sort((a,b) => a.date.localeCompare(b.date))
-        .slice(-28)
         .map(item => item.recovery.hrvRmssdMs);
-      if (values.length < 7) return null;
+
+      // Garmin necesita aproximadamente tres semanas de sueño consistente
+      // para establecer una referencia. TɅLOS no intenta copiar su algoritmo
+      // propietario: sólo exige un periodo comparable antes de crear su rango.
+      if (values.length < 12) return null;
       return {
         low:percentile(values,.20),
         high:percentile(values,.80),
-        source:"talos"
+        source:"talos21",
+        samples:values.length
       };
     }
 
@@ -7858,6 +8090,33 @@
 
     function metricRangeStart(range, referenceDate) {
       return evolutionRangeStart(range, referenceDate);
+    }
+
+    function sleepQualityRank(value) {
+      return ({ poor:1, fair:2, good:3, excellent:4 })[value] || null;
+    }
+
+    function sleepQualityFromRank(value) {
+      if (!isNumber(value)) return null;
+      if (value >= 3.5) return "excellent";
+      if (value >= 2.5) return "good";
+      if (value >= 1.5) return "fair";
+      return "poor";
+    }
+
+    function sleepQualityColor(value) {
+      return ({
+        excellent:"#64d2ff",
+        good:"#30d158",
+        fair:"#ffd60a",
+        poor:"#ff453a"
+      })[value] || "rgba(235,235,245,.34)";
+    }
+
+    function sleepRowsInRange(start, end) {
+      return state.wellness
+        .filter(item => item.date >= start && item.date <= end && isNumber(item.recovery?.sleepSeconds))
+        .sort((a,b)=>a.date.localeCompare(b.date));
     }
 
     function metricRowsForRange(metricKey, range, referenceDate) {
@@ -7936,9 +8195,11 @@
         const value = accessor(item);
         if (!isNumber(value)) return;
         const key = monthBucketKey(item.date);
-        const row = buckets.get(key) || { values:[], qualities:[] };
+        const row = buckets.get(key) || { values:[], qualityRanks:[], sleepScores:[] };
         row.values.push(value);
-        if (item.recovery?.sleepQualityLabel) row.qualities.push(item.recovery.sleepQualityLabel);
+        const rank = sleepQualityRank(item.recovery?.sleepQualityLabel);
+        if (isNumber(rank)) row.qualityRanks.push(rank);
+        if (isNumber(item.recovery?.sleepScore)) row.sleepScores.push(item.recovery.sleepScore);
         buckets.set(key,row);
       });
       const result = [];
@@ -7946,19 +8207,40 @@
       const endMonth = monthBucketKey(referenceDate);
       while (cursor <= endMonth) {
         const bucket = buckets.get(cursor);
-        const quality = bucket?.qualities?.length ? bucket.qualities.at(-1) : null;
+        const quality = bucket?.qualityRanks?.length ? sleepQualityFromRank(average(bucket.qualityRanks)) : null;
         result.push({
           key:cursor,
           date:`${cursor}-01`,
           label:monthBucketLabel(cursor,range==="all"),
           value:bucket?.values?.length ? average(bucket.values) : null,
-          quality
+          quality,
+          sleepScore:bucket?.sleepScores?.length ? average(bucket.sleepScores) : null
         });
         const next = nextMonthBucket(cursor);
         if (next === cursor) break;
         cursor = next;
       }
       return compactSeries(result,180);
+    }
+
+    function chartRenderWidth(rowCount, range, type = "line") {
+      if (rowCount <= 0) return 640;
+      if (range === "7d") return 640;
+      if (range === "30d") return Math.max(640, rowCount * (type === "bar" ? 38 : 42));
+      if (range === "6m") return Math.max(640, rowCount * 92);
+      if (range === "1y") return Math.max(680, rowCount * 64);
+      return Math.max(720, rowCount * (type === "bar" ? 48 : 52));
+    }
+
+    function chartValueLabel(value, kind = "number") {
+      if (!isNumber(value)) return "";
+      if (kind === "steps") return formatGroupedInteger(value);
+      if (kind === "sleep") {
+        const minutes = Math.round(value * 60);
+        return `${Math.floor(minutes/60)} h ${String(minutes%60).padStart(2,"0")}`;
+      }
+      if (kind === "vo2") return formatVo2Max(value);
+      return formatNumber(value, Math.abs(value) < 10 ? 1 : 0);
     }
 
     function metricNiceAxis(values, includeZero = false) {
@@ -7975,7 +8257,8 @@
     function metricLineChartSvg(rows, { color="#0a84ff", unit="", range="7d", averageLine=null, band=null, aria="Evolución de la métrica" } = {}) {
       const validRows = rows.filter(row => isNumber(row.value));
       if (!validRows.length) return '<div class="chart-empty">Sin datos en este periodo.</div>';
-      const width=640,height=228,left=54,right=14,top=20,bottom=43,plotW=width-left-right,plotH=height-top-bottom;
+      const width=640,height=258,left=58,right=18,top=48,bottom=46,plotW=width-left-right,plotH=height-top-bottom;
+      const renderWidth=chartRenderWidth(rows.length,range,"line");
       const extra = [];
       if (isNumber(averageLine)) extra.push(averageLine);
       if (band && isNumber(band.low) && isNumber(band.high)) extra.push(band.low,band.high);
@@ -7987,13 +8270,13 @@
       const grid = Array.from({length:5},(_,i)=>{
         const value=axis.min+gridStep*i;
         const y=yFor(value);
-        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.055)"/><text x="${left-8}" y="${(y+4).toFixed(1)}" fill="rgba(235,235,245,.62)" font-size="12" font-weight="600" text-anchor="end">${escapeHtml(formatNumber(value,Math.abs(value)<10?1:0))}</text>`;
+        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.055)"/><text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.68)" font-size="14.5" font-weight="620" text-anchor="end">${escapeHtml(formatNumber(value,Math.abs(value)<10?1:0))}</text>`;
       }).join("");
       const bandMarkup = band && isNumber(band.low) && isNumber(band.high)
-        ? `<rect x="${left}" y="${Math.min(yFor(band.high),yFor(band.low)).toFixed(1)}" width="${plotW}" height="${Math.abs(yFor(band.low)-yFor(band.high)).toFixed(1)}" rx="5" fill="rgba(48,209,88,.09)"/>`
+        ? `<rect x="${left}" y="${Math.min(yFor(band.high),yFor(band.low)).toFixed(1)}" width="${plotW}" height="${Math.abs(yFor(band.low)-yFor(band.high)).toFixed(1)}" rx="5" fill="rgba(48,209,88,.08)"/>`
         : "";
       const avgMarkup = isNumber(averageLine)
-        ? `<line x1="${left}" y1="${yFor(averageLine).toFixed(1)}" x2="${width-right}" y2="${yFor(averageLine).toFixed(1)}" stroke="rgba(235,235,245,.36)" stroke-width="1.4" stroke-dasharray="5 5"/>`
+        ? `<line x1="${left}" y1="${yFor(averageLine).toFixed(1)}" x2="${width-right}" y2="${yFor(averageLine).toFixed(1)}" stroke="rgba(235,235,245,.38)" stroke-width="1.5" stroke-dasharray="5 5"/>`
         : "";
       let segments=[], current=[];
       rows.forEach((row,index)=>{
@@ -8001,59 +8284,73 @@
         else if (current.length) { segments.push(current); current=[]; }
       });
       if (current.length) segments.push(current);
-      const lines = segments.map(points => `<polyline points="${points.join(" ")}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`).join("");
-      const dots = rows.map((row,index)=>isNumber(row.value)?`<circle cx="${xFor(index).toFixed(1)}" cy="${yFor(row.value).toFixed(1)}" r="${rows.length<=30?3.2:2}" fill="${color}"/>`:"").join("");
-      const ticks = chartTickIndexes(rows.length,range).map(index => `<text x="${xFor(index).toFixed(1)}" y="${height-12}" fill="rgba(235,235,245,.62)" font-size="12" font-weight="600" text-anchor="middle">${escapeHtml(rows[index]?.label || "")}</text>`).join("");
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(aria)}">${grid}${bandMarkup}${avgMarkup}${lines}${dots}${ticks}${unit?`<text x="10" y="${top+2}" fill="rgba(235,235,245,.58)" font-size="11.5" font-weight="650">${escapeHtml(unit)}</text>`:""}</svg>`;
+      const lines = segments.map(points => `<polyline points="${points.join(" ")}" fill="none" stroke="${color}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>`).join("");
+      const dots = rows.map((row,index)=>isNumber(row.value)?`<circle cx="${xFor(index).toFixed(1)}" cy="${yFor(row.value).toFixed(1)}" r="3.5" fill="${color}"/>`:"").join("");
+      const labelKind = unit === "VO₂" ? "vo2" : "number";
+      const values = rows.map((row,index)=>isNumber(row.value)
+        ? `<text x="${xFor(index).toFixed(1)}" y="${Math.max(16,yFor(row.value)-10).toFixed(1)}" fill="rgba(255,255,255,.92)" font-size="14" font-weight="720" text-anchor="middle">${escapeHtml(chartValueLabel(row.value,labelKind))}</text>`
+        : "").join("");
+      const ticks = chartTickIndexes(rows.length,range).map(index => `<text x="${xFor(index).toFixed(1)}" y="${height-13}" fill="rgba(235,235,245,.72)" font-size="14" font-weight="620" text-anchor="middle">${escapeHtml(rows[index]?.label || "")}</text>`).join("");
+      return `<svg viewBox="0 0 ${width} ${height}" style="width:${renderWidth}px" role="img" aria-label="${escapeHtml(aria)}">${grid}${bandMarkup}${avgMarkup}${lines}${dots}${values}${ticks}${unit?`<text x="10" y="${top-8}" fill="rgba(235,235,245,.64)" font-size="13.5" font-weight="650">${escapeHtml(unit)}</text>`:""}</svg>`;
     }
 
     function metricBarChartSvg(rows, { range="7d", kind="steps" } = {}) {
       if (!rows.some(row=>isNumber(row.value))) return '<div class="chart-empty">Sin datos en este periodo.</div>';
-      const width=640,height=228,left=54,right=14,top=20,bottom=43,plotW=width-left-right,plotH=height-top-bottom;
+      const width=640,height=258,left=58,right=18,top=48,bottom=46,plotW=width-left-right,plotH=height-top-bottom;
+      const renderWidth=chartRenderWidth(rows.length,range,"bar");
       const maxValue=Math.max(1,...rows.map(row=>isNumber(row.value)?row.value:0));
       const axisMax=kind==="sleep" ? Math.max(10,Math.ceil(maxValue/2)*2) : Math.ceil(maxValue/niceChartStep(maxValue,4))*niceChartStep(maxValue,4);
-      const slot=plotW/Math.max(1,rows.length),barW=Math.max(2,Math.min(24,slot*.64));
+      const slot=plotW/Math.max(1,rows.length),barW=Math.max(3,Math.min(28,slot*.72));
       const grid=Array.from({length:5},(_,i)=>{
         const value=axisMax*i/4;
         const y=top+plotH-(value/axisMax)*plotH;
         const label=kind==="steps"?formatGroupedInteger(value):formatNumber(value, value<10?1:0);
-        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.055)"/><text x="${left-8}" y="${(y+4).toFixed(1)}" fill="rgba(235,235,245,.62)" font-size="12" font-weight="600" text-anchor="end">${escapeHtml(label)}</text>`;
+        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.055)"/><text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.68)" font-size="14.5" font-weight="620" text-anchor="end">${escapeHtml(label)}</text>`;
       }).join("");
-      const qualityColor={ excellent:"#30d158",good:"#ffd60a",fair:"#ff9f0a",poor:"#ff453a" };
       const bars=rows.map((row,index)=>{
         if (!isNumber(row.value)) return "";
         const h=row.value/axisMax*plotH,x=left+index*slot+(slot-barW)/2,y=top+plotH-h;
-        const color=kind==="sleep" ? (qualityColor[row.quality] || "#64d2ff") : "#ffd60a";
-        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="${Math.min(4,barW/2).toFixed(1)}" fill="${color}" opacity=".82"/>`;
+        const color=kind==="sleep" ? sleepQualityColor(row.quality) : "#ffd60a";
+        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="${Math.min(4,barW/2).toFixed(1)}" fill="${color}" opacity=".86"/>`;
+      }).join("");
+      const labels=rows.map((row,index)=>{
+        if (!isNumber(row.value)) return "";
+        const h=row.value/axisMax*plotH,x=left+index*slot+slot/2,y=top+plotH-h;
+        return `<text x="${x.toFixed(1)}" y="${Math.max(17,y-9).toFixed(1)}" fill="rgba(255,255,255,.93)" font-size="14" font-weight="720" text-anchor="middle">${escapeHtml(chartValueLabel(row.value,kind))}</text>`;
       }).join("");
       const ticks=chartTickIndexes(rows.length,range).map(index=>{
         const x=left+index*slot+slot/2;
-        return `<text x="${x.toFixed(1)}" y="${height-12}" fill="rgba(235,235,245,.62)" font-size="12" font-weight="600" text-anchor="middle">${escapeHtml(rows[index]?.label || "")}</text>`;
+        return `<text x="${x.toFixed(1)}" y="${height-13}" fill="rgba(235,235,245,.72)" font-size="14" font-weight="620" text-anchor="middle">${escapeHtml(rows[index]?.label || "")}</text>`;
       }).join("");
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${kind==="sleep"?"Duración y calidad del sueño":"Pasos diarios"}">${grid}${bars}${ticks}<text x="10" y="${top+2}" fill="rgba(235,235,245,.58)" font-size="11.5" font-weight="650">${kind==="sleep"?"h":"pasos"}</text></svg>`;
+      return `<svg viewBox="0 0 ${width} ${height}" style="width:${renderWidth}px" role="img" aria-label="${kind==="sleep"?"Duración y calidad del sueño":"Pasos diarios"}">${grid}${bars}${labels}${ticks}<text x="10" y="${top-8}" fill="rgba(235,235,245,.64)" font-size="13.5" font-weight="650">${kind==="sleep"?"h":"pasos"}</text></svg>`;
     }
 
     function metricLoadChartSvg(rows, range) {
       const values=rows.flatMap(row=>[row.fitness,row.fatigue,row.freshness]).filter(isNumber);
       if (rows.length<2 || !values.length) return '<div class="chart-empty">Aún no hay suficiente histórico de carga.</div>';
-      const width=640,height=228,left=54,right=14,top=20,bottom=43,plotW=width-left-right,plotH=height-top-bottom;
+      const width=640,height=270,left=58,right=18,top=54,bottom=48,plotW=width-left-right,plotH=height-top-bottom;
+      const renderWidth=chartRenderWidth(rows.length,range,"line");
       const axis=metricNiceAxis(values,true);
       const yFor=value=>top+(axis.max-value)/(axis.max-axis.min)*plotH;
       const xFor=index=>left+index/Math.max(1,rows.length-1)*plotW;
       const grid=Array.from({length:5},(_,i)=>{
         const value=axis.min+(axis.max-axis.min)*i/4,y=yFor(value);
-        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${Math.abs(value)<1?'.13':'.055'})"/><text x="${left-8}" y="${(y+4).toFixed(1)}" fill="rgba(235,235,245,.62)" font-size="12" font-weight="600" text-anchor="end">${escapeHtml(formatNumber(value,0))}</text>`;
+        return `<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${Math.abs(value)<1?'.13':'.055'})"/><text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.68)" font-size="14.5" font-weight="620" text-anchor="end">${escapeHtml(formatNumber(value,0))}</text>`;
       }).join("");
-      const line=(key,color,widthPx)=> {
+      const series=(key,color,widthPx,offset)=> {
         const points=rows.map((row,index)=>isNumber(row[key])?`${xFor(index).toFixed(1)},${yFor(row[key]).toFixed(1)}`:null).filter(Boolean).join(" ");
-        return points ? `<polyline points="${points}" fill="none" stroke="${color}" stroke-width="${widthPx}" stroke-linecap="round" stroke-linejoin="round"/>` : "";
+        const dots=rows.map((row,index)=>isNumber(row[key])?`<circle cx="${xFor(index).toFixed(1)}" cy="${yFor(row[key]).toFixed(1)}" r="3" fill="${color}"/>`:"").join("");
+        const labels=rows.map((row,index)=>isNumber(row[key])
+          ? `<text x="${xFor(index).toFixed(1)}" y="${Math.max(15,Math.min(height-bottom-3,yFor(row[key])+offset)).toFixed(1)}" fill="${color}" font-size="12.8" font-weight="720" text-anchor="middle">${escapeHtml(formatNumber(row[key],1))}</text>`
+          : "").join("");
+        return `${points?`<polyline points="${points}" fill="none" stroke="${color}" stroke-width="${widthPx}" stroke-linecap="round" stroke-linejoin="round"/>`:""}${dots}${labels}`;
       };
       const tickIndexes=loadChartTickIndexes(rows.map(row=>({date:row.date})),range);
       const ticks=tickIndexes.map(index=>{
         const label=["6m","1y"].includes(range)?monthBucketLabel(monthBucketKey(rows[index].date),false):formatDate(rows[index].date,{day:"numeric",month:"short"});
-        return `<text x="${xFor(index).toFixed(1)}" y="${height-12}" fill="rgba(235,235,245,.62)" font-size="12" font-weight="600" text-anchor="middle">${escapeHtml(label)}</text>`;
+        return `<text x="${xFor(index).toFixed(1)}" y="${height-13}" fill="rgba(235,235,245,.72)" font-size="14" font-weight="620" text-anchor="middle">${escapeHtml(label)}</text>`;
       }).join("");
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolución de forma, fatiga y frescura">${grid}${line("fitness","#0a84ff",3)}${line("fatigue","#ff9f0a",2.7)}${line("freshness","#30d158",2.3)}${ticks}</svg>`;
+      return `<svg viewBox="0 0 ${width} ${height}" style="width:${renderWidth}px" role="img" aria-label="Evolución de forma, fatiga y frescura">${grid}${series("fitness","#0a84ff",3,-10)}${series("fatigue","#ff9f0a",2.7,17)}${series("freshness","#30d158",2.3,-10)}${ticks}</svg>`;
     }
 
     function metricStat(label,value) {
@@ -8061,130 +8358,117 @@
     }
 
     function metricDetailModel(metricKey, range, referenceDate) {
-      const wellness = state.wellness.find(item=>item.date===referenceDate) || { recovery:{},load:{},body:{} };
-      const recovery=wellness.recovery||{}, load=wellness.load||{}, body=wellness.body||{};
+      const startDate=metricRangeStart(range,referenceDate);
       const rows=metricRowsForRange(metricKey,range,referenceDate);
       const rangeLabel=evolutionPeriodLabel(range);
       const valid=rows.filter(row=>isNumber(row.value));
-      const current = valid.at(-1)?.value ?? null;
 
       if (metricKey==="sleep") {
-        const avg=average(valid.map(row=>row.value));
-        const quality=recovery.sleepQualityLabel;
-        const score=recovery.sleepScore;
+        const raw=sleepRowsInRange(startDate,referenceDate);
+        const avg=average(raw.map(item=>item.recovery.sleepSeconds));
+        const scores=raw.map(item=>item.recovery?.sleepScore).filter(isNumber);
+        const ranks=raw.map(item=>sleepQualityRank(item.recovery?.sleepQualityLabel)).filter(isNumber);
+        const avgQuality=ranks.length?sleepQualityFromRank(average(ranks)):null;
+        const longest=raw.length?Math.max(...raw.map(item=>item.recovery.sleepSeconds)):null;
         return {
           title:"Sueño", icon:"💤",
-          currentValue:formatSleep(recovery.sleepSeconds),
-          currentUnit:"",
-          currentContext:sleepQualityMarkup(quality,score) || relativeDayContext(referenceDate,referenceDate),
           chart:metricBarChartSvg(rows,{range,kind:"sleep"}),
           stats:[
-            metricStat("Media del periodo",isNumber(avg)?formatSleep(avg*3600):"—"),
-            metricStat("Última calidad",quality?`<span class="${qualityClass(quality)}">${escapeHtml(qualityLabel(quality))}</span>`:"—"),
-            metricStat("Puntuación",isNumber(score)?`${escapeHtml(formatNumber(score))}/100`:"—"),
-            metricStat("Noches con datos",escapeHtml(formatNumber(valid.length)))
+            metricStat("Media de sueño",isNumber(avg)?formatSleep(avg):"—"),
+            metricStat("Calidad media",avgQuality?`<span class="${qualityClass(avgQuality)}">${escapeHtml(qualityLabel(avgQuality))}</span>`:"—"),
+            metricStat("Puntuación media",scores.length?`${escapeHtml(formatNumber(average(scores)))}/100`:"—"),
+            metricStat("Máximo del periodo",isNumber(longest)?formatSleep(longest):"—")
           ].join(""),
-          note:`${rangeLabel}. Las barras representan duración; el color sólo expresa la calidad registrada: Excelente verde, Bueno amarillo, Regular naranja y Malo rojo.`
+          note:`${rangeLabel}. En vistas mensuales o anuales cada barra representa la media del mes. Si no existe calidad histórica para un periodo, la barra se muestra en gris.`
         };
       }
 
       if (metricKey==="hrv") {
         const guidance=hrvGuidanceForDate(referenceDate);
-        const avg7=average(state.wellness.filter(item=>item.date<=referenceDate&&item.date>=addDaysToKey(referenceDate,-6)).map(item=>item.recovery?.hrvRmssdMs));
+        const values=valid.map(row=>row.value);
         const rangeText=guidance?`${formatNumber(guidance.low)}–${formatNumber(guidance.high)} ms`:"—";
         return {
           title:"VFC", icon:"❤️",
-          currentValue:isNumber(recovery.hrvRmssdMs)?formatNumber(recovery.hrvRmssdMs):"—",
-          currentUnit:isNumber(recovery.hrvRmssdMs)?"ms":"",
-          currentContext:guidance ? `Rango ${rangeText}` : "",
           chart:metricLineChartSvg(rows,{color:"#ff453a",unit:"ms",range,band:guidance,aria:"Evolución de la variabilidad de la frecuencia cardiaca"}),
           stats:[
+            metricStat("Media del periodo",values.length?`${escapeHtml(formatNumber(average(values)))} ms`:"—"),
             metricStat("Rango habitual",escapeHtml(rangeText)),
-            metricStat("Media 7 días",isNumber(avg7)?`${escapeHtml(formatNumber(avg7))} ms`:"—"),
-            metricStat("Valor actual",isNumber(recovery.hrvRmssdMs)?`${escapeHtml(formatNumber(recovery.hrvRmssdMs))} ms`:"—"),
-            metricStat("Referencia",guidance?.source==="received"?"Rango recibido":guidance?"Rango TɅLOS":"Sin referencia")
+            metricStat("Mínimo",values.length?`${escapeHtml(formatNumber(Math.min(...values)))} ms`:"—"),
+            metricStat("Máximo",values.length?`${escapeHtml(formatNumber(Math.max(...values)))} ms`:"—")
           ].join(""),
           note:guidance?.source==="received"
-            ? "TɅLOS usa los límites de referencia recibidos en los datos de bienestar."
+            ? "TɅLOS usa directamente los límites de referencia recibidos."
             : guidance
-              ? "Al no recibir límites de referencia, TɅLOS calcula un rango habitual con los percentiles 20–80 de los últimos 28 días disponibles; no lo presenta como rango Garmin."
-              : "Se necesitan al menos 7 días con VFC para calcular un rango habitual TɅLOS."
+              ? `Rango TɅLOS calculado con ${guidance.samples} noches válidas de las últimas tres semanas, usando percentiles 20–80.`
+              : "Todavía no hay suficientes noches válidas para crear un rango TɅLOS. Se exige un histórico aproximado de tres semanas."
         };
       }
 
       if (metricKey==="rhr") {
         const guidance=restingGuidanceForDate(referenceDate);
-        const avg=guidance?.mean;
+        const values=valid.map(row=>row.value);
         return {
-          title:"FC en reposo", icon:"🫀",
-          currentValue:isNumber(recovery.restingHeartRateBpm)?formatNumber(recovery.restingHeartRateBpm):"—",
-          currentUnit:isNumber(recovery.restingHeartRateBpm)?"ppm":"",
-          currentContext:isNumber(avg)?`Media 28 d · ${formatNumber(avg)} ppm`:"",
-          chart:metricLineChartSvg(rows,{color:"#ff6961",unit:"ppm",range,averageLine:avg,aria:"Evolución de la frecuencia cardiaca en reposo"}),
+          title:"FC reposo", icon:"🫀",
+          chart:metricLineChartSvg(rows,{color:"#ff6961",unit:"ppm",range,averageLine:guidance?.mean,aria:"Evolución de la frecuencia cardiaca en reposo"}),
           stats:[
-            metricStat("Media 28 días",isNumber(avg)?`${escapeHtml(formatNumber(avg))} ppm`:"—"),
-            metricStat("Rango habitual",guidance?`${escapeHtml(formatNumber(guidance.low))}–${escapeHtml(formatNumber(guidance.high))} ppm`:"—"),
-            metricStat("Valor actual",isNumber(recovery.restingHeartRateBpm)?`${escapeHtml(formatNumber(recovery.restingHeartRateBpm))} ppm`:"—"),
-            metricStat("Días usados",guidance?escapeHtml(formatNumber(guidance.samples)):"—")
+            metricStat("Media del periodo",values.length?`${escapeHtml(formatNumber(average(values)))} ppm`:"—"),
+            metricStat("Media 28 días",isNumber(guidance?.mean)?`${escapeHtml(formatNumber(guidance.mean))} ppm`:"—"),
+            metricStat("Mínimo",values.length?`${escapeHtml(formatNumber(Math.min(...values)))} ppm`:"—"),
+            metricStat("Máximo",values.length?`${escapeHtml(formatNumber(Math.max(...values)))} ppm`:"—")
           ].join(""),
-          note:"La línea discontinua marca tu media reciente; el rango habitual se calcula con la distribución de tus últimos 28 días disponibles."
+          note:"La línea discontinua marca la media móvil de referencia de 28 días."
         };
       }
 
       if (metricKey==="vo2") {
-        const vo2=latestVo2MaxForDate(referenceDate,wellness);
-        const first=valid[0]?.value, last=valid.at(-1)?.value;
-        const delta=isNumber(first)&&isNumber(last)&&valid.length>1?last-first:null;
+        const values=valid.map(row=>row.value);
+        const first=values[0],last=values.at(-1);
+        const delta=isNumber(first)&&isNumber(last)&&values.length>1?last-first:null;
         return {
           title:"VO₂ máx.", icon:"🫁",
-          currentValue:isNumber(vo2?.value)?formatVo2Max(vo2.value):"—",
-          currentUnit:isNumber(vo2?.value)?"ml/kg/min":"",
-          currentContext:vo2?relativeDayContext(vo2.date,referenceDate):"",
           chart:metricLineChartSvg(rows,{color:"#30d158",unit:"VO₂",range,aria:"Evolución del VO2 máximo"}),
           stats:[
-            metricStat("Último valor",isNumber(vo2?.value)?escapeHtml(formatVo2Max(vo2.value)):"—"),
-            metricStat("Última medición",vo2?escapeHtml(relativeDayContext(vo2.date,referenceDate)):"—"),
-            metricStat("Cambio periodo",isNumber(delta)?`${delta>=0?"+":""}${escapeHtml(formatVo2Max(delta))}`:"—"),
-            metricStat("Mediciones",escapeHtml(formatNumber(valid.length)))
+            metricStat("Media del periodo",values.length?escapeHtml(formatVo2Max(average(values))):"—"),
+            metricStat("Cambio del periodo",isNumber(delta)?`${delta>=0?"+":""}${escapeHtml(formatVo2Max(delta))}`:"—"),
+            metricStat("Mínimo",values.length?escapeHtml(formatVo2Max(Math.min(...values))):"—"),
+            metricStat("Máximo",values.length?escapeHtml(formatVo2Max(Math.max(...values))):"—")
           ].join(""),
-          note:"La gráfica muestra únicamente mediciones reales disponibles; TɅLOS no inventa valores diarios entre dos estimaciones."
+          note:"La gráfica muestra sólo estimaciones reales disponibles; no interpola valores entre mediciones."
         };
       }
 
       if (metricKey==="steps") {
-        const avg=average(valid.map(row=>row.value));
-        const max=valid.length?Math.max(...valid.map(row=>row.value)):null;
+        const values=valid.map(row=>row.value);
+        const total=values.reduce((sum,value)=>sum+value,0);
         return {
           title:"Pasos", icon:"👟",
-          currentValue:isNumber(body.steps)?formatGroupedInteger(body.steps):"—",
-          currentUnit:"",
-          currentContext:relativeDayContext(referenceDate,referenceDate),
           chart:metricBarChartSvg(rows,{range,kind:"steps"}),
           stats:[
-            metricStat("Hoy / día elegido",isNumber(body.steps)?escapeHtml(formatGroupedInteger(body.steps)):"—"),
-            metricStat("Media del periodo",isNumber(avg)?escapeHtml(formatGroupedInteger(avg)):"—"),
-            metricStat("Máximo",isNumber(max)?escapeHtml(formatGroupedInteger(max)):"—"),
-            metricStat("Días con datos",escapeHtml(formatNumber(valid.length)))
+            metricStat("Media diaria",values.length?escapeHtml(formatGroupedInteger(average(values))):"—"),
+            metricStat("Total",values.length?escapeHtml(formatGroupedInteger(total)):"—"),
+            metricStat("Máximo diario",values.length?escapeHtml(formatGroupedInteger(Math.max(...values))):"—"),
+            metricStat("Días con datos",escapeHtml(formatNumber(values.length)))
           ].join(""),
-          note:`${rangeLabel}. Los separadores de miles siguen el formato español.`
+          note:`${rangeLabel}. Los miles y millones usan la notación española.`
         };
       }
 
-      const semantic=loadSemanticSnapshot(load,referenceDate);
+      const semanticRows=rows.filter(row=>isNumber(row.fitness)||isNumber(row.fatigue)||isNumber(row.freshness));
+      const forms=semanticRows.map(row=>row.fitness).filter(isNumber);
+      const fatigues=semanticRows.map(row=>row.fatigue).filter(isNumber);
+      const freshness=semanticRows.map(row=>row.freshness).filter(isNumber);
+      const latestSemantic=loadSemanticSnapshot((state.wellness.filter(item=>item.date<=referenceDate).sort((a,b)=>a.date.localeCompare(b.date)).at(-1)||{}).load||{},referenceDate);
       return {
         title:"Carga", icon:"⚡",
-        currentValue:isNumber(semantic.freshness)?`${semantic.freshness>=0?"+":""}${formatNumber(semantic.freshness,1)}`:"—",
-        currentUnit:isNumber(semantic.freshness)?"frescura":"",
-        currentContext:[isNumber(semantic.fitness)?`Forma ${formatNumber(semantic.fitness,1)}`:"",isNumber(semantic.fatigue)?`Fatiga ${formatNumber(semantic.fatigue,1)}`:""].filter(Boolean).join(" · "),
         chart:metricLoadChartSvg(rows,range),
         legend:`<div class="metric-detail-legend"><span><i style="background:#0a84ff"></i>Forma</span><span><i style="background:#ff9f0a"></i>Fatiga</span><span><i style="background:#30d158"></i>Frescura</span></div>`,
         stats:[
-          metricStat("Forma",isNumber(semantic.fitness)?escapeHtml(formatNumber(semantic.fitness,1)):"—"),
-          metricStat("Fatiga",isNumber(semantic.fatigue)?escapeHtml(formatNumber(semantic.fatigue,1)):"—"),
-          metricStat("Frescura",isNumber(semantic.freshness)?`${semantic.freshness>=0?"+":""}${escapeHtml(formatNumber(semantic.freshness,1))}`:"—"),
-          metricStat("Tendencia",escapeHtml(semantic.trendLabel))
+          metricStat("Forma media",forms.length?escapeHtml(formatNumber(average(forms),1)):"—"),
+          metricStat("Fatiga media",fatigues.length?escapeHtml(formatNumber(average(fatigues),1)):"—"),
+          metricStat("Frescura media",freshness.length?`${average(freshness)>=0?"+":""}${escapeHtml(formatNumber(average(freshness),1))}`:"—"),
+          metricStat("Tendencia",escapeHtml(latestSemantic.trendLabel))
         ].join(""),
-        note:"Forma resume la carga sostenida; Fatiga, la carga reciente; Frescura expresa el equilibrio entre ambas. Tendencia compara la Forma con su nivel aproximado de hace 7 días."
+        note:"Forma refleja carga sostenida; Fatiga, carga reciente; Frescura, el equilibrio entre ambas. TɅLOS mantiene ocultos los nombres técnicos internos."
       };
     }
 
@@ -8198,10 +8482,6 @@
       $("#metricDetailTitle").textContent=`${model.icon} ${model.title}`;
       $("#metricDetailContent").innerHTML=`
         <div class="metric-detail-toolbar">${[["7d","7 días"],["30d","1 mes"],["6m","6 meses"],["1y","1 año"],["all","Todo"]].map(([value,label])=>`<button type="button" class="metric-range ${range===value?"active":""}" data-metric-range="${value}">${label}</button>`).join("")}</div>
-        <div class="metric-detail-hero">
-          <div><span>${escapeHtml(formatFullDate(referenceDate))}</span><strong>${model.currentValue}${model.currentUnit?` <small>${escapeHtml(model.currentUnit)}</small>`:""}</strong></div>
-          <em>${model.currentContext || ""}</em>
-        </div>
         <article class="metric-detail-card"><h3>Evolución · ${escapeHtml(evolutionPeriodLabel(range))}</h3><div class="metric-detail-chart">${model.chart}</div>${model.legend||""}</article>
         <div class="metric-detail-stats">${model.stats}</div>
         <div class="metric-detail-note">${escapeHtml(model.note)}</div>`;
@@ -8219,7 +8499,6 @@
 
     function todayMetricMarkup({ metricKey="", className="", icon="", label="", value="—", unit="", context="", contextMarkup="", tone="" }) {
       return `<button type="button" class="today-primary-metric ${escapeHtml(className)}" data-metric-detail="${escapeHtml(metricKey)}" aria-label="Abrir evolución de ${escapeHtml(label)}">
-        <span class="today-metric-open" aria-hidden="true">›</span>
         <div class="today-metric-head"><span class="today-metric-icon" aria-hidden="true">${icon}</span><span class="today-metric-label">${escapeHtml(label)}</span></div>
         <div class="today-metric-value">${value}${unit ? `<small>${escapeHtml(unit)}</small>` : ""}</div>
         <div class="today-metric-context ${escapeHtml(tone)}">${contextMarkup || (context ? escapeHtml(context) : "&nbsp;")}</div>
@@ -8229,10 +8508,9 @@
     function upcomingPlanMarkup(fromDate) {
       const endDate = addDaysToKey(fromDate, 6);
       const rows = upcomingPlanSessions(fromDate, endDate);
-      const until = formatDate(endDate,{weekday:"short",day:"numeric",month:"short"}).replace(".","");
-      if (!rows.length) return `<article class="upcoming-card"><div class="upcoming-head"><strong>Próximos entrenamientos</strong><span>Hasta ${escapeHtml(until)}</span></div><div class="plan-empty">No hay entrenamientos disponibles en el plan aceptado hasta esa fecha.</div></article>`;
+      if (!rows.length) return `<article class="upcoming-card"><div class="upcoming-head"><strong>Próximos entrenamientos</strong></div><div class="plan-empty">No hay entrenamientos disponibles en los próximos siete días.</div></article>`;
       return `<article class="upcoming-card">
-        <div class="upcoming-head"><strong>Próximos entrenamientos</strong><span>Hasta ${escapeHtml(until)}</span></div>
+        <div class="upcoming-head"><strong>Próximos entrenamientos</strong></div>
         <div class="upcoming-list">${rows.map(day => {
           const date = dateFromKey(day.date);
           const weekday = date ? new Intl.DateTimeFormat("es-ES", { weekday:"short", day:"numeric" }).format(date).replace(".", "") : day.date;
@@ -8347,7 +8625,7 @@
           metricKey:"rhr",
           className:"metric-rhr",
           icon:"🫀",
-          label:"FC en reposo",
+          label:"FC reposo",
           value:isNumber(recovery.restingHeartRateBpm) ? formatNumber(recovery.restingHeartRateBpm) : "—",
           unit:isNumber(recovery.restingHeartRateBpm) ? "ppm" : "",
           context:rhrContext
@@ -8383,11 +8661,11 @@
       const subjective = state.subjective || {};
       const feelingsMarkup = isToday ? `
           <article class="card data-card form-card">
-            <div class="data-title"><h3>¿Cómo te encuentras?</h3><span>Opcional</span></div>
+            <div class="data-title"><h3>¿Cómo te encuentras?</h3></div>
             <div class="feelings">
               ${feelingSelect("energy", "⚡ Energía", subjective.energy, ["Sin registrar", "Muy baja", "Baja", "Normal", "Buena", "Muy buena"])}
               ${feelingSelect("legs", "🦵 Piernas", subjective.legs, ["Sin registrar", "Muy cargadas", "Cargadas", "Normales", "Sueltas", "Muy sueltas"])}
-              ${feelingSelect("discomfort", "🩹 Molestias", subjective.discomfort, ["Sin registrar", "Ninguna", "Leve", "Moderada", "Alta", "Limitante"])}
+              ${feelingSelect("discomfort", "🩹 Molestias", subjective.discomfort, [{ label:"Sin registrar", value:0 }, { label:"Limitante", value:5 }, { label:"Alta", value:4 }, { label:"Moderada", value:3 }, { label:"Leve", value:2 }, { label:"Ninguna", value:1 }])}
             </div>
           </article>` : "";
 
@@ -8440,7 +8718,12 @@
     }
 
     function feelingSelect(key, label, selected, options) {
-      return `<div class="feeling-field"><label for="feeling-${key}">${label}</label><select id="feeling-${key}" data-feeling="${key}">${options.map((option, index) => `<option value="${index}" ${Number(selected) === index ? "selected" : ""}>${escapeHtml(option)}</option>`).join("")}</select></div>`;
+      return `<div class="feeling-field"><label for="feeling-${key}">${label}</label><select id="feeling-${key}" data-feeling="${key}">${options.map((option, index) => {
+        const explicit = option && typeof option === "object";
+        const value = explicit ? Number(option.value) : index;
+        const text = explicit ? option.label : option;
+        return `<option value="${value}" ${Number(selected) === value ? "selected" : ""}>${escapeHtml(text)}</option>`;
+      }).join("")}</select></div>`;
     }
 
     async function saveSubjective(event) {
@@ -9258,34 +9541,41 @@
 
     function barChartSvg(rows, color = "#0a84ff", range = "30d") {
       if (!rows.length) return '<div class="chart-empty">Sin kilómetros registrados en este periodo.</div>';
-      const width = 640, height = 226, top = 60, bottom = 46, left = 54, right = 12;
+      const width = 640, height = 258, top = 52, bottom = 48, left = 58, right = 16;
       const plotH = height - top - bottom, plotW = width - left - right;
+      const renderWidth=chartRenderWidth(rows.length,range,"bar");
       const rawMax = Math.max(0, ...rows.map(row => row.value));
       const step = niceChartStep(Math.max(rawMax,1), 4);
       const axisMax = Math.max(step, Math.ceil(Math.max(rawMax,1) / step) * step);
       const slot = plotW / rows.length;
-      const barW = Math.max(2, Math.min(22, slot * .68));
+      const barW = Math.max(3, Math.min(28, slot * .72));
 
       const grid = [];
       for (let value=0; value<=axisMax + step*.01; value += step) {
         const y = top + plotH - (value/axisMax)*plotH;
         grid.push(`<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${value===0?'.14':'.06'})"/>`);
-        grid.push(`<text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.66)" font-size="13.5" font-weight="600" text-anchor="end">${escapeHtml(formatNumber(value, value < 10 && step < 1 ? 1 : 0))}</text>`);
+        grid.push(`<text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.70)" font-size="14.5" font-weight="620" text-anchor="end">${escapeHtml(formatNumber(value, value < 10 && step < 1 ? 1 : 0))}</text>`);
       }
 
       const bars = rows.map((row,index) => {
         const h = rawMax <= 0 ? 0 : (row.value / axisMax) * plotH;
         const x = left + index * slot + (slot - barW)/2;
         const y = top + plotH - h;
-        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(row.value>0?1:0,h).toFixed(1)}" rx="${Math.min(3,barW/2).toFixed(1)}" fill="${color}" opacity="${index === rows.length-1 ? .95 : .64}"/>`;
+        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(row.value>0?1:0,h).toFixed(1)}" rx="${Math.min(4,barW/2).toFixed(1)}" fill="${color}" opacity="${index === rows.length-1 ? .96 : .70}"/>`;
+      }).join("");
+
+      const labels=rows.map((row,index)=>{
+        if (!isNumber(row.value)) return "";
+        const h=(row.value/axisMax)*plotH,x=left+index*slot+slot/2,y=top+plotH-h;
+        return `<text x="${x.toFixed(1)}" y="${Math.max(17,y-9).toFixed(1)}" fill="rgba(255,255,255,.93)" font-size="14" font-weight="720" text-anchor="middle">${escapeHtml(formatNumber(row.value,1))}</text>`;
       }).join("");
 
       const ticks = chartTickIndexes(rows.length,range).map(index => {
         const x = left + index*slot + slot/2;
-        return `<text x="${x.toFixed(1)}" y="${height-12}" fill="rgba(235,235,245,.66)" font-size="13" font-weight="600" text-anchor="middle">${escapeHtml(rows[index].label)}</text>`;
+        return `<text x="${x.toFixed(1)}" y="${height-13}" fill="rgba(235,235,245,.72)" font-size="14" font-weight="620" text-anchor="middle">${escapeHtml(rows[index].label)}</text>`;
       }).join("");
 
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Kilómetros de carrera en el periodo">${grid.join("")}${bars}${ticks}<text x="${left}" y="20" fill="rgba(235,235,245,.82)" font-size="16" font-weight="700">máx. ${formatNumber(rawMax,1)} km</text><text x="10" y="${top-9}" fill="rgba(235,235,245,.62)" font-size="12.5" font-weight="650">km</text></svg>`;
+      return `<svg viewBox="0 0 ${width} ${height}" style="width:${renderWidth}px" role="img" aria-label="Kilómetros de carrera en el periodo">${grid.join("")}${bars}${labels}${ticks}<text x="10" y="${top-8}" fill="rgba(235,235,245,.64)" font-size="13.5" font-weight="650">km</text></svg>`;
     }
 
     function loadChartTickIndexes(rows, range) {
@@ -9319,31 +9609,36 @@
       if (axisMax <= axisMin) axisMax = axisMin + step;
       if ((axisMax - axisMin) / step < 4) axisMax = axisMin + step * 4;
 
-      const width=640,height=204,left=54,right=12,top=14,bottom=40,plotW=width-left-right,plotH=height-top-bottom;
-      const point = (value,index) => {
-        const x = left + index/(rows.length-1)*plotW;
-        const y = top + (axisMax-value)/(axisMax-axisMin)*plotH;
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
-      };
-      const ctl = rows.map((row,index)=>isNumber(row.load?.ctl)?point(row.load.ctl,index):null).filter(Boolean).join(" ");
-      const atl = rows.map((row,index)=>isNumber(row.load?.atl)?point(row.load.atl,index):null).filter(Boolean).join(" ");
+      const width=640,height=264,left=58,right=16,top=48,bottom=48,plotW=width-left-right,plotH=height-top-bottom;
+      const renderWidth=chartRenderWidth(rows.length,range,"line");
+      const xFor=index=>left+index/(rows.length-1)*plotW;
+      const yFor=value=>top+(axisMax-value)/(axisMax-axisMin)*plotH;
       const grid = [];
       for (let value=axisMin; value<=axisMax + step*.01; value+=step) {
-        const y = top + (axisMax-value)/(axisMax-axisMin)*plotH;
+        const y = yFor(value);
         const digits = step < 1 ? 1 : 0;
         const zero = Math.abs(value) < step * .01;
         grid.push(`<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${zero?'.16':'.055'})" stroke-width="${zero?'1.4':'1'}"/>`);
-        grid.push(`<text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.66)" font-size="13.5" font-weight="600" text-anchor="end">${escapeHtml(formatNumber(value,digits))}</text>`);
+        grid.push(`<text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.70)" font-size="14.5" font-weight="620" text-anchor="end">${escapeHtml(formatNumber(value,digits))}</text>`);
       }
+      const series=(accessor,color,labelOffset)=>{
+        const points=rows.map((row,index)=>isNumber(accessor(row))?`${xFor(index).toFixed(1)},${yFor(accessor(row)).toFixed(1)}`:null).filter(Boolean).join(" ");
+        const dots=rows.map((row,index)=>isNumber(accessor(row))?`<circle cx="${xFor(index).toFixed(1)}" cy="${yFor(accessor(row)).toFixed(1)}" r="3.2" fill="${color}"/>`:"").join("");
+        const labels=rows.map((row,index)=>{
+          const value=accessor(row);
+          if (!isNumber(value)) return "";
+          return `<text x="${xFor(index).toFixed(1)}" y="${Math.max(15,Math.min(height-bottom-2,yFor(value)+labelOffset)).toFixed(1)}" fill="${color}" font-size="13" font-weight="720" text-anchor="middle">${escapeHtml(formatNumber(value,1))}</text>`;
+        }).join("");
+        return `${points?`<polyline points="${points}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`:""}${dots}${labels}`;
+      };
       const tickIndexes = loadChartTickIndexes(rows,range);
       const ticks = tickIndexes.map(index => {
-        const x = left + index/(rows.length-1)*plotW;
         const label = ["6m","1y"].includes(range)
           ? monthBucketLabel(monthBucketKey(rows[index].date), false)
           : formatDate(rows[index].date,{day:"numeric",month:"short"});
-        return `<text x="${x.toFixed(1)}" y="${height-12}" fill="rgba(235,235,245,.66)" font-size="13" font-weight="600" text-anchor="middle">${escapeHtml(label)}</text>`;
+        return `<text x="${xFor(index).toFixed(1)}" y="${height-13}" fill="rgba(235,235,245,.72)" font-size="14" font-weight="620" text-anchor="middle">${escapeHtml(label)}</text>`;
       }).join("");
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolución de forma y fatiga">${grid.join("")}<polyline points="${ctl}" fill="none" stroke="#0a84ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${atl}" fill="none" stroke="#ff9f0a" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" opacity=".92"/>${ticks}<text x="10" y="${top-8}" fill="rgba(235,235,245,.62)" font-size="12.5" font-weight="650">carga</text></svg>`;
+      return `<svg viewBox="0 0 ${width} ${height}" style="width:${renderWidth}px" role="img" aria-label="Evolución de forma y fatiga">${grid.join("")}${series(row=>row.load?.ctl,"#0a84ff",-10)}${series(row=>row.load?.atl,"#ff9f0a",18)}${ticks}</svg>`;
     }
 
 
@@ -9356,14 +9651,16 @@
         .sort((a,b) => a.date.localeCompare(b.date));
 
       if (!monthly) {
-        const byDate = new Map(rows.map(item => [item.date, item.recovery.sleepSeconds / 3600]));
+        const byDate = new Map(rows.map(item => [item.date, item]));
         const result = [];
         let cursor = start;
         while (cursor <= end) {
+          const item=byDate.get(cursor);
           result.push({
             key: cursor,
             label: formatDate(cursor,{day:"numeric",month:"short"}),
-            value: byDate.has(cursor) ? byDate.get(cursor) : null
+            value: item ? item.recovery.sleepSeconds / 3600 : null,
+            quality:item?.recovery?.sleepQualityLabel || null
           });
           cursor = addDaysToKey(cursor,1);
         }
@@ -9373,19 +9670,22 @@
       const buckets = new Map();
       for (const row of rows) {
         const key = monthBucketKey(row.date);
-        const values = buckets.get(key) || [];
-        values.push(row.recovery.sleepSeconds / 3600);
-        buckets.set(key, values);
+        const bucket = buckets.get(key) || { values:[], qualityRanks:[] };
+        bucket.values.push(row.recovery.sleepSeconds / 3600);
+        const rank=sleepQualityRank(row.recovery?.sleepQualityLabel);
+        if (isNumber(rank)) bucket.qualityRanks.push(rank);
+        buckets.set(key,bucket);
       }
       const result = [];
       let cursor = monthBucketKey(start);
       const endMonth = monthBucketKey(end);
       while (cursor <= endMonth) {
-        const values = buckets.get(cursor) || [];
+        const bucket = buckets.get(cursor);
         result.push({
           key: cursor,
           label: monthBucketLabel(cursor, range === "all"),
-          value: values.length ? average(values) : null
+          value: bucket?.values?.length ? average(bucket.values) : null,
+          quality:bucket?.qualityRanks?.length ? sleepQualityFromRank(average(bucket.qualityRanks)) : null
         });
         const next = nextMonthBucket(cursor);
         if (next === cursor) break;
@@ -9396,31 +9696,38 @@
 
     function sleepChartSvg(rows, range) {
       if (!rows.length || !rows.some(row => isNumber(row.value))) return '<div class="chart-empty">Sin datos de sueño en este periodo.</div>';
-      const width=640,height=216,top=22,bottom=46,left=54,right=12,plotW=width-left-right,plotH=height-top-bottom;
+      const width=640,height=258,top=48,bottom=48,left=58,right=16,plotW=width-left-right,plotH=height-top-bottom;
+      const renderWidth=chartRenderWidth(rows.length,range,"bar");
       const maxObserved = Math.max(...rows.map(row => isNumber(row.value) ? row.value : 0));
       const axisMax = Math.max(10, Math.ceil(maxObserved / 2) * 2);
       const step = 2;
       const slot = plotW / Math.max(1, rows.length);
-      const barW = Math.max(2, Math.min(22,slot*.66));
+      const barW = Math.max(3, Math.min(28,slot*.72));
       const grid = [];
       for (let value=0; value<=axisMax; value+=step) {
         const y = top + plotH - value/axisMax*plotH;
         grid.push(`<line x1="${left}" y1="${y.toFixed(1)}" x2="${width-right}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,${value===0?'.14':'.055'})"/>`);
-        grid.push(`<text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.68)" font-size="13.5" font-weight="600" text-anchor="end">${value}</text>`);
+        grid.push(`<text x="${left-9}" y="${(y+5).toFixed(1)}" fill="rgba(235,235,245,.70)" font-size="14.5" font-weight="620" text-anchor="end">${value}</text>`);
       }
       const bars = rows.map((row,index) => {
         if (!isNumber(row.value)) return "";
         const h = row.value/axisMax*plotH;
         const x = left + index*slot + (slot-barW)/2;
         const y = top + plotH - h;
-        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="${Math.min(3,barW/2).toFixed(1)}" fill="#64d2ff" opacity="${index===rows.length-1?'.95':'.62'}"/>`;
+        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="${Math.min(4,barW/2).toFixed(1)}" fill="${sleepQualityColor(row.quality)}" opacity=".86"/>`;
+      }).join("");
+      const labels=rows.map((row,index)=>{
+        if (!isNumber(row.value)) return "";
+        const h=row.value/axisMax*plotH,x=left+index*slot+slot/2,y=top+plotH-h;
+        return `<text x="${x.toFixed(1)}" y="${Math.max(17,y-9).toFixed(1)}" fill="rgba(255,255,255,.93)" font-size="14" font-weight="720" text-anchor="middle">${escapeHtml(chartValueLabel(row.value,"sleep"))}</text>`;
       }).join("");
       const ticks = chartTickIndexes(rows.length,range).map(index => {
         const x=left+index*slot+slot/2;
-        return `<text x="${x.toFixed(1)}" y="${height-12}" fill="rgba(235,235,245,.68)" font-size="13" font-weight="600" text-anchor="middle">${escapeHtml(rows[index].label)}</text>`;
+        return `<text x="${x.toFixed(1)}" y="${height-13}" fill="rgba(235,235,245,.72)" font-size="14" font-weight="620" text-anchor="middle">${escapeHtml(rows[index].label)}</text>`;
       }).join("");
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Duración del sueño">${grid.join("")}${bars}${ticks}<text x="10" y="${top+2}" fill="rgba(235,235,245,.62)" font-size="12.5" font-weight="650">h</text></svg>`;
+      return `<svg viewBox="0 0 ${width} ${height}" style="width:${renderWidth}px" role="img" aria-label="Duración del sueño">${grid.join("")}${bars}${labels}${ticks}<text x="10" y="${top-8}" fill="rgba(235,235,245,.64)" font-size="13.5" font-weight="650">h</text></svg>`;
     }
+
 
 
     function goalTrajectoryRunnerProfile(performanceMemory = {}) {
