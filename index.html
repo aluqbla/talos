@@ -4245,6 +4245,52 @@
     }
   </style>
 
+
+  <style id="talos-v150-fitnesssyncer-health">
+    .today-health-strip {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:6px;
+      margin-top:-2px;
+    }
+    .today-health-chip {
+      min-width:0;
+      padding:8px 9px;
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:14px;
+      background:rgba(255,255,255,.028);
+    }
+    .today-health-chip span,
+    .today-health-chip strong,
+    .today-health-chip small { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .today-health-chip span { color:var(--muted); font-size:.58rem; font-weight:650; }
+    .today-health-chip strong { margin-top:3px; color:var(--text); font-size:.92rem; line-height:1; font-weight:720; }
+    .today-health-chip strong em { color:var(--muted); font-size:.48rem; font-style:normal; font-weight:620; }
+    .today-health-chip small { margin-top:3px; color:var(--muted); font-size:.49rem; line-height:1.1; }
+    .sleep-extra-grid {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:5px;
+      margin-top:2px;
+    }
+    .sleep-extra-item {
+      min-width:0;
+      padding:6px 7px;
+      border:1px solid rgba(255,255,255,.055);
+      border-radius:10px;
+      background:rgba(255,255,255,.025);
+    }
+    .sleep-extra-item span,
+    .sleep-extra-item strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .sleep-extra-item span { color:var(--muted); font-size:.52rem; }
+    .sleep-extra-item strong { margin-top:2px; color:var(--secondary); font-size:.65rem; }
+    .sleep-extra-source { margin:5px 1px 0; color:var(--muted); font-size:.50rem; }
+    @media (max-width:360px) {
+      .today-health-strip { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .sleep-extra-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+  </style>
+
 </head>
 <body>
   <div class="app">
@@ -4595,7 +4641,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "1.4.0";
+    const APP_VERSION = "1.5.0";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-3";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
@@ -5008,6 +5054,7 @@
       item.recovery ||= {};
       item.load ||= {};
       item.body ||= {};
+      item.sources ||= {};
       if (!isNumber(item.load.form) && isNumber(item.load.ctl) && isNumber(item.load.atl)) item.load.form = item.load.ctl - item.load.atl;
       if (!item.recovery.sleepQualityLabel && isNumber(item.recovery.sleepQuality)) {
         item.recovery.sleepQualityLabel = ({ 1: "excellent", 2: "good", 3: "fair", 4: "poor" })[item.recovery.sleepQuality] || null;
@@ -5390,7 +5437,8 @@
         { key:"lastWorkerVersion", value:sync.workerVersion, updatedAt:now },
         { key:"lastSyncStatus", value:{
           at:now, complete:sync.complete, warnings:sync.warnings, workerVersion:sync.workerVersion,
-          window:sync.window && typeof sync.window === "object" ? sync.window : null
+          window:sync.window && typeof sync.window === "object" ? sync.window : null,
+          healthSources:sync.healthSources && typeof sync.healthSources === "object" ? sync.healthSources : null
         }, updatedAt:now }
       ];
       if (sync.syncAt) settingRows.push({ key:"lastSyncAt", value:sync.syncAt, updatedAt:now });
@@ -5403,6 +5451,12 @@
           [DATA_STORES.settings]:settingRows
         }
       });
+      if (typeof sync.fitnessSyncerSession === "string" && sync.fitnessSyncerSession.length > 20) {
+        await connectionSet("fitnessSyncerSession", sync.fitnessSyncerSession);
+      }
+      if (["authorization_invalid","authorization_error"].includes(sync.healthSources?.fitnessSyncer?.status)) {
+        await connectionSet("fitnessSyncerSession", "");
+      }
       if (reload) await loadLocalData();
       await autoAssignExternalGear(activities);
       return { newActivities,newWellness,activityCount:activities.length,wellnessCount:wellness.length,complete:sync.complete,warnings:sync.warnings };
@@ -5431,7 +5485,9 @@
       method = "GET", token = null, body = null, timeoutMs = 22000, retries = 1
     } = {}) {
       const accessToken = token ?? await connectionGet("accessToken").catch(() => "");
+      const fitnessSyncerSession = await connectionGet("fitnessSyncerSession").catch(() => "");
       const headers = { "X-Talos-Access": accessToken };
+      if (fitnessSyncerSession) headers["X-Talos-FitnessSyncer"] = fitnessSyncerSession;
       if (body !== null) headers["Content-Type"] = "application/json";
       let lastError = null;
 
@@ -5443,6 +5499,7 @@
             method,
             headers,
             body: body === null ? undefined : JSON.stringify(body),
+            credentials:"include",
             signal: controller.signal
           });
           const text = await response.text();
@@ -5474,10 +5531,13 @@
 
     async function workerRawRequest(path, { token = null, timeoutMs = 25000 } = {}) {
       const accessToken = token ?? await connectionGet("accessToken").catch(() => "");
+      const fitnessSyncerSession = await connectionGet("fitnessSyncerSession").catch(() => "");
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), timeoutMs);
       try {
-        return await fetch(`${state.workerUrl}${path}`, { headers:{ "X-Talos-Access":accessToken }, signal:controller.signal });
+        const headers = { "X-Talos-Access":accessToken };
+        if (fitnessSyncerSession) headers["X-Talos-FitnessSyncer"] = fitnessSyncerSession;
+        return await fetch(`${state.workerUrl}${path}`, { headers, credentials:"include", signal:controller.signal });
       } catch (error) {
         if (error?.name === "AbortError") throw new Error("La descarga tardó demasiado en responder.");
         throw error;
@@ -9155,6 +9215,90 @@
       return quality ? `<span class="today-sleep-context">${quality}</span>` : scoreText || "";
     }
 
+    function fitnessSyncerHealthAvailable(recovery = {}) {
+      return [
+        recovery.garminStressAverage,
+        recovery.spo2NocturnalAveragePercent,
+        recovery.spo2AveragePercent,
+        recovery.sleepRespirationBrpm,
+        recovery.fitnessSyncerAverageSleepingHeartRateBpm,
+        recovery.sleepDeepSeconds,
+        recovery.sleepLightSeconds,
+        recovery.sleepRemSeconds
+      ].some(isNumber);
+    }
+
+    function fitnessSyncerSpo2Value(recovery = {}) {
+      return isNumber(recovery.spo2NocturnalAveragePercent)
+        ? recovery.spo2NocturnalAveragePercent
+        : isNumber(recovery.spo2AveragePercent)
+          ? recovery.spo2AveragePercent
+          : recovery.spo2Source === "fitnesssyncer" && isNumber(recovery.spo2Percent)
+            ? recovery.spo2Percent
+            : null;
+    }
+
+    function fitnessSyncerRespirationValue(recovery = {}) {
+      return isNumber(recovery.sleepRespirationBrpm)
+        ? recovery.sleepRespirationBrpm
+        : recovery.respirationSource === "fitnesssyncer" && isNumber(recovery.respirationBrpm)
+          ? recovery.respirationBrpm
+          : null;
+    }
+
+    function todayFitnessSyncerHealthMarkup(recovery = {}) {
+      if (!fitnessSyncerHealthAvailable(recovery)) return "";
+      const stress = recovery.garminStressAverage;
+      const spo2 = fitnessSyncerSpo2Value(recovery);
+      const respiration = fitnessSyncerRespirationValue(recovery);
+      const nightHr = recovery.fitnessSyncerAverageSleepingHeartRateBpm;
+      const nightHrMin = recovery.fitnessSyncerMinimumSleepingHeartRateBpm;
+      const rows = [
+        {
+          label:"🧠 Estrés",
+          value:isNumber(stress) ? formatNumber(stress) : "—",
+          unit:isNumber(stress) ? "/100" : "",
+          context:isNumber(recovery.garminStressHighSeconds) && recovery.garminStressHighSeconds >= 60 ? `alto ${formatSleep(recovery.garminStressHighSeconds)}` : "Garmin"
+        },
+        {
+          label:"🩸 SpO₂",
+          value:isNumber(spo2) ? formatNumber(spo2,1) : "—",
+          unit:isNumber(spo2) ? "%" : "",
+          context:isNumber(recovery.spo2NocturnalMinPercent) ? `mín. noche ${formatNumber(recovery.spo2NocturnalMinPercent,1)} %` : isNumber(recovery.spo2MinPercent) ? `mín. ${formatNumber(recovery.spo2MinPercent,1)} %` : ""
+        },
+        {
+          label:"🌬️ Respiración",
+          value:isNumber(respiration) ? formatNumber(respiration,1) : "—",
+          unit:isNumber(respiration) ? "rpm" : "",
+          context:isNumber(respiration) ? "durante el sueño" : ""
+        },
+        {
+          label:"❤️ FC noche",
+          value:isNumber(nightHr) ? formatNumber(nightHr) : "—",
+          unit:isNumber(nightHr) ? "ppm" : "",
+          context:isNumber(nightHrMin) ? `mín. ${formatNumber(nightHrMin)} ppm` : ""
+        }
+      ];
+      return `<section class="today-health-strip" aria-label="Salud complementaria de Garmin vía FitnessSyncer">${rows.map(row=>`<div class="today-health-chip"><span>${row.label}</span><strong>${row.value}${row.unit?` <em>${row.unit}</em>`:""}</strong><small>${escapeHtml(row.context || "FitnessSyncer")}</small></div>`).join("")}</section>`;
+    }
+
+    function sleepFitnessSyncerDetailMarkup(referenceDate) {
+      const wellness = state.wellness.find(item => item.date === referenceDate);
+      const recovery = wellness?.recovery || {};
+      const items = [
+        ["Profundo", isNumber(recovery.sleepDeepSeconds) ? formatSleep(recovery.sleepDeepSeconds) : null],
+        ["Ligero", isNumber(recovery.sleepLightSeconds) ? formatSleep(recovery.sleepLightSeconds) : null],
+        ["REM", isNumber(recovery.sleepRemSeconds) ? formatSleep(recovery.sleepRemSeconds) : null],
+        ["Despierto", isNumber(recovery.sleepAwakeSeconds) ? formatSleep(recovery.sleepAwakeSeconds) : null],
+        ["Eficiencia", isNumber(recovery.sleepEfficiencyPercent) ? `${formatNumber(recovery.sleepEfficiencyPercent,1)} %` : null],
+        ["FC nocturna", isNumber(recovery.fitnessSyncerAverageSleepingHeartRateBpm) ? `${formatNumber(recovery.fitnessSyncerAverageSleepingHeartRateBpm)} ppm` : null],
+        ["Respiración", isNumber(fitnessSyncerRespirationValue(recovery)) ? `${formatNumber(fitnessSyncerRespirationValue(recovery),1)} rpm` : null],
+        ["SpO₂", isNumber(fitnessSyncerSpo2Value(recovery)) ? `${formatNumber(fitnessSyncerSpo2Value(recovery),1)} %` : null]
+      ].filter(([,value])=>value);
+      if (!items.length) return "";
+      return `<div><div class="sleep-extra-grid">${items.map(([label,value])=>`<div class="sleep-extra-item"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("")}</div><p class="sleep-extra-source">Datos complementarios Garmin · FitnessSyncer · ${escapeHtml(formatDate(referenceDate,{day:"numeric",month:"short"}))}</p></div>`;
+    }
+
     function hrvGuidanceForDate(referenceDate) {
       const received = state.wellness
         .filter(item => item.date <= referenceDate && isNumber(item.recovery?.hrvBaselineLowMs) && isNumber(item.recovery?.hrvBaselineHighMs))
@@ -9631,6 +9775,7 @@
             metricStat("Puntuación media",scores.length?`${escapeHtml(formatNumber(average(scores)))}/100`:"—"),
             metricStat("Máximo del periodo",isNumber(longest)?formatSleep(longest):"—")
           ].join(""),
+          guidance:sleepFitnessSyncerDetailMarkup(referenceDate),
           note:`${rangeLabel}. En vistas mensuales o anuales cada barra representa la media del mes. Si no existe calidad histórica para un periodo, la barra se muestra en gris.`
         };
       }
@@ -9927,6 +10072,7 @@
           context:loadContext
         })
       ].join("");
+      const fitnessSyncerHealthMarkup = todayFitnessSyncerHealthMarkup(recovery);
 
       const subjective = state.subjective || {};
       const feelingsMarkup = isToday ? `
@@ -9963,6 +10109,7 @@
             ${primaryMetrics}
           </section>
 
+          ${fitnessSyncerHealthMarkup}
           ${feelingsMarkup}
           ${upcomingPlanMarkup(upcomingStart)}
         </div>`;
@@ -10513,6 +10660,10 @@
         ["⭐ Sueño", isNumber(recovery.sleepScore) ? `${formatNumber(recovery.sleepScore)}/100` : "—"],
         ["〽️ VFC", isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"],
         ["❤️ Reposo", isNumber(recovery.restingHeartRateBpm) ? `${formatNumber(recovery.restingHeartRateBpm)} ppm` : "—"],
+        ["🧠 Estrés", isNumber(recovery.garminStressAverage) ? `${formatNumber(recovery.garminStressAverage)}/100` : "—"],
+        ["🩸 SpO₂", isNumber(fitnessSyncerSpo2Value(recovery)) ? `${formatNumber(fitnessSyncerSpo2Value(recovery),1)} %` : "—"],
+        ["🌬️ Respiración", isNumber(fitnessSyncerRespirationValue(recovery)) ? `${formatNumber(fitnessSyncerRespirationValue(recovery),1)} rpm` : "—"],
+        ["❤️ FC noche", isNumber(recovery.fitnessSyncerAverageSleepingHeartRateBpm) ? `${formatNumber(recovery.fitnessSyncerAverageSleepingHeartRateBpm)} ppm` : "—"],
         ["📈 Forma", isNumber(load.ctl) ? formatNumber(load.ctl, 1) : "—"],
         ["⚡ Fatiga", isNumber(load.atl) ? formatNumber(load.atl, 1) : "—"]
       ];
@@ -11224,6 +11375,47 @@
       showToast("Perfil del corredor actualizado.");
     }
 
+    async function connectFitnessSyncerFromTalos() {
+      const token = await connectionGet("accessToken").catch(() => "");
+      if (!token) return openConnectionDialog();
+      let popup = null;
+      try { popup = window.open("about:blank", "talos-fitnesssyncer", "popup,width=620,height=760"); } catch {}
+      try {
+        const { response, payload } = await workerRequest("/fitnesssyncer/authorize", {
+          method:"POST",
+          token,
+          body:{ bridgeOrigin:window.location.origin },
+          timeoutMs:18000,
+          retries:0
+        });
+        if (!response.ok || !payload?.authorizationUrl || !payload?.callbackTarget) throw new Error(payload?.error || "No se pudo iniciar FitnessSyncer.");
+        let copied = false;
+        try {
+          await navigator.clipboard.writeText(payload.callbackTarget);
+          copied = true;
+        } catch {}
+        if (popup && !popup.closed) popup.location.href = payload.authorizationUrl;
+        else window.open(payload.authorizationUrl, "_blank", "noopener");
+        if (!copied) window.prompt("Copia esta URL. Después de pulsar Permitir en FitnessSyncer, sustituye personal.fitnesssyncer.com por ella y conserva ?code=…&state=…", payload.callbackTarget);
+        showToast(copied ? "FitnessSyncer abierto. Tras Permitir, sustituye personal.fitnesssyncer.com por la URL copiada y conserva ?code=…&state=…." : "FitnessSyncer abierto. Completa la autorización en la nueva ventana.");
+      } catch (error) {
+        try { popup?.close(); } catch {}
+        showToast(error?.message || String(error), true);
+      }
+    }
+
+    window.addEventListener("message", async event => {
+      let workerOrigin = "";
+      try { workerOrigin = new URL(state.workerUrl).origin; } catch {}
+      if (!workerOrigin || event.origin !== workerOrigin) return;
+      const data = event.data;
+      if (!data || data.type !== "talos-fitnesssyncer-auth" || typeof data.token !== "string" || data.token.length < 20) return;
+      await connectionSet("fitnessSyncerSession", data.token);
+      showToast("FitnessSyncer conectado con TɅLOS.");
+      if (state.activeView === "manage") renderManage();
+      setTimeout(() => syncNow({ manual:true }), 250);
+    });
+
     function renderManage() {
       const acceptedPlanCount = state.plans.reduce((total, record) => total + (record.accepted?.plan?.days || []).filter(day => day.sport !== "rest").length, 0);
       $("#appVersionLabel").textContent = `TɅLOS ${APP_VERSION}`;
@@ -11234,9 +11426,9 @@
           <div class="button-row compact-actions"><button class="secondary-button compact-button" type="button" data-athlete-profile>Editar perfil</button></div>
         </article>
         <article class="card manage-card">
-          <h3>🔗 <span class="connection-dot ${state.hasToken && navigator.onLine ? "ok" : ""}"></span>Conexión con Intervals.icu <span class="manage-status-pill ${!navigator.onLine ? "offline" : state.lastSyncStatus?.complete === false ? "warn" : state.hasToken ? "ok" : ""}">${!navigator.onLine ? "Sin conexión" : state.lastSyncStatus?.complete === false ? "Parcial" : state.hasToken ? "Conectado" : "Sin configurar"}</span></h3>
-          ${state.lastSyncStatus ? `<p class="season-race-hint">${state.lastSyncStatus.complete ? "Última sincronización completa" : "Última sincronización parcial"}${state.lastSyncStatus.at ? ` · ${escapeHtml(formatDate(String(state.lastSyncStatus.at).slice(0,10),{day:"numeric",month:"short"}))}` : ""}${state.lastSyncStatus.warnings?.length ? ` · ${state.lastSyncStatus.warnings.length} aviso/s` : ""}</p>` : ""}
-          <div class="button-row compact-actions"><button class="primary-button compact-button" type="button" data-manage-sync>Actualizar</button><button class="secondary-button compact-button" type="button" data-configure>Configurar conexión</button></div>
+          <h3>🔗 <span class="connection-dot ${state.hasToken && navigator.onLine ? "ok" : ""}"></span>Fuentes de datos <span class="manage-status-pill ${!navigator.onLine ? "offline" : state.lastSyncStatus?.complete === false ? "warn" : state.hasToken ? "ok" : ""}">${!navigator.onLine ? "Sin conexión" : state.lastSyncStatus?.complete === false ? "Parcial" : state.hasToken ? "Conectado" : "Sin configurar"}</span></h3>
+          ${state.lastSyncStatus ? `<p class="season-race-hint">Intervals.icu · ${state.lastSyncStatus.complete ? "sincronización completa" : "sincronización parcial"}${state.lastSyncStatus.at ? ` · ${escapeHtml(formatDate(String(state.lastSyncStatus.at).slice(0,10),{day:"numeric",month:"short"}))}` : ""}${state.lastSyncStatus.healthSources?.fitnessSyncer?.status === "connected" ? " · FitnessSyncer salud ✓" : state.lastSyncStatus.healthSources?.fitnessSyncer?.status === "partial" ? " · FitnessSyncer parcial" : state.lastSyncStatus.healthSources?.fitnessSyncer?.status === "not_authorized" ? " · FitnessSyncer sin vincular" : ""}${state.lastSyncStatus.warnings?.length ? ` · ${state.lastSyncStatus.warnings.length} aviso/s` : ""}</p>` : ""}
+          <div class="button-row compact-actions"><button class="primary-button compact-button" type="button" data-manage-sync>Actualizar</button><button class="secondary-button compact-button" type="button" data-connect-fitnesssyncer>FitnessSyncer</button><button class="secondary-button compact-button" type="button" data-configure>Intervals.icu</button></div>
         </article>
         <article class="card manage-card">
           <h3>🗄️ Base de datos</h3>
@@ -11249,6 +11441,7 @@
         </div>`;
       $("[data-athlete-profile]")?.addEventListener("click", openAthleteProfileDialog);
       $("[data-manage-sync]").addEventListener("click", () => syncNow({ manual: true }));
+      $("[data-connect-fitnesssyncer]")?.addEventListener("click", connectFitnessSyncerFromTalos);
       $("[data-configure]").addEventListener("click", openConnectionDialog);
       $("[data-export]").addEventListener("click", exportBackup);
       $("[data-import]").addEventListener("click", () => $("#importInput").click());
