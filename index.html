@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <meta name="theme-color" content="#15202b">
+  <meta name="theme-color" content="#050507">
   <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -4645,6 +4645,376 @@
       .plan-day-detail .plan-activity-button .copy span{font-size:.69rem!important}
     }
 
+
+    /* v2.0.11 · Sistema visual de Cuaderno de bitácora */
+    :root{
+      color-scheme:dark;
+      --bg:#000000;
+      --bg-elevated:#101014;
+      --bg-grouped:rgba(28,28,30,.46);
+      --bg-secondary:rgba(44,44,46,.42);
+      --glass:rgba(45,45,52,.22);
+      --glass-strong:rgba(58,58,66,.34);
+      --glass-clear:rgba(255,255,255,.035);
+      --glass-surface:rgba(28,28,30,.40);
+      --glass-surface-strong:rgba(44,44,46,.42);
+      --glass-control:rgba(45,45,52,.22);
+      --separator:rgba(84,84,88,.52);
+      --separator-soft:rgba(255,255,255,.075);
+      --line:rgba(255,255,255,.075);
+      --text:#ffffff;
+      --secondary:#ebebf5;
+      --muted:rgba(235,235,245,.60);
+      --muted-2:rgba(235,235,245,.34);
+      --blue:#0a84ff;
+      --cyan:#64d2ff;
+      --green:#30d158;
+      --amber:#ffd60a;
+      --red:#ff453a;
+      --purple:#bf5af2;
+      --radius:24px;
+      --r-card:24px;
+      --r-control:18px;
+      --r-small:13px;
+      --shadow-card:0 12px 38px rgba(0,0,0,.34);
+      --shadow-glass:0 18px 54px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.035);
+      --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;
+    }
+
+    html{background:#000!important}
+    html,body,.app,.views,.view,.view.active{
+      color:var(--text)!important;
+      font-family:var(--font)!important;
+    }
+    body{
+      background:
+        radial-gradient(circle at 18% 0%,rgba(10,132,255,.10),transparent 30%),
+        radial-gradient(circle at 88% 18%,rgba(175,82,222,.07),transparent 28%),
+        #000!important;
+      background-attachment:fixed!important;
+      text-rendering:optimizeLegibility;
+      -webkit-font-smoothing:antialiased;
+    }
+    .app{
+      width:min(980px,100%)!important;
+      padding-inline:14px!important;
+      padding-bottom:calc(104px + var(--safe-bottom))!important;
+      overflow-x:hidden!important;
+      background:transparent!important;
+    }
+
+    /* Encabezado: misma profundidad, cristal y curva inferior que Cuaderno. */
+    .topbar{
+      position:sticky!important;
+      top:0!important;
+      z-index:30!important;
+      width:calc(100% + 28px)!important;
+      min-height:calc(92px + var(--safe-top))!important;
+      margin:0 -14px 22px!important;
+      padding:var(--safe-top) 14px 16px!important;
+      border:0!important;
+      border-radius:0 0 30px 30px!important;
+      background:rgba(9,9,11,.82)!important;
+      -webkit-backdrop-filter:blur(42px) saturate(195%)!important;
+      backdrop-filter:blur(42px) saturate(195%)!important;
+      box-shadow:0 16px 44px rgba(0,0,0,.44),inset 0 -1px 0 rgba(255,255,255,.035)!important;
+    }
+    .topbar::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      border-radius:inherit;
+      background:
+        radial-gradient(circle at 22% 0%,rgba(10,132,255,.12),transparent 38%),
+        radial-gradient(circle at 84% 10%,rgba(175,82,222,.075),transparent 34%);
+    }
+    .brand-mark{
+      width:min(266px,100%)!important;
+      height:42px!important;
+      color:#fff!important;
+      filter:drop-shadow(0 2px 4px rgba(0,0,0,.95)) drop-shadow(0 12px 24px rgba(0,0,0,.48))!important;
+    }
+
+    /* Superficies principales */
+    .card,.activity-card,.shoe-card,.today-plan-card,.today-mini-card,.today-wide-card,
+    .planning-card,.plan-draft-card,.calendar-card,.evolution-card,.evolution-clean-card,
+    .evolution-focus,.forecast-card,.upcoming-card,.manage-card,.manage-mini-card,
+    .data-hub-section,.shoe-assignment,.activity-analysis,.planning-weekly-memory,
+    .planning-forecast,.perception-card,.roadmap-preview-day,.post-race-card,
+    .preparation-map-card,.activity-classification{
+      background:var(--bg-grouped)!important;
+      border:1px solid var(--separator-soft)!important;
+      -webkit-backdrop-filter:blur(34px) saturate(190%)!important;
+      backdrop-filter:blur(34px) saturate(190%)!important;
+      box-shadow:var(--shadow-card)!important;
+    }
+    .card,.manage-card,.evolution-card,.calendar-card,.evolution-clean-card,.evolution-focus,
+    .planning-card,.plan-draft-card,.post-race-card,.preparation-map-card{
+      border-radius:var(--r-card)!important;
+    }
+
+    /* Las seis métricas de Hoy siguen la tarjeta contadora de Cuaderno. */
+    .today-primary-metric{
+      background:rgba(28,28,30,.40)!important;
+      border:1px solid rgba(255,255,255,.12)!important;
+      border-radius:20px!important;
+      -webkit-backdrop-filter:blur(34px) saturate(190%)!important;
+      backdrop-filter:blur(34px) saturate(190%)!important;
+      box-shadow:0 8px 24px rgba(0,0,0,.25)!important;
+    }
+    .today-primary-metric::before{
+      opacity:.72!important;
+      border-radius:999px!important;
+    }
+    #view-today .today-subjective-compact,
+    #view-today .upcoming-card{
+      background:rgba(28,28,30,.40)!important;
+      border:1px solid rgba(255,255,255,.12)!important;
+      border-radius:22px!important;
+      -webkit-backdrop-filter:blur(34px) saturate(190%)!important;
+      backdrop-filter:blur(34px) saturate(190%)!important;
+      box-shadow:0 8px 24px rgba(0,0,0,.25)!important;
+    }
+
+    /* Controles y botones de cristal */
+    .icon-button,.secondary-button,.glass-select,.glass-control,.glass-date,
+    .plan-field input,.plan-field select,.plan-field textarea,.activity-type-field select,
+    dialog input,dialog select,dialog textarea,.segmented-control button,
+    .evolution-controls button,.month-buttons button,.day-nav-button,
+    .roadmap-week,.filter-picker-button,.compact-button{
+      background:var(--glass)!important;
+      border:1px solid rgba(255,255,255,.17)!important;
+      color:var(--text)!important;
+      -webkit-backdrop-filter:blur(36px) saturate(195%)!important;
+      backdrop-filter:blur(36px) saturate(195%)!important;
+      box-shadow:var(--shadow-glass)!important;
+    }
+    .icon-button{border-radius:17px!important}
+    .secondary-button,.glass-select,.glass-control,.glass-date,
+    .plan-field input,.plan-field select,.plan-field textarea,.activity-type-field select,
+    dialog input,dialog select,dialog textarea{border-radius:17px!important}
+    .primary-button,.activity-save-button{
+      background:rgba(10,132,255,.72)!important;
+      border:1px solid rgba(120,205,255,.38)!important;
+      color:#fff!important;
+      box-shadow:0 10px 28px rgba(10,132,255,.30),inset 0 1px 0 rgba(255,255,255,.24)!important;
+    }
+    .danger-button,.activity-cancel-button{
+      background:rgba(255,69,58,.24)!important;
+      border:1px solid rgba(255,120,112,.32)!important;
+      color:#ff9f9a!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important;
+    }
+    .segmented-control{
+      background:rgba(28,28,30,.34)!important;
+      border:1px solid var(--separator-soft)!important;
+      border-radius:17px!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05)!important;
+    }
+    .segmented-control button{
+      background:transparent!important;
+      border-color:transparent!important;
+      box-shadow:none!important;
+      color:var(--muted)!important;
+    }
+    .segmented-control button.active,
+    .segmented-control button[data-classification="training"].active,
+    .segmented-control button[data-classification="race"].active,
+    .evolution-controls button.active{
+      background:var(--blue)!important;
+      border-color:rgba(255,255,255,.24)!important;
+      color:#fff!important;
+      box-shadow:0 10px 28px rgba(10,132,255,.34),inset 0 1px 0 rgba(255,255,255,.30)!important;
+    }
+
+    /* Actividades, calendario y datos */
+    #activityList .activity-card{
+      background:rgba(28,28,30,.40)!important;
+      border-color:rgba(255,255,255,.12)!important;
+      box-shadow:0 8px 24px rgba(0,0,0,.25)!important;
+    }
+    #activityList .activity-card:active{background:rgba(44,44,46,.48)!important}
+    .activity-chip,.entry-chip,.chip{
+      background:rgba(44,44,46,.38)!important;
+      border-color:var(--separator-soft)!important;
+      color:var(--secondary)!important;
+    }
+    .day-cell{
+      background:rgba(28,28,30,.34)!important;
+      border:1px solid var(--separator-soft)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+    }
+    .day-cell.today{
+      border-color:rgba(90,180,255,.48)!important;
+      background:rgba(10,132,255,.13)!important;
+      box-shadow:inset 0 0 0 1px rgba(10,132,255,.10)!important;
+    }
+    .day-cell.selected{
+      border-color:var(--separator-soft)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+    }
+    .data-hub-section{
+      border-radius:22px!important;
+      overflow:hidden!important;
+    }
+    .data-hub-section summary{
+      background:rgba(28,28,30,.14)!important;
+    }
+    .data-subrow{border-top-color:var(--separator-soft)!important}
+    .data-record-button{
+      background:rgba(44,44,46,.26)!important;
+      border-color:var(--separator-soft)!important;
+      border-radius:16px!important;
+    }
+
+    /* Gráficas y subpaneles */
+    .evolution-chart,.metric-detail-chart,.forecast-history-wrap,
+    .analysis-meaning-grid>div,.detail-item,.hero-stat,.metric-detail-stat,
+    .post-race-stat,.day-health-metric{
+      background:rgba(44,44,46,.38)!important;
+      border:1px solid var(--separator-soft)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.045)!important;
+    }
+    .evolution-chart,.metric-detail-chart,.forecast-history-wrap{
+      border-radius:18px!important;
+      overflow:hidden!important;
+    }
+    .forecast-card{
+      background:rgba(44,44,46,.38)!important;
+      border-color:var(--separator-soft)!important;
+      border-radius:17px!important;
+      box-shadow:none!important;
+    }
+
+    /* Chat */
+    .talos-chat-message{
+      border:1px solid var(--separator-soft)!important;
+      box-shadow:0 8px 24px rgba(0,0,0,.18)!important;
+    }
+    .talos-chat-message.user{
+      background:rgba(10,132,255,.20)!important;
+      border-color:rgba(90,180,255,.30)!important;
+    }
+    .talos-chat-message.assistant{
+      background:rgba(44,44,46,.38)!important;
+    }
+    .talos-chat-cost{border-top-color:var(--separator-soft)!important;color:var(--muted)!important}
+
+    /* Navegación inferior flotante, igual que Cuaderno. */
+    .bottom-nav{
+      position:fixed!important;
+      z-index:100!important;
+      left:50%!important;
+      bottom:calc(10px + var(--safe-bottom))!important;
+      transform:translateX(-50%)!important;
+      width:min(calc(100% - 20px),720px)!important;
+      padding:7px 9px!important;
+      border-radius:30px!important;
+      background:rgba(39,39,46,.42)!important;
+      border:1px solid rgba(255,255,255,.24)!important;
+      -webkit-backdrop-filter:blur(46px) saturate(210%)!important;
+      backdrop-filter:blur(46px) saturate(210%)!important;
+      box-shadow:0 20px 58px rgba(0,0,0,.66),inset 0 1px 0 rgba(255,255,255,.21),inset 0 -1px 0 rgba(255,255,255,.04)!important;
+    }
+    .nav-button{
+      min-height:54px!important;
+      border-radius:18px!important;
+      background:transparent!important;
+      color:var(--muted)!important;
+      box-shadow:none!important;
+      transition:background .2s ease,color .2s ease,transform .16s ease!important;
+    }
+    .nav-button .nav-emoji{font-size:1.24rem!important;filter:saturate(.7)!important}
+    .nav-button .nav-label{font-size:.65rem!important;font-weight:500!important}
+    .nav-button.active{
+      color:#fff!important;
+      background:rgba(255,255,255,.075)!important;
+      box-shadow:none!important;
+    }
+    .nav-button.active .nav-emoji{filter:none!important}
+
+    /* Fichas flotantes y diálogos como hojas de cristal. */
+    dialog{
+      border-radius:30px!important;
+      background:rgba(28,28,32,.64)!important;
+      border:1px solid rgba(255,255,255,.18)!important;
+      -webkit-backdrop-filter:blur(48px) saturate(210%)!important;
+      backdrop-filter:blur(48px) saturate(210%)!important;
+      box-shadow:0 24px 70px rgba(0,0,0,.62),inset 0 1px 0 rgba(255,255,255,.16)!important;
+    }
+    dialog::backdrop{
+      background:rgba(0,0,0,.38)!important;
+      -webkit-backdrop-filter:blur(12px)!important;
+      backdrop-filter:blur(12px)!important;
+    }
+    dialog .dialog-header{
+      background:rgba(28,28,32,.56)!important;
+      border-bottom:1px solid rgba(255,255,255,.07)!important;
+      -webkit-backdrop-filter:blur(44px) saturate(205%)!important;
+      backdrop-filter:blur(44px) saturate(205%)!important;
+    }
+    .metric-detail-popover,.plan-day-popover{
+      background:rgba(28,28,32,.68)!important;
+      border:1px solid rgba(255,255,255,.18)!important;
+      border-radius:30px!important;
+      -webkit-backdrop-filter:blur(48px) saturate(210%)!important;
+      backdrop-filter:blur(48px) saturate(210%)!important;
+      box-shadow:0 24px 70px rgba(0,0,0,.62),inset 0 1px 0 rgba(255,255,255,.16)!important;
+    }
+    .plan-day-popover-header,.metric-detail-popover-header{
+      background:rgba(28,28,32,.42)!important;
+      border-bottom:1px solid rgba(255,255,255,.07)!important;
+    }
+    .plan-day-close,.plan-day-arrow{
+      background:var(--glass)!important;
+      border:1px solid rgba(255,255,255,.17)!important;
+      color:var(--secondary)!important;
+      -webkit-backdrop-filter:blur(36px) saturate(195%)!important;
+      backdrop-filter:blur(36px) saturate(195%)!important;
+      box-shadow:var(--shadow-glass)!important;
+    }
+
+    select{color-scheme:dark}
+    select option{background:#1c1c1e!important;color:#fff!important}
+
+    @media(max-width:430px){
+      .app{padding-inline:14px!important}
+      .topbar{
+        width:calc(100% + 28px)!important;
+        margin-inline:-14px!important;
+        min-height:calc(84px + var(--safe-top))!important;
+        margin-bottom:18px!important;
+        padding:var(--safe-top) 14px 13px!important;
+        border-radius:0 0 26px 26px!important;
+      }
+      .brand-mark{width:min(244px,100%)!important;height:38px!important}
+      .bottom-nav{width:calc(100% - 20px)!important}
+      .nav-button .nav-label{font-size:.61rem!important}
+      .data-hub-section{border-radius:20px!important}
+    }
+
+    @media(max-width:360px){
+      .topbar{min-height:calc(80px + var(--safe-top))!important}
+      .brand-mark{width:min(220px,100%)!important;height:34px!important}
+      .bottom-nav{width:calc(100% - 14px)!important;padding-inline:6px!important}
+      .nav-button .nav-label{font-size:.58rem!important}
+      .nav-button .nav-emoji{font-size:1.14rem!important}
+    }
+
+    @media(prefers-reduced-transparency:reduce){
+      .topbar,.bottom-nav,dialog,.metric-detail-popover,.plan-day-popover,
+      .card,.activity-card,.today-primary-metric,.data-hub-section,
+      .icon-button,.secondary-button,.glass-select,.glass-control,.glass-date{
+        -webkit-backdrop-filter:none!important;
+        backdrop-filter:none!important;
+      }
+      .topbar{background:#09090b!important}
+      .bottom-nav{background:rgba(44,44,46,.92)!important}
+      dialog,.metric-detail-popover,.plan-day-popover{background:rgba(28,28,32,.94)!important}
+    }
+
 </style>
 </head>
 <body>
@@ -4991,7 +5361,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "2.0.10";
+    const APP_VERSION = "2.0.11";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-4";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
