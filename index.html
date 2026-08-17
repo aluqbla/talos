@@ -4585,6 +4585,66 @@
       .data-hub-section summary{min-height:62px!important;padding:0 14px!important}
       .data-hub-section summary span{font-size:1.22rem!important}
     }
+
+    /* v2.0.10 · correcciones de recuperación, jerarquía visual y calendario. */
+    .topbar{
+      border:0!important;
+      border-bottom:0!important;
+      margin-bottom:18px!important;
+      min-height:calc(66px + var(--safe-top))!important;
+      padding-bottom:10px!important;
+      box-shadow:none!important;
+    }
+    .brand-mark{height:38px!important;width:min(254px,100%)!important}
+    .view.active{padding-top:2px!important}
+    #view-today .today-day-nav{margin-bottom:14px!important}
+    #view-today .today-grid{gap:14px!important}
+    #view-today .today-subjective-compact,
+    #view-today .upcoming-card{
+      background:var(--glass-surface)!important;
+      border:1px solid var(--line)!important;
+      -webkit-backdrop-filter:blur(26px) saturate(175%)!important;
+      backdrop-filter:blur(26px) saturate(175%)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.065),0 10px 30px rgba(0,0,0,.12)!important;
+    }
+    #activityDialog .hero-stat,
+    #activityDialog .detail-item{
+      background:var(--glass-control)!important;
+      border:1px solid rgba(255,255,255,.115)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.055)!important;
+      -webkit-backdrop-filter:blur(18px) saturate(165%)!important;
+      backdrop-filter:blur(18px) saturate(165%)!important;
+    }
+    .evolution-clean > .evolution-clean-card .evolution-card-head strong{
+      font-size:1.26rem!important;
+      line-height:1.1!important;
+      letter-spacing:-.025em!important;
+    }
+    .plan-day-detail{font-size:.82rem!important}
+    .plan-day-detail .day-health-grid{gap:7px!important}
+    .plan-day-detail .day-health-metric{padding:9px 6px!important}
+    .plan-day-detail .day-health-metric span{font-size:.72rem!important;line-height:1.2!important}
+    .plan-day-detail .day-health-metric strong{font-size:1rem!important;line-height:1.15!important;margin-top:5px!important}
+    .plan-day-detail .plan-day-section{margin-top:12px!important}
+    .plan-day-detail .plan-day-section h4{font-size:.84rem!important;line-height:1.2!important;text-transform:none!important;margin-bottom:7px!important}
+    .plan-day-detail .plan-activity-button .sport{font-size:1.18rem!important}
+    .plan-day-detail .plan-activity-button .copy strong{font-size:.86rem!important}
+    .plan-day-detail .plan-activity-button .copy span{font-size:.72rem!important}
+    .plan-day-detail .planned-session-body,
+    .plan-day-detail .planned-session-body p,
+    .plan-day-detail .draft-steps li{font-size:.72rem!important;line-height:1.4!important}
+    @media(max-width:430px){
+      .topbar{margin-bottom:16px!important;min-height:calc(63px + var(--safe-top))!important}
+      .brand-mark{height:34px!important;width:min(238px,100%)!important}
+      #view-today .today-day-nav{margin-bottom:13px!important}
+      #view-today .today-grid{gap:13px!important}
+      .evolution-clean > .evolution-clean-card .evolution-card-head strong{font-size:1.18rem!important}
+      .plan-day-detail .day-health-metric span{font-size:.68rem!important}
+      .plan-day-detail .day-health-metric strong{font-size:.94rem!important}
+      .plan-day-detail .plan-activity-button .copy strong{font-size:.82rem!important}
+      .plan-day-detail .plan-activity-button .copy span{font-size:.69rem!important}
+    }
+
 </style>
 </head>
 <body>
@@ -4854,9 +4914,9 @@
         <details class="plan-optional-block">
           <summary>Competiciones B/C · opcional</summary>
           <div class="season-race-grid" id="seasonRaceGrid">
-            <div class="season-race-row" data-season-race-row><select data-season-race-goal aria-label="Distancia competición secundaria"><option value="">Distancia</option><option value="5k">5 km</option><option value="10k">10 km</option><option value="half_marathon">Media</option><option value="marathon">Maratón</option></select><input type="date" data-season-race-date aria-label="Fecha competición secundaria"><select data-season-race-priority aria-label="Prioridad competición secundaria"><option value="B">B</option><option value="C">C</option></select></div>
-            <div class="season-race-row" data-season-race-row><select data-season-race-goal aria-label="Distancia competición secundaria"><option value="">Distancia</option><option value="5k">5 km</option><option value="10k">10 km</option><option value="half_marathon">Media</option><option value="marathon">Maratón</option></select><input type="date" data-season-race-date aria-label="Fecha competición secundaria"><select data-season-race-priority aria-label="Prioridad competición secundaria"><option value="B">B</option><option value="C">C</option></select></div>
-            <div class="season-race-row" data-season-race-row><select data-season-race-goal aria-label="Distancia competición secundaria"><option value="">Distancia</option><option value="5k">5 km</option><option value="10k">10 km</option><option value="half_marathon">Media</option><option value="marathon">Maratón</option></select><input type="date" data-season-race-date aria-label="Fecha competición secundaria"><select data-season-race-priority aria-label="Prioridad competición secundaria"><option value="B">B</option><option value="C">C</option></select></div>
+            <div class="season-race-row" data-season-race-row><select data-season-race-goal aria-label="Distancia competición secundaria"><option value="">Distancia</option><option value="5k">5 km</option><option value="10k">10 km</option><option value="half_marathon">Media maratón</option><option value="marathon">Maratón</option></select><input type="date" data-season-race-date aria-label="Fecha competición secundaria"><select data-season-race-priority aria-label="Prioridad competición secundaria"><option value="B">B</option><option value="C">C</option></select></div>
+            <div class="season-race-row" data-season-race-row><select data-season-race-goal aria-label="Distancia competición secundaria"><option value="">Distancia</option><option value="5k">5 km</option><option value="10k">10 km</option><option value="half_marathon">Media maratón</option><option value="marathon">Maratón</option></select><input type="date" data-season-race-date aria-label="Fecha competición secundaria"><select data-season-race-priority aria-label="Prioridad competición secundaria"><option value="B">B</option><option value="C">C</option></select></div>
+            <div class="season-race-row" data-season-race-row><select data-season-race-goal aria-label="Distancia competición secundaria"><option value="">Distancia</option><option value="5k">5 km</option><option value="10k">10 km</option><option value="half_marathon">Media maratón</option><option value="marathon">Maratón</option></select><input type="date" data-season-race-date aria-label="Fecha competición secundaria"><select data-season-race-priority aria-label="Prioridad competición secundaria"><option value="B">B</option><option value="C">C</option></select></div>
           </div>
         </details>
 
@@ -4931,7 +4991,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "2.0.9";
+    const APP_VERSION = "2.0.10";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-4";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
@@ -5681,6 +5741,48 @@
       state.bestRecordsLoaded = false;
     }
 
+    function activityMirrorFingerprint(activity) {
+      const start = String(activity?.start?.utc || activity?.start?.local || "").slice(0,19);
+      const type = String(activity?.type || "").trim().toLowerCase();
+      const distance = isNumber(activity?.distanceM) ? Math.round(activity.distanceM * 10) : "na";
+      const duration = isNumber(activity?.movingSec) ? Math.round(activity.movingSec)
+        : isNumber(activity?.recordingSec) ? Math.round(activity.recordingSec)
+          : isNumber(activity?.elapsedSec) ? Math.round(activity.elapsedSec) : "na";
+      if (!start) return `id:${String(activity?.id || Math.random())}`;
+      return `${type}|${start}|${distance}|${duration}`;
+    }
+
+    function activityCanonicalScore(activity) {
+      let score = 0;
+      if (activity?.source === "GARMIN_CONNECT") score += 100;
+      if (activity?.detailsLoaded) score += 18;
+      if (safeArray(activity?.intervals).length) score += 8;
+      if (activity?.flags?.hasHeartRate || isNumber(activity?.heartRate?.averageBpm)) score += 5;
+      if (safeArray(activity?.streamTypes).length) score += 3;
+      if (activity?.originalFile?.available) score += 2;
+      return score;
+    }
+
+    function dedupeMirroredActivities(rows) {
+      const groups = new Map();
+      for (const activity of safeArray(rows)) {
+        const key = activityMirrorFingerprint(activity);
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(activity);
+      }
+      const aliases = {};
+      const activities = [];
+      for (const group of groups.values()) {
+        const ranked = [...group].sort((a,b) => activityCanonicalScore(b) - activityCanonicalScore(a));
+        const canonical = ranked[0];
+        activities.push(canonical);
+        for (const duplicate of ranked.slice(1)) {
+          if (duplicate?.id !== undefined && canonical?.id !== undefined) aliases[String(duplicate.id)] = String(canonical.id);
+        }
+      }
+      return { activities, aliases };
+    }
+
     async function loadLocalData() {
       const [activities, wellness, calendar, plans, analyses, weeklyReviews, shoes, shoeAssignments, activityMeta, lastSyncAt, lastSyncStatus, workerUrl, subjective, planPreferences, athleteProfile] = await Promise.all([
         storeGetAll(DATA_STORES.activities),
@@ -5700,7 +5802,10 @@
         settingGet("athleteProfile")
       ]);
       await ensureAthleteProfile(athleteProfile);
-      state.activities = activities.map(normalizeActivity).filter(Boolean).sort((a, b) => String(a.start?.local || "").localeCompare(String(b.start?.local || "")));
+      const normalizedActivities = activities.map(normalizeActivity).filter(Boolean);
+      const dedupedActivities = dedupeMirroredActivities(normalizedActivities);
+      state.activities = dedupedActivities.activities.sort((a, b) => String(a.start?.local || "").localeCompare(String(b.start?.local || "")));
+      state.activityAliases = dedupedActivities.aliases;
       invalidateBestRecords();
       state.wellness = wellness.map(normalizeWellness).filter(Boolean).sort((a, b) => a.date.localeCompare(b.date));
       state.calendar = calendar.sort((a, b) => String(a.startLocal || "").localeCompare(String(b.startLocal || "")));
@@ -5924,15 +6029,6 @@
       return Math.round(valid.reduce((sum, part) => sum + clamp(part.score, 0, 100) * part.weight, 0) / totalWeight);
     }
 
-    function recoveryReferenceDateTime(dateKey, referenceOverride = null) {
-      if (!dateFromKey(dateKey)) return null;
-      if (referenceOverride instanceof Date && !Number.isNaN(referenceOverride.getTime())) return referenceOverride;
-      if (dateKey === todayKey()) return new Date();
-      const date = dateFromKey(dateKey);
-      date.setHours(8, 0, 0, 0);
-      return date;
-    }
-
     function activityRecoverySeverity(activity) {
       if (!activity) return null;
       const load = activity.load || {};
@@ -6003,38 +6099,6 @@
       const durationSec = activity?.movingSec || activity?.recordingSec || activity?.elapsedSec;
       if (isNumber(durationSec) && durationSec >= 2 * 3600) hours += 12;
       return clamp(hours, 16, 120);
-    }
-
-    function recoveryActivityEndTime(activity) {
-      if (!activity) return null;
-      const local = activity?.start?.local;
-      const utc = activity?.start?.utc;
-      let activityTime = null;
-      if (local) {
-        const parsed = new Date(local);
-        if (!Number.isNaN(parsed.getTime())) activityTime = parsed;
-      }
-      if (!activityTime && utc) {
-        const parsed = new Date(utc);
-        if (!Number.isNaN(parsed.getTime())) activityTime = parsed;
-      }
-      if (!activityTime) {
-        const parsed = dateFromKey(activityDateKey(activity));
-        if (parsed) {
-          parsed.setHours(12,0,0,0);
-          activityTime = parsed;
-        }
-      }
-      if (!activityTime) return null;
-      const durationSec = activity.movingSec || activity.recordingSec || activity.elapsedSec || 0;
-      return new Date(activityTime.getTime() + Math.max(0, durationSec) * 1000);
-    }
-
-    function recoveryEvidenceTime(dateKey) {
-      const date = dateFromKey(dateKey);
-      if (!date) return null;
-      date.setHours(8,0,0,0);
-      return date;
     }
 
     function physiologicalRecoveryResponse(current) {
@@ -6175,14 +6239,20 @@
         const basePenalty = activityBaseRecoveryPenalty(stress);
         if (basePenalty <= 0) continue;
 
-        /* El paso de los días sólo determina la fracción máxima recuperable.
-           Los puntos sólo se liberan cuando la fisiología de una mañana posterior
-           es compatible con recuperación. No existe ya una hora fija de las 08:00. */
+        /* Una sesión antigua no puede mantener deuda de recuperación indefinidamente.
+           Se estudia únicamente durante su ventana teórica y dos noches de margen.
+           Si la ventana ya se ha cumplido y la fisiología confirma recuperación,
+           la deuda de esa sesión se considera totalmente saldada. */
+        if (recoveryNights > recoveryNightsNeeded + 2) continue;
         const potentialRecovery = clamp(recoveryNights / recoveryNightsNeeded, 0, 1);
         const confirmation = clamp((response.score - .25) / .65, 0, 1);
         const confirmedFraction = potentialRecovery * confirmation;
         const deterioration = response.deterioration;
-        const residualPenalty = basePenalty * (1 - confirmedFraction) * (1 + deterioration);
+        const recoveryFullyConfirmed = recoveryNights >= recoveryNightsNeeded && response.score >= .78 && response.redFlags === 0;
+        const residualPenalty = recoveryFullyConfirmed
+          ? 0
+          : basePenalty * (1 - confirmedFraction) * (1 + deterioration);
+        if (residualPenalty <= .05) continue;
 
         sessions.push({
           activity,
@@ -9327,19 +9397,34 @@
       return Boolean(state.planPreferences && state.plans.some(record => record.accepted?.plan && record.weekEnd >= todayKey() && record.weekStart >= currentStart));
     }
 
+    async function clearConfiguredTrainingPlan(message = "Preparación eliminada. Configura un nuevo plan.") {
+      const currentStart = weekBounds(todayKey()).start;
+      const targetDate = state.planPreferences?.targetDate || null;
+      const belongsToCurrentPreparation = record => {
+        const dates = [
+          record?.accepted?.preferences?.targetDate,
+          record?.draft?.preferences?.targetDate,
+          record?.accepted?.plan?.strategy?.targetDate,
+          record?.draft?.plan?.strategy?.targetDate
+        ].filter(Boolean);
+        return targetDate ? dates.includes(targetDate) || record.weekStart >= currentStart : record.weekStart >= currentStart;
+      };
+      const removable = state.plans.filter(belongsToCurrentPreparation);
+      for (const record of removable) await storeDelete(DATA_STORES.plans, record.weekStart);
+      state.plans = state.plans.filter(record => !belongsToCurrentPreparation(record));
+      await storeDelete(DATA_STORES.settings, "planPreferences");
+      state.planPreferences = null;
+      state.selectedPlanDraftWeek = null;
+      state.roadmapPreviewCache.clear();
+      state.selectedPlanDate = todayKey();
+      renderPlan();
+      showToast(message);
+    }
+
     async function cancelActiveTrainingPlan() {
       if (!hasActiveTrainingPlan()) return;
-      if (!window.confirm("¿Cancelar la preparación vigente? Se eliminarán las semanas actuales y futuras del plan, pero no tus actividades ni el histórico ya completado.")) return;
-      const currentStart = weekBounds(todayKey()).start;
-      const removable = state.plans.filter(record => record.weekStart >= currentStart);
-      for (const record of removable) await storeDelete(DATA_STORES.plans,record.weekStart);
-      state.plans = state.plans.filter(record => record.weekStart < currentStart);
-      await storeDelete(DATA_STORES.settings,"planPreferences");
-      state.planPreferences = null;
-      state.roadmapPreviewCache.clear();
-      state.selectedPlanDate = null;
-      renderPlan();
-      showToast("Preparación cancelada.");
+      if (!window.confirm("¿Cancelar y eliminar la preparación vigente? Se borrarán su configuración, sus propuestas y sus semanas aceptadas. Tus actividades no se modificarán.")) return;
+      await clearConfiguredTrainingPlan();
     }
 
     async function generateWeeklyPlan(options = {}) {
@@ -9483,17 +9568,7 @@
     async function discardDraftPlan(weekStart) {
       const record = state.plans.find(item => item.weekStart === weekStart);
       if (!record) return;
-      if (record.accepted) {
-        record.draft = null;
-        await storePut(DATA_STORES.plans, record);
-      } else {
-        await storeDelete(DATA_STORES.plans, weekStart);
-        state.plans = state.plans.filter(item => item.weekStart !== weekStart);
-      }
-      if (state.selectedPlanDraftWeek === weekStart) state.selectedPlanDraftWeek = null;
-      state.roadmapPreviewCache.clear();
-      renderPlan();
-      showToast("Borrador descartado.");
+      await clearConfiguredTrainingPlan("Propuesta descartada. Configura un nuevo plan.");
     }
 
     function qualityLabel(value) {
@@ -10413,7 +10488,7 @@ function renderToday() {
         todayMetricMarkup({metricKey:"rhr",className:"metric-rhr",icon:"🫀",label:"FC reposo",value:isNumber(recovery.restingHeartRateBpm)&&recovery.restingHeartRateBpm>0?formatNumber(recovery.restingHeartRateBpm):"",unit:isNumber(recovery.restingHeartRateBpm)&&recovery.restingHeartRateBpm>0?"ppm":"",context:rhrContext}),
         todayMetricMarkup({metricKey:"vo2",className:"metric-vo2",icon:"🫁",label:"VO₂ máx.",value:isNumber(vo2?.value)&&vo2.value>0?formatVo2Max(vo2.value):"",unit:isNumber(vo2?.value)&&vo2.value>0?"ml/kg/min":"",context:vo2Context.text}),
         todayMetricMarkup({metricKey:"load",className:"metric-load",icon:"⚡",label:"Carga",value:loadPairValue,context:freshnessContext}),
-        todayMetricMarkup({metricKey:"volume",className:"metric-volume",icon:"🏃",label:"Volumen",value:volumeKm>0?formatNumber(volumeKm,1):"",unit:volumeKm>0?"km":"",context:volumeKm>0?`7 días · ${formatNumber(volumeRuns.length)} actividades`:""})
+        todayMetricMarkup({metricKey:"volume",className:"metric-volume",icon:"🏃🏻‍♂️",label:"Volumen",value:volumeKm>0?formatNumber(volumeKm,1):"",unit:volumeKm>0?"km":"",context:volumeKm>0?`7 días · ${formatNumber(volumeRuns.length)} actividades`:""})
       ].join("");
       const subjective = state.subjective || {};
       const feelingsMarkup = isToday ? `<article class="card today-subjective-compact"><div class="feelings">${feelingSelect("energy","⚡ Energía",subjective.energy,["Sin registrar","Muy baja","Baja","Normal","Buena","Muy buena"])}${feelingSelect("legs","🦵 Piernas",subjective.legs,["Sin registrar","Muy cargadas","Cargadas","Normales","Sueltas","Muy sueltas"])}${feelingSelect("discomfort","🩹 Molestias",subjective.discomfort,[{label:"Sin registrar",value:0},{label:"Limitante",value:5},{label:"Alta",value:4},{label:"Moderada",value:3},{label:"Leve",value:2},{label:"Ninguna",value:1}])}</div></article>` : "";
@@ -10987,10 +11062,10 @@ function renderToday() {
       const historicalDecisionTrace = localPlanRecord?.accepted?.plan?.decisionTrace || null;
       const metrics = [
         ["💤 Sueño", formatSleep(recovery.sleepSeconds)],
-        ["⭐ Sueño", isNumber(recovery.sleepScore) ? `${formatNumber(recovery.sleepScore)}/100` : "—"],
-        ["〽️ VFC", isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"],
-        ["❤️ Reposo", isNumber(recovery.restingHeartRateBpm) ? `${formatNumber(recovery.restingHeartRateBpm)} ppm` : "—"],
-        ["📈 Forma", isNumber(load.ctl) ? formatNumber(load.ctl, 1) : "—"],
+        ["💤 Puntuación sueño", isNumber(recovery.sleepScore) ? `${formatNumber(recovery.sleepScore)}/100` : "—"],
+        ["❤️ VFC", isNumber(recovery.hrvRmssdMs) ? `${formatNumber(recovery.hrvRmssdMs)} ms` : "—"],
+        ["🫀 FC reposo", isNumber(recovery.restingHeartRateBpm) ? `${formatNumber(recovery.restingHeartRateBpm)} ppm` : "—"],
+        ["⚡ Forma", isNumber(load.ctl) ? formatNumber(load.ctl, 1) : "—"],
         ["⚡ Fatiga", isNumber(load.atl) ? formatNumber(load.atl, 1) : "—"]
       ];
       const activityMarkup = activities.map(activity => `
@@ -11749,7 +11824,7 @@ function evolutionBounds() {
             const totalKm=runs.reduce((sum,a)=>sum+(isNumber(a.distanceM)?a.distanceM/1000:0),0);
       const weeks=Math.max(1,(daysBetweenKeys(start,end)+1)/7);
       const goals=["5k","10k","half_marathon","marathon"];
-      const goalLabels={"5k":"5 km","10k":"10 km",half_marathon:"Media",marathon:"Maratón"};
+      const goalLabels={"5k":"5 km","10k":"10 km",half_marathon:"Media maratón",marathon:"Maratón"};
       const forecasts=goals.map(goal=>buildPerformanceForecast(memory,{...preferences,goal},reference,state.weeklyReviews));
       const selectedGoal=goals.includes(state.evolutionForecastGoal)?state.evolutionForecastGoal:"5k";
       const forecastRange=state.evolutionForecastRange||"6m";
@@ -11846,51 +11921,92 @@ function evolutionBounds() {
     }
 
     function paceCurveBestRecords(payload, targets) {
-      const runningById=new Map();
-      state.activities.filter(isRunningActivity).forEach(activity=>{
-        const id=String(activity.id);
-        runningById.set(id,activity);
-        if(id.startsWith("i")) runningById.set(id.slice(1),activity);
-      });
-      const best={}, seen=new WeakSet();
-      const resolveActivity=(node,inherited=null)=>{
-        if(!node||typeof node!=="object") return inherited;
-        const nested=node.activity&&typeof node.activity==="object"?node.activity:null;
-        const candidates=[node.activity_id,node.activityId,node.activity_id_str,node.activity?.id,nested?.activity_id,node.id];
-        for(const value of candidates) {
-          if(value===null||value===undefined) continue;
-          const raw=String(value), match=runningById.get(raw)||runningById.get(raw.startsWith("i")?raw.slice(1):`i${raw}`);
-          if(match) return match;
+      const runningById = new Map();
+      const runningByDate = new Map();
+      const aliases = state.activityAliases || {};
+      const normalizeActivityId = value => {
+        if (value === null || value === undefined || Array.isArray(value) || typeof value === "object") return null;
+        const raw = String(value);
+        const variants = [raw, raw.startsWith("i") ? raw.slice(1) : `i${raw}`];
+        for (const variant of variants) {
+          const canonical = aliases[variant] || aliases[raw] || variant;
+          const match = runningById.get(canonical) || runningById.get(String(canonical).startsWith("i") ? String(canonical).slice(1) : `i${canonical}`);
+          if (match) return match;
         }
+        return null;
+      };
+      state.activities.filter(isRunningActivity).forEach(activity => {
+        const id = String(activity.id);
+        runningById.set(id, activity);
+        if (id.startsWith("i")) runningById.set(id.slice(1), activity);
+        const date = activityDateKey(activity);
+        if (date) {
+          if (!runningByDate.has(date)) runningByDate.set(date, []);
+          runningByDate.get(date).push(activity);
+        }
+      });
+      const best = {}, seen = new WeakSet();
+      const resolveActivity = (node, inherited = null, keyHint = null) => {
+        if (keyHint) {
+          const keyed = normalizeActivityId(keyHint);
+          if (keyed) return keyed;
+        }
+        if (!node || typeof node !== "object") return inherited;
+        const nested = node.activity && typeof node.activity === "object" ? node.activity : null;
+        const candidates = [node.activity_id,node.activityId,node.activity_id_str,node.activity?.id,nested?.activity_id,node.id];
+        for (const value of candidates) {
+          const match = normalizeActivityId(value);
+          if (match) return match;
+        }
+        const dateValue = String(node.start_date_local || node.startDateLocal || node.start_date || node.date || "").slice(0,10);
+        const dateRows = dateValue ? runningByDate.get(dateValue) : null;
+        if (dateRows?.length === 1) return dateRows[0];
         return inherited;
       };
-      const register=(activity,distanceM,timeSec)=>{
-        if(!activity||!isNumber(distanceM)||!isNumber(timeSec)||timeSec<=0) return;
-        for(const targetKm of targets) {
-          const targetM=targetKm*1000, tolerance=Math.max(8,targetM*.006);
-          if(Math.abs(distanceM-targetM)>tolerance) continue;
-          const record=candidateRecord(activity,targetKm,timeSec,"intervals-pace-curve");
-          const key=recordTargetKey(targetKm);
-          if(record&&(!best[key]||record.timeSec<best[key].timeSec)) best[key]=record;
+      const register = (activity, distanceM, timeSec) => {
+        if (!activity || !isNumber(distanceM) || !isNumber(timeSec) || timeSec <= 0) return;
+        for (const targetKm of targets) {
+          const targetM = targetKm * 1000, tolerance = Math.max(8, targetM * .006);
+          if (Math.abs(distanceM - targetM) > tolerance) continue;
+          const record = candidateRecord(activity,targetKm,timeSec,"intervals-pace-curve");
+          const key = recordTargetKey(targetKm);
+          if (record && (!best[key] || record.timeSec < best[key].timeSec)) best[key] = record;
         }
       };
-      const visit=(node,inheritedActivity=null,depth=0)=>{
-        if(depth>12||node===null||node===undefined) return;
-        if(Array.isArray(node)) { node.forEach(item=>visit(item,inheritedActivity,depth+1)); return; }
-        if(typeof node!=="object") return;
-        if(seen.has(node)) return; seen.add(node);
-        const activity=resolveActivity(node,inheritedActivity);
-        const distances=Array.isArray(node.distance)?node.distance:Array.isArray(node.distances)?node.distances:null;
-        const seconds=Array.isArray(node.secs)?node.secs:Array.isArray(node.seconds)?node.seconds:Array.isArray(node.time)?node.time:null;
-        if(distances&&seconds) {
-          const n=Math.min(distances.length,seconds.length);
-          for(let i=0;i<n;i++) register(activity,Number(distances[i]),Number(seconds[i]));
+      const visit = (node, inheritedActivity = null, depth = 0, keyHint = null) => {
+        if (depth > 12 || node === null || node === undefined) return;
+        if (Array.isArray(node)) { node.forEach(item => visit(item,inheritedActivity,depth+1,null)); return; }
+        if (typeof node !== "object") return;
+        if (seen.has(node)) return;
+        seen.add(node);
+        const activity = resolveActivity(node,inheritedActivity,keyHint);
+        const distances = Array.isArray(node.distance) ? node.distance : Array.isArray(node.distances) ? node.distances : null;
+        const seconds = Array.isArray(node.secs) ? node.secs : Array.isArray(node.seconds) ? node.seconds : Array.isArray(node.time) ? node.time : Array.isArray(node.times) ? node.times : null;
+        const ids = Array.isArray(node.activity_id) ? node.activity_id
+          : Array.isArray(node.activity_ids) ? node.activity_ids
+            : Array.isArray(node.activityId) ? node.activityId
+              : Array.isArray(node.activityIds) ? node.activityIds
+                : Array.isArray(node.ids) ? node.ids : null;
+        if (distances && seconds) {
+          const n = Math.min(distances.length,seconds.length);
+          for (let i=0;i<n;i++) {
+            const rowActivity = ids ? (normalizeActivityId(ids[i]) || activity) : activity;
+            register(rowActivity,Number(distances[i]),Number(seconds[i]));
+          }
+        } else if (seconds && ids) {
+          const scalarDistance = Number(node.distance_m ?? node.distanceM ?? node.distance);
+          if (Number.isFinite(scalarDistance)) {
+            const n = Math.min(seconds.length,ids.length);
+            for (let i=0;i<n;i++) register(normalizeActivityId(ids[i]) || activity,scalarDistance,Number(seconds[i]));
+          }
         } else {
-          const distance=Number(node.distance_m??node.distanceM??node.distance);
-          const secs=Number(node.secs??node.seconds??node.time_sec??node.timeSec??node.elapsed_time??node.moving_time);
-          if(Number.isFinite(distance)&&Number.isFinite(secs)) register(activity,distance,secs);
+          const distance = Number(node.distance_m ?? node.distanceM ?? node.distance);
+          const secs = Number(node.secs ?? node.seconds ?? node.time_sec ?? node.timeSec ?? node.elapsed_time ?? node.moving_time);
+          if (Number.isFinite(distance) && Number.isFinite(secs)) register(activity,distance,secs);
         }
-        Object.values(node).forEach(value=>{ if(value&&typeof value==="object") visit(value,activity,depth+1); });
+        Object.entries(node).forEach(([key,value]) => {
+          if (value && typeof value === "object") visit(value,activity,depth+1,key);
+        });
       };
       visit(payload);
       return best;
@@ -11901,7 +12017,7 @@ function evolutionBounds() {
       const token=await connectionGet("accessToken").catch(()=>"");
       if(!token) return {};
       const distances=targets.map(km=>km*1000).join(",");
-      const path=`/best-efforts/pace?oldest=2018-01-01&newest=${encodeURIComponent(todayKey())}&distances=${encodeURIComponent(distances)}`;
+      const path=`/best-efforts/pace?oldest=2018-01-01&newest=${encodeURIComponent(todayKey())}&distances=${encodeURIComponent(distances)}&gap=false`;
       const {response,payload}=await workerRequest(path,{token,timeoutMs:22000,retries:1});
       if(!response.ok||!payload?.ok) return {};
       return paceCurveBestRecords(payload.data,targets);
