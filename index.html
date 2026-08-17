@@ -1969,6 +1969,22 @@ select option{background:#1c1c1e !important;color:#fff !important;}
   .best-record-grid .data-record-button span,.best-record-grid .data-subrow span{font-size:.70rem !important;}
   .best-record-grid .data-record-button strong,.best-record-grid .data-subrow strong{font-size:.84rem;}
 }
+
+.evolution-v2{gap:9px;}
+.evolution-answer-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px;}
+.evolution-answer-item{min-width:0;padding:9px 10px;border-radius:13px;background:#22303c;border:1px solid #38444d;}
+.evolution-answer-item span{display:block;color:var(--muted);font-size:.58rem;line-height:1.2;}
+.evolution-answer-item strong{display:block;margin-top:4px;font-size:.82rem;line-height:1.18;overflow-wrap:anywhere;}
+.evolution-answer-item small{display:block;margin-top:3px;color:var(--secondary);font-size:.58rem;line-height:1.25;overflow-wrap:anywhere;}
+.evolution-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.evolution-card-note{color:var(--muted);font-size:.6rem;text-align:right;}
+@media (max-width:430px){
+  .evolution-answer-grid{gap:5px;}
+  .evolution-answer-item{padding:8px 7px;}
+  .evolution-answer-item strong{font-size:.74rem;}
+  .evolution-answer-item small{font-size:.54rem;}
+  .evolution-card-note{display:none;}
+}
 </style>
 </head>
 <body>
@@ -2380,8 +2396,8 @@ function wait(milliseconds) {
 }
     "use strict";
 
-    const APP_VERSION = "2.1.14";
-    const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-4";
+    const APP_VERSION = "2.2.5";
+    const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-5";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
     const CONNECTION_STORE = "settings";
@@ -2440,11 +2456,16 @@ function wait(milliseconds) {
       subjective: null,
       lastSyncAt: null,
       lastSyncStatus: null,
+      streamDiagnostics: null,
+      streamDiagnosticsLoading: false,
       workerUrl: DEFAULT_WORKER_URL,
       hasToken: false,
       syncing: false,
       generatingPlan: false,
       adaptingPlan: false,
+      dailyPlanReviewRunning: false,
+      dailyPlanReviewTimer: 0,
+      dailyPlanReview: null,
       activeView: "today",
       selectedTodayDate: null,
       monthCursor: new Date(),
@@ -2452,7 +2473,7 @@ function wait(milliseconds) {
       evolutionRange: "7d",
       evolutionFrom: "",
       evolutionTo: "",
-      evolutionForecastGoal: "5k",
+      evolutionForecastGoal: null,
       evolutionForecastRange: "6m",
       selectedPlanDraftWeek: null,
       metricDetail: { key:null, range:"7d", referenceDate:null },
@@ -3513,7 +3534,8 @@ function wait(milliseconds) {
             { storeName:DATA_STORES.settings, key:"lastSyncStatus", label:"lastSyncStatus" },
             { storeName:DATA_STORES.subjective, key:todayKey(), label:"subjective" },
             { storeName:DATA_STORES.settings, key:"planPreferences", label:"planPreferences" },
-            { storeName:DATA_STORES.settings, key:"athleteProfile", label:"athleteProfile" }
+            { storeName:DATA_STORES.settings, key:"athleteProfile", label:"athleteProfile" },
+            { storeName:DATA_STORES.settings, key:"dailyPlanReview", label:"dailyPlanReview" }
           ]
         }),
         connectionGetMany(["workerUrl","accessToken"]).catch(() => ({}))
@@ -3533,6 +3555,7 @@ function wait(milliseconds) {
       const subjective = snapshot.get.subjective || null;
       const planPreferences = snapshot.get.planPreferences?.value ?? null;
       const athleteProfile = snapshot.get.athleteProfile?.value ?? null;
+      const dailyPlanReview = snapshot.get.dailyPlanReview?.value ?? null;
       const workerUrl = connection.workerUrl || null;
       const accessToken = connection.accessToken || "";
 
@@ -3561,6 +3584,9 @@ function wait(milliseconds) {
       state.planPreferences = planPreferences && typeof planPreferences === "object" ? planPreferences : null;
       state.lastSyncAt = lastSyncAt;
       state.lastSyncStatus = lastSyncStatus && typeof lastSyncStatus === "object" ? lastSyncStatus : null;
+      state.streamDiagnostics = null;
+      state.streamDiagnosticsLoading = false;
+      state.dailyPlanReview = dailyPlanReview && typeof dailyPlanReview === "object" ? dailyPlanReview : null;
       state.workerUrl = normalizeWorkerUrl(workerUrl || DEFAULT_WORKER_URL);
       state.hasToken = Boolean(accessToken);
       state.subjective = subjective || { date: todayKey(), energy: 0, legs: 0, discomfort: 0 };
@@ -3699,7 +3725,7 @@ function wait(milliseconds) {
 
     function workerRetryIsSafe(path, method) {
       const verb = String(method || "GET").toUpperCase();
-      return verb === "GET" || path === "/sync" || path === "/plan/preview";
+      return verb === "GET" || path === "/sync" || path === "/plan/preview" || path === "/plan/daily";
     }
 
     function workerRetryDelay(response, payload, attempt) {
@@ -4498,6 +4524,206 @@ function wait(milliseconds) {
       };
     }
 
+
+    function raceGoalProgressStatusLabel(status) {
+      return ({
+        building:"Construyendo capacidad",
+        on_track:"Capacidad en trayectoria",
+        specificity_gap:"Exposición específica pendiente",
+        capacity_gap:"Objetivo aún no respaldado",
+        finishing:"Afinando",
+        race_ready:"Objetivo respaldado",
+        protect:"Proteger adaptación",
+        recovery:"Recuperación",
+        limited:"Evidencia limitada"
+      })[status] || "Construyendo capacidad";
+    }
+
+    function raceGoalSpecificWeight(goal, sessionType) {
+      const type = String(sessionType || "").toLowerCase();
+      const weights = {
+        "5k": { intervals:1, threshold:.9, hills:.8, tempo:.75, steady:.45, long:.35, race:1 },
+        "10k": { threshold:1, intervals:.9, tempo:.85, steady:.65, long:.55, hills:.55, race:1 },
+        half_marathon: { long:1, threshold:.9, tempo:.9, steady:.8, intervals:.45, hills:.35, race:1 },
+        marathon: { long:1, steady:.9, tempo:.75, threshold:.55, intervals:.25, hills:.25, race:1 }
+      };
+      return weights[goal]?.[type] || 0;
+    }
+
+    function raceGoalLongReferenceKm(goal) {
+      return ({ "5k":8, "10k":12, half_marathon:18, marathon:28 })[goal] || null;
+    }
+
+    function raceGoalProgressWindowDays(goal) {
+      return ({ "5k":42, "10k":49, half_marathon:56, marathon:70 })[goal] || 42;
+    }
+
+    function raceGoalProgressProfile(
+      preferences,
+      performanceForecast,
+      goalTrajectory,
+      execution,
+      recentActivities,
+      preparationState,
+      roadmap,
+      referenceDate = todayKey()
+    ) {
+      const goal = preferences?.goal;
+      const targetDate = dateFromKey(preferences?.targetDate) ? preferences.targetDate : null;
+      if (!["5k","10k","half_marathon","marathon"].includes(goal) || !targetDate || targetDate <= referenceDate) return null;
+
+      const weeksRemaining = isNumber(goalTrajectory?.weeksRemaining)
+        ? goalTrajectory.weeksRemaining
+        : Math.max(0, daysBetweenKeys(referenceDate,targetDate) / 7);
+      const windowDays = raceGoalProgressWindowDays(goal);
+      const windowStart = addDaysToKey(referenceDate, -(windowDays - 1));
+      const records = safeArray(execution?.records).filter(row => row?.date >= windowStart && row.date <= referenceDate && row.sport === "run");
+
+      let plannedSpecificWeight = 0;
+      let completedSpecificWeight = 0;
+      let plannedSpecificSessions = 0;
+      let completedSpecificSessions = 0;
+      const physiological = [];
+
+      for (const row of records) {
+        const weight = raceGoalSpecificWeight(goal,row.sessionType);
+        if (!weight) continue;
+        plannedSpecificWeight += weight;
+        plannedSpecificSessions += 1;
+        if (!row.completed) continue;
+
+        const executionFactor = isNumber(row.executionScore) ? clamp(row.executionScore / 100,.65,1) : 1;
+        completedSpecificWeight += weight * executionFactor;
+        completedSpecificSessions += 1;
+
+        let physiologyScore = isNumber(row.physiologicalScore) ? row.physiologicalScore : null;
+        if (!isNumber(physiologyScore)) {
+          physiologyScore = ({
+            appropriate:100,
+            acceptable:88,
+            elevated:68,
+            compromised:40
+          })[row.physiologicalVerdict] ?? null;
+        }
+        if (isNumber(physiologyScore)) physiological.push({score:physiologyScore,weight});
+      }
+
+      const specificExposurePercent = plannedSpecificWeight >= .75
+        ? Math.round(clamp(completedSpecificWeight / plannedSpecificWeight,0,1) * 100)
+        : null;
+      const physiologyWeight = physiological.reduce((sum,item) => sum + item.weight,0);
+      const absorptionPercent = physiologyWeight
+        ? Math.round(physiological.reduce((sum,item) => sum + item.score * item.weight,0) / physiologyWeight)
+        : null;
+
+      const recentRuns = safeArray(recentActivities).filter(activity => activity?.sport === "run" && activity.date >= windowStart && activity.date <= referenceDate);
+      const longestRunKm = recentRuns.reduce((maximum,activity) => Math.max(maximum,isNumber(activity.distanceKm) ? activity.distanceKm : 0),0);
+      const longRunReferenceKm = raceGoalLongReferenceKm(goal);
+      const longRunCoveragePercent = isNumber(longRunReferenceKm) && longRunReferenceKm > 0
+        ? Math.round(clamp(longestRunKm / longRunReferenceKm,0,1) * 100)
+        : null;
+
+      const trajectoryScore = ({
+        ahead:100,
+        on_track:92,
+        reachable:78,
+        uncertain:58,
+        unsupported:35
+      })[goalTrajectory?.status] ?? (performanceForecast?.available ? (performanceForecast.confidence === "limited" ? 58 : 70) : null);
+
+      const componentWeights = ({
+        "5k": { trajectory:.50, specific:.35, long:.05, absorption:.10 },
+        "10k": { trajectory:.48, specific:.32, long:.10, absorption:.10 },
+        half_marathon: { trajectory:.42, specific:.28, long:.20, absorption:.10 },
+        marathon: { trajectory:.38, specific:.25, long:.27, absorption:.10 }
+      })[goal];
+      const components = [
+        [trajectoryScore,componentWeights.trajectory],
+        [specificExposurePercent,componentWeights.specific],
+        [longRunCoveragePercent,componentWeights.long],
+        [absorptionPercent,componentWeights.absorption]
+      ].filter(([value]) => isNumber(value));
+      const totalWeight = components.reduce((sum,[,weight]) => sum + weight,0);
+      const score = totalWeight
+        ? Math.round(components.reduce((sum,[value,weight]) => sum + value * weight,0) / totalWeight)
+        : null;
+
+      const forecastEvidence = performanceForecast?.confidence === "high" ? 2
+        : performanceForecast?.confidence === "medium" ? 1.5
+          : performanceForecast?.available ? .75 : 0;
+      const exposureEvidence = plannedSpecificWeight >= 3 ? 2 : plannedSpecificWeight >= 1.5 ? 1 : 0;
+      const physiologyEvidence = physiological.length >= 2 ? 1 : physiological.length ? .5 : 0;
+      const historyEvidence = recentRuns.length >= 4 ? 1 : recentRuns.length >= 2 ? .5 : 0;
+      const evidence = forecastEvidence + exposureEvidence + physiologyEvidence + historyEvidence;
+      const confidence = evidence >= 5 ? "high" : evidence >= 3 ? "medium" : "limited";
+
+      const trajectoryStatus = goalTrajectory?.status || null;
+      const targetUnsupported = trajectoryStatus === "unsupported" && goalTrajectory?.confidence !== "limited";
+      const specificityGap = plannedSpecificWeight >= 1.5 && isNumber(specificExposurePercent) && specificExposurePercent < 60;
+      const durabilityFloor = ({ "5k":55, "10k":65, half_marathon:75, marathon:75 })[goal] || 65;
+      const durabilityReady = !isNumber(longRunCoveragePercent) || longRunCoveragePercent >= durabilityFloor;
+      const absorptionReady = !isNumber(absorptionPercent) || absorptionPercent >= 70;
+
+      let status = "building";
+      if (preparationState?.status === "recovery") status = "recovery";
+      else if (preparationState?.status === "protect") status = "protect";
+      else if (targetUnsupported) status = "capacity_gap";
+      else if (specificityGap) status = "specificity_gap";
+      else if (confidence === "limited" && plannedSpecificWeight < 1.5) status = "limited";
+      else if (weeksRemaining <= 3) {
+        const trajectoryReady = !["unsupported","uncertain"].includes(trajectoryStatus);
+        status = isNumber(score) && score >= 78
+          && (!isNumber(specificExposurePercent) || specificExposurePercent >= 70)
+          && durabilityReady && absorptionReady && trajectoryReady
+          ? "race_ready"
+          : "finishing";
+      } else if (isNumber(score) && score >= 72) status = "on_track";
+
+      const summary = status === "race_ready"
+        ? "Pronóstico, exposición específica y resistencia reciente respaldan el objetivo; ahora prima conservar la frescura."
+        : status === "capacity_gap"
+          ? "El rendimiento observado todavía no respalda el tiempo objetivo; TɅLOS mantiene los ritmos anclados a la capacidad demostrada."
+          : status === "specificity_gap"
+            ? "La capacidad general avanza, pero falta completar una parte relevante de la exposición específica prevista."
+            : status === "protect"
+              ? "La capacidad no se fuerza mientras la respuesta fisiológica exige consolidar."
+              : status === "recovery"
+                ? "La prioridad actual es absorber la competición antes de volver a valorar capacidad específica."
+                : status === "limited"
+                  ? "Todavía falta evidencia específica suficiente para valorar con precisión la preparación para esta carrera."
+                  : status === "finishing"
+                    ? "La preparación entra en su tramo final; se afina sin intentar recuperar carga o sesiones perdidas."
+                    : status === "on_track"
+                      ? "El rendimiento, la exposición específica y la resistencia reciente evolucionan de forma compatible con el objetivo."
+                      : "La preparación sigue construyendo capacidad específica; la valoración ganará precisión con más semanas ejecutadas.";
+
+      return {
+        schemaVersion:1,
+        status,
+        label:raceGoalProgressStatusLabel(status),
+        score,
+        confidence,
+        goal,
+        asOfDate:referenceDate,
+        targetDate,
+        weeksRemaining:Math.round(weeksRemaining * 10) / 10,
+        targetTimeSec:finiteOrNullClient(preferences.targetTimeSec),
+        predictedTimeSec:isNumber(performanceForecast?.predictedTimeSec) ? Math.round(performanceForecast.predictedTimeSec) : null,
+        trajectoryStatus,
+        windowDays,
+        plannedSpecificSessions,
+        completedSpecificSessions,
+        plannedSpecificWeight:Math.round(plannedSpecificWeight * 100) / 100,
+        completedSpecificWeight:Math.round(completedSpecificWeight * 100) / 100,
+        specificExposurePercent,
+        absorptionPercent,
+        longestRunKm:Math.round(longestRunKm * 10) / 10,
+        longRunReferenceKm,
+        longRunCoveragePercent,
+        summary
+      };
+    }
+
     function buildPerformanceForecast(performanceMemory = {}, preferences = {}, referenceDate = todayKey(), weeklyReviews = []) {
       const goal = preferences.goal;
       const targetDistanceKm = goalDistanceKm(goal);
@@ -4864,23 +5090,42 @@ function wait(milliseconds) {
           physiologicalScore: isNumber(analysis?.physiologicalScore) ? analysis.physiologicalScore : null,
           executionVerdict: analysis?.executionVerdict || null,
           physiologicalVerdict: analysis?.physiologicalVerdict || null,
-          analysisConfidence: analysis?.confidence?.label || null,
-          analysisConfidenceScore: isNumber(analysis?.confidence?.score) ? analysis.confidence.score : null
+          observedSessionType: analysis?.trainingEffect?.observedSessionType || null,
+          trainingEffectQuality: analysis?.trainingEffect?.quality || null,
+          learningSignal: analysis?.trainingEffect?.learningSignal || null,
+          learningWeight: isNumber(analysis?.trainingEffect?.learningWeight) ? analysis.trainingEffect.learningWeight : null,
+          stimulusScore: isNumber(analysis?.trainingEffect?.stimulusScore) ? analysis.trainingEffect.stimulusScore : null,
+          recoveryCostScore: isNumber(analysis?.trainingEffect?.recoveryCostScore) ? analysis.trainingEffect.recoveryCostScore : null,
+          specificContributionPercent: isNumber(analysis?.trainingEffect?.specificContributionPercent) ? analysis.trainingEffect.specificContributionPercent : null,
+          analysisConfidence: analysis?.confidence?.label || analysis?.trainingEffect?.confidence?.label || null,
+          analysisConfidenceScore: isNumber(analysis?.confidence?.score) ? analysis.confidence.score : isNumber(analysis?.trainingEffect?.confidence?.score) ? analysis.trainingEffect.confidence.score : null
         };
       });
 
-      const unplannedRecords = state.activities
-        .filter(activity => {
-          const date = activityDateKey(activity);
-          return date >= oldest && date <= referenceDate && isRunningActivity(activity) && !matchedActivityIds.has(String(activity.id));
+      const unplannedRecords = indexedRunningActivitiesBetween(oldest, referenceDate)
+        .filter(activity => !matchedActivityIds.has(String(activity.id)))
+        .map(activity => {
+          const analysis = activityAnalysisRecord(activity.id)?.analysis || null;
+          return {
+            activityId: String(activity.id), date: activityDateKey(activity), sport: "run",
+            sessionType: analysis?.trainingEffect?.observedSessionType || null,
+            actualDistanceKm: isNumber(activity.distanceM) ? Math.round(activity.distanceM / 100) / 10 : null,
+            actualDurationMin: isNumber(activityDuration(activity)) ? Math.round(activityDuration(activity) / 60) : null,
+            actualPaceSecPerKm: activity.movingPaceSecPerKm ?? null,
+            trainingLoad: activity.load?.trainingLoad ?? null,
+            completed:true,
+            physiologicalScore:isNumber(analysis?.physiologicalScore) ? analysis.physiologicalScore : null,
+            physiologicalVerdict:analysis?.physiologicalVerdict || null,
+            observedSessionType:analysis?.trainingEffect?.observedSessionType || null,
+            trainingEffectQuality:analysis?.trainingEffect?.quality || null,
+            learningSignal:analysis?.trainingEffect?.learningSignal || null,
+            learningWeight:isNumber(analysis?.trainingEffect?.learningWeight) ? analysis.trainingEffect.learningWeight : null,
+            stimulusScore:isNumber(analysis?.trainingEffect?.stimulusScore) ? analysis.trainingEffect.stimulusScore : null,
+            recoveryCostScore:isNumber(analysis?.trainingEffect?.recoveryCostScore) ? analysis.trainingEffect.recoveryCostScore : null,
+            specificContributionPercent:isNumber(analysis?.trainingEffect?.specificContributionPercent) ? analysis.trainingEffect.specificContributionPercent : null,
+            analysisConfidence:analysis?.confidence?.label || analysis?.trainingEffect?.confidence?.label || null
+          };
         })
-        .map(activity => ({
-          activityId: String(activity.id), date: activityDateKey(activity), sport: "run",
-          actualDistanceKm: isNumber(activity.distanceM) ? Math.round(activity.distanceM / 100) / 10 : null,
-          actualDurationMin: isNumber(activityDuration(activity)) ? Math.round(activityDuration(activity) / 60) : null,
-          actualPaceSecPerKm: activity.movingPaceSecPerKm ?? null,
-          trainingLoad: activity.load?.trainingLoad ?? null
-        }))
         .sort((a,b) => a.date.localeCompare(b.date));
 
       const completed = records.filter(item => item.completed);
@@ -4915,8 +5160,10 @@ function wait(milliseconds) {
     }
 
     function adaptiveMemoryProfile(execution) {
-      const records = (Array.isArray(execution?.records) ? execution.records : [])
-        .filter(row => row?.completed && adaptiveMemorySessionGroup(row.sessionType));
+      const records = [
+        ...(Array.isArray(execution?.records) ? execution.records : []),
+        ...(Array.isArray(execution?.unplannedRecords) ? execution.unplannedRecords : [])
+      ].filter(row => row?.completed && adaptiveMemorySessionGroup(row.observedSessionType || row.sessionType));
 
       const referenceDate = dateFromKey(execution?.referenceDate) ? execution.referenceDate : todayKey();
       const summarize = rows => {
@@ -4942,15 +5189,18 @@ function wait(milliseconds) {
         const elevatedRate = weightedRate(row => row.physiologicalVerdict === "elevated");
         const overRate = weightedRate(row => row.executionVerdict === "over");
         const appropriateRate = weightedRate(row => ["appropriate", "acceptable"].includes(row.physiologicalVerdict));
+        const protectLearningRate = weightedRate(row => row.learningSignal === "protect");
+        const costlyLearningRate = weightedRate(row => row.trainingEffectQuality === "productive_costly");
+        const productiveLearningRate = weightedRate(row => row.learningSignal === "reinforce");
 
-        let risk = compromisedRate * .58 + elevatedRate * .24 + overRate * .10;
+        let risk = compromisedRate * .58 + elevatedRate * .24 + overRate * .10 + protectLearningRate * .12 + costlyLearningRate * .05;
         if (isNumber(physiologicalScore) && physiologicalScore < 72) risk += .20;
         else if (isNumber(physiologicalScore) && physiologicalScore < 80) risk += .10;
         risk = clamp(risk, 0, 1);
 
         // El aprendizaje nunca aumenta por sí solo la carga segura: sólo mantiene o reduce.
         const factor = weightSum < 1.5 ? 1 : clamp(1 - risk * .24, .82, 1);
-        const sensitivity = weightSum < 1.5 ? 1 : clamp(1 + compromisedRate * .30 + elevatedRate * .15, 1, 1.25);
+        const sensitivity = weightSum < 1.5 ? 1 : clamp(1 + compromisedRate * .30 + elevatedRate * .15 + protectLearningRate * .10, 1, 1.25);
 
         return {
           sampleCount: rows.length,
@@ -4961,15 +5211,17 @@ function wait(milliseconds) {
           elevatedRate: Math.round(elevatedRate * 100),
           compromisedRate: Math.round(compromisedRate * 100),
           overRate: Math.round(overRate * 100),
+          protectLearningRate: Math.round(protectLearningRate * 100),
+          productiveLearningRate: Math.round(productiveLearningRate * 100),
           factor: Math.round(factor * 100) / 100,
           recoverySensitivity: Math.round(sensitivity * 100) / 100
         };
       };
 
       const byGroup = {
-        easy: summarize(records.filter(row => adaptiveMemorySessionGroup(row.sessionType) === "easy")),
-        long: summarize(records.filter(row => adaptiveMemorySessionGroup(row.sessionType) === "long")),
-        quality: summarize(records.filter(row => adaptiveMemorySessionGroup(row.sessionType) === "quality"))
+        easy: summarize(records.filter(row => adaptiveMemorySessionGroup(row.observedSessionType || row.sessionType) === "easy")),
+        long: summarize(records.filter(row => adaptiveMemorySessionGroup(row.observedSessionType || row.sessionType) === "long")),
+        quality: summarize(records.filter(row => adaptiveMemorySessionGroup(row.observedSessionType || row.sessionType) === "quality"))
       };
       const overall = summarize(records);
       const evidenceWeight = overall.evidenceWeight || 0;
@@ -6211,7 +6463,161 @@ function wait(milliseconds) {
       };
     }
 
-    function planningIntentProfile(preferences, constraints, performanceForecast, performanceMemory, block, learning, roadmapWeek = null, goalTrajectory = null, referenceDate = todayKey()) {
+    function preparationStateLabel(status) {
+      return ({
+        building:"Construyendo",
+        on_track:"En trayectoria",
+        stabilize:"Estabilizar",
+        underexposed:"Exposición insuficiente",
+        protect:"Proteger",
+        race_ready:"Listo para competir",
+        freshen:"Priorizar frescura",
+        recovery:"Recuperación",
+        maintenance:"Mantenimiento",
+        open:"Plan abierto"
+      })[status] || "Construyendo";
+    }
+
+    function preparationStateProfile(preferences, roadmap, reviews, goalTrajectory, learning, postRaceContext, referenceDate = todayKey()) {
+      if (postRaceContext?.active) {
+        return {
+          schemaVersion:1, active:true, status:"recovery", label:preparationStateLabel("recovery"),
+          reviewedWeeks:0, adherencePercent:null, keyCompletionPercent:null,
+          volumeFactor:1, longFactor:1, qualityFactor:0, specificityFactor:0,
+          forceConsolidation:false, noCatchup:true,
+          summary:"Recuperación postcompetición activa; no se compensa la carga de la carrera."
+        };
+      }
+      if (postRaceContext?.transition === "maintenance") {
+        return {
+          schemaVersion:1, active:false, status:"maintenance", label:preparationStateLabel("maintenance"),
+          reviewedWeeks:0, adherencePercent:null, keyCompletionPercent:null,
+          volumeFactor:1, longFactor:1, qualityFactor:0, specificityFactor:0,
+          forceConsolidation:false, noCatchup:true,
+          summary:"Ciclo competitivo completado; mantenimiento hasta configurar un nuevo objetivo."
+        };
+      }
+      if (!roadmap?.currentWeek || !Array.isArray(roadmap.weeks) || !roadmap.weeks.length) {
+        return {
+          schemaVersion:1, active:false, status:"open", label:preparationStateLabel("open"),
+          reviewedWeeks:0, adherencePercent:null, keyCompletionPercent:null,
+          volumeFactor:1, longFactor:1, qualityFactor:1, specificityFactor:1,
+          forceConsolidation:false, noCatchup:false,
+          summary:"Sin una preparación competitiva cerrada."
+        };
+      }
+
+      const phase = roadmap.currentWeek.phase || "base";
+      const start = dateFromKey(preferences?.planStartDate)
+        ? weekBounds(preferences.planStartDate).start
+        : roadmap.weeks[0].weekStart;
+      const completed = safeArray(reviews)
+        .filter(item => item?.weekStart && item?.weekEnd && item.weekStart >= start && item.weekEnd < referenceDate)
+        .sort((a,b) => String(a.weekStart).localeCompare(String(b.weekStart)))
+        .slice(-8);
+      const rows = completed.slice(-6);
+      const weights = [0.35,0.5,0.65,0.8,0.9,1].slice(-rows.length);
+      const weighted = getter => {
+        const values = rows.map((item,index) => ({ value:finiteOrNullClient(getter(item)), weight:weights[index] || 1 })).filter(item => isNumber(item.value));
+        const total = values.reduce((sum,item) => sum + item.weight,0);
+        return total ? values.reduce((sum,item) => sum + item.value * item.weight,0) / total : null;
+      };
+      const adherence = weighted(item => item.adherencePercent);
+      const keyCompletion = weighted(item => {
+        const total = finiteOrNullClient(item.keySessions);
+        const done = finiteOrNullClient(item.keySessionsCompleted);
+        return isNumber(total) && total > 0 && isNumber(done) ? done / total * 100 : null;
+      });
+      const recentTwo = rows.slice(-2);
+      const recentSum = key => recentTwo.reduce((sum,item) => sum + (isNumber(item?.[key]) ? item[key] : 0),0);
+      const compromised = Math.max(recentSum("physiologyCompromisedCount"), finiteOrNullClient(learning?.compromisedRecent) || 0);
+      const elevated = Math.max(recentSum("physiologyElevatedCount"), finiteOrNullClient(learning?.elevatedRecent) || 0);
+      const recoveryDown = recentTwo.some(item => item.recoveryTrend === "down");
+      const enoughEvidence = rows.length >= 2 && (isNumber(adherence) || isNumber(keyCompletion));
+      const underexposed = enoughEvidence && ((isNumber(keyCompletion) && keyCompletion < 60) || (isNumber(adherence) && adherence < 65));
+      const mixedExposure = enoughEvidence && !underexposed && ((isNumber(keyCompletion) && keyCompletion < 75) || (isNumber(adherence) && adherence < 80));
+      const physiologicalRisk = compromised > 0 || elevated >= 2 || (recoveryDown && elevated > 0);
+      const trajectoryStatus = goalTrajectory?.status || null;
+      const trajectoryConfidence = goalTrajectory?.confidence || "limited";
+      const trajectorySupported = trajectoryStatus !== "unsupported" || trajectoryConfidence === "limited";
+      const racePhase = ["taper","race_week"].includes(phase);
+
+      let status = enoughEvidence ? "on_track" : "building";
+      let volumeFactor = 1, longFactor = 1, qualityFactor = 1, specificityFactor = 1;
+      let forceConsolidation = false;
+      let noCatchup = false;
+      const reasons = [];
+
+      if (physiologicalRisk && !racePhase) {
+        status = "protect";
+        qualityFactor = 0;
+        specificityFactor = .55;
+        forceConsolidation = true;
+        noCatchup = true;
+        reasons.push("La respuesta fisiológica reciente exige consolidar antes de continuar la progresión.");
+      } else if (racePhase) {
+        const raceReady = !physiologicalRisk
+          && (!enoughEvidence || ((adherence ?? 100) >= 80 && (keyCompletion ?? 100) >= 75))
+          && trajectorySupported;
+        status = raceReady ? "race_ready" : "freshen";
+        qualityFactor = 0;
+        specificityFactor = phase === "race_week" ? .20 : .45;
+        noCatchup = true;
+        reasons.push(raceReady ? "La prioridad es llegar fresco manteniendo lo ya construido." : "No se intenta recuperar trabajo pendiente cerca de la competición.");
+      } else if (underexposed) {
+        status = "underexposed";
+        volumeFactor = .96;
+        longFactor = .97;
+        qualityFactor = .75;
+        specificityFactor = .78;
+        noCatchup = true;
+        reasons.push("La preparación acumula menos exposición de la prevista; TɅLOS mantiene sin compensar sesiones perdidas.");
+      } else if (mixedExposure) {
+        status = "stabilize";
+        volumeFactor = .98;
+        longFactor = .98;
+        qualityFactor = .85;
+        specificityFactor = .88;
+        noCatchup = true;
+        reasons.push("La ejecución global es suficiente para continuar, pero todavía conviene estabilizar antes de aumentar especificidad.");
+      } else if (!trajectorySupported) {
+        status = "stabilize";
+        qualityFactor = .90;
+        specificityFactor = .72;
+        reasons.push("El objetivo está por delante de la capacidad demostrada; el plan usa la capacidad actual como referencia.");
+      } else if (enoughEvidence) {
+        reasons.push("Cumplimiento, sesiones clave y respuesta fisiológica permiten seguir la hoja de ruta prevista.");
+      } else {
+        reasons.push("Todavía faltan semanas revisadas para valorar la preparación completa; se mantiene una progresión prudente.");
+      }
+
+      return {
+        schemaVersion:1,
+        active:true,
+        status,
+        label:preparationStateLabel(status),
+        phase,
+        weekIndex:roadmap.currentWeek.index,
+        totalWeeks:roadmap.totalWeeks,
+        weeksToGoal:finiteOrNullClient(roadmap.currentWeek.weeksToGoal),
+        reviewedWeeks:rows.length,
+        adherencePercent:isNumber(adherence) ? Math.round(adherence) : null,
+        keyCompletionPercent:isNumber(keyCompletion) ? Math.round(keyCompletion) : null,
+        compromisedRecent:compromised,
+        elevatedRecent:elevated,
+        trajectoryStatus,
+        volumeFactor,
+        longFactor,
+        qualityFactor,
+        specificityFactor,
+        forceConsolidation,
+        noCatchup,
+        summary:reasons[0],
+        reasons:reasons.slice(0,3)
+      };
+    }
+
+    function planningIntentProfile(preferences, constraints, performanceForecast, performanceMemory, block, learning, roadmapWeek = null, goalTrajectory = null, referenceDate = todayKey(), preparationState = null) {
       const goal = preferences.goal || "base";
       const phase = constraints.trainingPhase || "base";
       const priority = ["A","B","C"].includes(preferences.priority) ? preferences.priority : "A";
@@ -6298,9 +6704,11 @@ function wait(milliseconds) {
         qualityFlavor = "none";
       }
 
+      const preparationQualityFactor = isNumber(preparationState?.qualityFactor) ? preparationState.qualityFactor : 1;
+      const effectiveLearningQualityFactor = Math.min(learning?.qualityFactor ?? 1, preparationQualityFactor);
       const specificityBase = ({ rebuilding:.10, base:.20, development:.55, specific:1, taper:.35, race_week:.15 })[phase] ?? .25;
       const priorityFactor = priority === "A" ? 1 : priority === "B" ? .85 : .68;
-      const specificityFactor = Math.round(clamp(specificityBase * priorityFactor * (learning?.qualityFactor ?? 1), 0, 1) * 100) / 100;
+      const specificityFactor = Math.round(clamp(specificityBase * priorityFactor * effectiveLearningQualityFactor, 0, 1) * 100) / 100;
 
       let longRunShareTarget = ({
         base: .34,
@@ -6316,6 +6724,14 @@ function wait(milliseconds) {
         longRunShareTarget = isNumber(roadmapWeek.longRunShareTarget) ? roadmapWeek.longRunShareTarget : longRunShareTarget;
       }
       const roadmapSpecificity = roadmapWeek && isNumber(roadmapWeek.specificityFactor) ? roadmapWeek.specificityFactor : specificityFactor;
+      const preparationSpecificityFactor = isNumber(preparationState?.specificityFactor) ? preparationState.specificityFactor : 1;
+      const finalSpecificity = Math.round(clamp((roadmapWeek ? roadmapSpecificity * effectiveLearningQualityFactor : specificityFactor) * preparationSpecificityFactor,0,1)*100)/100;
+      const progressionMode = preparationState?.forceConsolidation
+        ? "consolidate"
+        : ["underexposed","stabilize"].includes(preparationState?.status) && (learning?.progressionMode || "build") === "build"
+          ? "hold"
+          : (learning?.progressionMode || "build");
+      if (progressionMode === "consolidate") qualityFlavor = "none";
 
       return {
         schemaVersion: 1,
@@ -6325,7 +6741,7 @@ function wait(milliseconds) {
         weeksToGoal: finiteOrNullClient(constraints.weeksToGoal),
         primaryFocus,
         qualityFlavor,
-        specificityFactor: roadmapSpecificity,
+        specificityFactor: finalSpecificity,
         longRunShareTarget,
         roadmapWeek: roadmapWeek ? { ...roadmapWeek } : null,
         trainingRacePaceSecPerKm,
@@ -6335,10 +6751,11 @@ function wait(milliseconds) {
         goalStatus,
         goalTrajectory: goalTrajectory ? { ...goalTrajectory } : null,
         forecastConfidence: performanceForecast?.confidence || "limited",
-        progressionMode: learning?.progressionMode || "build",
-        learningVolumeFactor: learning?.volumeFactor ?? 1,
-        learningLongFactor: learning?.longFactor ?? 1,
-        learningQualityFactor: learning?.qualityFactor ?? 1
+        progressionMode,
+        learningVolumeFactor: Math.min(learning?.volumeFactor ?? 1, preparationState?.volumeFactor ?? 1),
+        learningLongFactor: Math.min(learning?.longFactor ?? 1, preparationState?.longFactor ?? 1),
+        learningQualityFactor: effectiveLearningQualityFactor,
+        preparationState: preparationState ? { ...preparationState } : null
       };
     }
 
@@ -6472,8 +6889,14 @@ function wait(milliseconds) {
       const lifeContext = temporaryInterruptionWeekProfile(preferences.temporaryInterruption, week.start, week.end);
       const preparationRoadmap = preparationRoadmapProfile(preferences, constraints, reference);
       const roadmapWeek = preparationRoadmap?.currentWeek || null;
+      const learningProfile = planningLearningProfile(reference, state.weeklyReviews, execution);
+      const preparationState = preparationStateProfile(preferences, preparationRoadmap, state.weeklyReviews, goalTrajectory, learningProfile, postRaceContext, reference);
+      const goalProgress = raceGoalProgressProfile(preferences, performanceForecast, goalTrajectory, execution, recentActivities, preparationState, preparationRoadmap, reference);
       const feedbackBlock = trainingBlockProfile(reference, constraints.trainingPhase, state.weeklyReviews);
-      const trainingBlock = roadmapWeek && !feedbackBlock.forced
+      const preparationBlock = preparationState?.forceConsolidation && !["taper","race_week","post_race"].includes(roadmapWeek?.phase || constraints.trainingPhase)
+        ? { week:4, type:"consolidation", label:"Consolidación de preparación", volumeFactor:.84, longFactor:.88, forced:true, preparation:true }
+        : null;
+      const trainingBlock = preparationBlock || (roadmapWeek && !feedbackBlock.forced
         ? {
             week: roadmapWeek.blockWeek,
             type: roadmapWeek.blockType,
@@ -6483,7 +6906,7 @@ function wait(milliseconds) {
             forced: false,
             roadmap: true
           }
-        : feedbackBlock;
+        : feedbackBlock);
 
       if (roadmapWeek) {
         constraints.trainingPhase = roadmapWeek.phase;
@@ -6499,10 +6922,13 @@ function wait(milliseconds) {
       const strengthPlan = adaptiveStrengthProfileClient(recentActivities, plannedHistory, constraints, preferences, readiness, subjective, lifeContext, postRaceContext, roadmapWeek, reference);
       constraints.strengthTargetDays = strengthPlan.targetDays;
       constraints.strengthDurationMin = strengthPlan.durationMin;
-      const learningProfile = planningLearningProfile(reference, state.weeklyReviews, execution);
-      const planningIntent = planningIntentProfile(preferences, constraints, performanceForecast, performanceMemory, trainingBlock, learningProfile, roadmapWeek, goalTrajectory, reference);
+      if (preparationState?.forceConsolidation) {
+        constraints.qualityAllowed = false;
+        constraints.maxHardDays = 0;
+      }
+      const planningIntent = planningIntentProfile(preferences, constraints, performanceForecast, performanceMemory, trainingBlock, learningProfile, roadmapWeek, goalTrajectory, reference, preparationState);
       return {
-        schemaVersion: "talos-planning-snapshot-13",
+        schemaVersion: "talos-planning-snapshot-15",
         generatedAt: new Date().toISOString(),
         referenceDate: reference,
         history: { oldest: activityOldest, newest: reference, days: 365 },
@@ -6524,6 +6950,7 @@ function wait(milliseconds) {
         performanceMemory,
         performanceForecast,
         goalTrajectory,
+        goalProgress,
         postRaceContext,
         lifeContext,
         strengthPlan,
@@ -6533,6 +6960,7 @@ function wait(milliseconds) {
         athlete: athleteContext(runnerProfile),
         learningProfile,
         preparationRoadmap,
+        preparationState,
         planningIntent,
         weeklyReviews: recentWeeklyReviewMemory(reference, 8),
         recentActivities,
@@ -6560,7 +6988,20 @@ function wait(milliseconds) {
       const storedDecisionTrace = record?.draft?.plan?.decisionTrace || record?.accepted?.plan?.decisionTrace || null;
       const currentWeek = weekBounds(todayKey());
       const currentRecord = state.plans.find(item => item.weekStart === currentWeek.start && item.accepted?.plan);
+      const dailyReview = currentRecord && state.dailyPlanReview?.date === todayKey() && state.dailyPlanReview?.weekStart === currentWeek.start ? state.dailyPlanReview : null;
       const canAdaptCurrentWeek = Boolean(currentRecord && todayKey() >= currentWeek.start && todayKey() < currentWeek.end && currentRecord.accepted.plan.days?.some(day => day.date > todayKey() && day.sport !== "rest"));
+      const goalProgress = snapshot.goalProgress || null;
+      const dataDiagnostics = buildDecisionDataDiagnostics(todayKey());
+      const planDataIssues = dataDiagnostics.scopes.plan;
+      const goalProgressDetail = goalProgress ? [
+        isNumber(goalProgress.predictedTimeSec) && isNumber(goalProgress.targetTimeSec)
+          ? `${formatTargetTime(goalProgress.predictedTimeSec)} estimado · ${formatTargetTime(goalProgress.targetTimeSec)} objetivo`
+          : isNumber(goalProgress.predictedTimeSec) ? `${formatTargetTime(goalProgress.predictedTimeSec)} estimado` : null,
+        isNumber(goalProgress.specificExposurePercent) ? `específico ${goalProgress.specificExposurePercent}%` : null,
+        isNumber(goalProgress.longestRunKm) && goalProgress.longestRunKm > 0 && isNumber(goalProgress.longRunReferenceKm)
+          ? `tirada ${formatNumber(goalProgress.longestRunKm,1)}/${formatNumber(goalProgress.longRunReferenceKm,1)} km`
+          : null
+      ].filter(Boolean).join(" · ") : "";
       const seven = snapshot.training.last7Days;
       const ready = snapshot.dataQuality.readyForPlanning;
       const status = state.syncing ? "Actualizando datos…" : state.adaptingPlan ? "Revisando…" : state.generatingPlan ? "Generando…" : record?.draft ? "Borrador listo" : record?.accepted ? "Plan guardado" : state.planPreferences ? "Motor preparado" : ready ? "Configura el plan" : "Reuniendo datos";
@@ -6576,12 +7017,20 @@ function wait(milliseconds) {
         snapshot.preparationRoadmap?.currentWeek
           ? `Ruta objetivo: sem. ${snapshot.preparationRoadmap.currentWeek.index}/${snapshot.preparationRoadmap.totalWeeks} · ${trainingPhaseLabel(snapshot.preparationRoadmap.currentWeek.phase)} · ${snapshot.preparationRoadmap.currentWeek.focus}`
           : "Sin carrera objetivo: planificación abierta",
+        snapshot.preparationState?.active
+          ? `Estado preparación: ${snapshot.preparationState.label}${isNumber(snapshot.preparationState.adherencePercent) ? ` · ${snapshot.preparationState.adherencePercent}% cumplimiento` : ""}${isNumber(snapshot.preparationState.keyCompletionPercent) ? ` · ${snapshot.preparationState.keyCompletionPercent}% sesiones clave` : ""}`
+          : `Estado preparación: ${snapshot.preparationState?.label || "sin preparación cerrada"}`,
         snapshot.preparationRoadmap?.secondaryRaces?.length
           ? `Temporada: 1 objetivo principal + ${snapshot.preparationRoadmap.secondaryRaces.length} competición/es B/C`
           : "Temporada: sólo carrera objetivo principal",
-        snapshot.goalTrajectory
-          ? `Objetivo: ${snapshot.goalTrajectory.statusLabel} · brecha ${formatNumber(snapshot.goalTrajectory.gapPercent,1)}% · ${formatNumber(snapshot.goalTrajectory.weeksRemaining,1)} sem.`
-          : "Objetivo: sin trayectoria calculable",
+        snapshot.preparationState?.active
+          ? `Estado preparación: ${snapshot.preparationState.label} · revisadas ${snapshot.preparationState.reviewedWeeks} sem.${snapshot.preparationState.noCatchup ? " · sin compensar carga omitida" : ""}`
+          : `Estado preparación: ${snapshot.preparationState?.label || "abierto"}`,
+        snapshot.goalProgress
+          ? `Capacidad específica: ${snapshot.goalProgress.label}${isNumber(snapshot.goalProgress.score) ? ` · ${snapshot.goalProgress.score}/100` : ""}${isNumber(snapshot.goalProgress.specificExposurePercent) ? ` · exposición ${snapshot.goalProgress.specificExposurePercent}%` : ""}`
+          : snapshot.goalTrajectory
+            ? `Objetivo: ${snapshot.goalTrajectory.statusLabel} · brecha ${formatNumber(snapshot.goalTrajectory.gapPercent,1)}% · ${formatNumber(snapshot.goalTrajectory.weeksRemaining,1)} sem.`
+            : "Objetivo: sin trayectoria calculable",
         snapshot.postRaceContext?.active
           ? `Postcompetición: ${seasonRaceGoalLabel(snapshot.postRaceContext.goal)} · recuperación hasta ${formatDate(snapshot.postRaceContext.recoveryUntilDate,{day:"numeric",month:"short"})}`
           : snapshot.postRaceContext?.transition === "maintenance" ? "Ciclo competitivo completado: mantenimiento hasta configurar el siguiente objetivo" : "Sin recuperación postcompetición activa",
@@ -6596,7 +7045,10 @@ function wait(milliseconds) {
         snapshot.constraints.qualityAllowed ? "Calidad: máximo 1 sesión" : snapshot.constraints.steadyAllowed ? "Estímulo sostenido permitido" : "Sólo carrera fácil",
         storedDecisionTrace?.confidence
           ? `Decisión guardada: confianza ${decisionConfidenceSpanish(storedDecisionTrace.confidence.label)}${isNumber(storedDecisionTrace.confidence.score) ? ` · ${formatNumber(storedDecisionTrace.confidence.score)}/100` : ""}`
-          : "Aún no hay una decisión semanal guardada"
+          : "Aún no hay una decisión semanal guardada",
+        dailyReview
+          ? `Ajuste diario: ${dailyReview.changed ? dailyReview.summary : "sin cambios necesarios"}`
+          : "Ajuste diario: pendiente de la próxima actualización"
       ];
       if (storedDecisionTrace?.trace?.length) reasons.push(...storedDecisionTrace.trace.slice(0, 3));
       node.innerHTML = `
@@ -6612,7 +7064,10 @@ function wait(milliseconds) {
         </div>
         <div class="planning-explanation-toggle-row"><button class="planning-explanation-toggle" type="button" data-plan-explanations aria-expanded="false">Ver base</button></div>
         <div class="planning-reasons hidden" data-plan-reasons>${reasons.map(reason => `<span class="planning-reason">${escapeHtml(reason)}</span>`).join("")}</div>
+        ${planDataIssues.length ? `<div class="planning-weekly-memory"><strong>⚠️ Datos · ${planDataIssues.length === 1 ? escapeHtml(planDataIssues[0].title) : `${planDataIssues.length} incidencias`}</strong><span>${escapeHtml(planDataIssues[0].detail)}</span></div>` : ""}
+        ${goalProgress ? `<div class="planning-weekly-memory"><strong>🎯 Objetivo · ${escapeHtml(goalProgress.label)}${isNumber(goalProgress.score) ? ` · ${goalProgress.score}/100` : ""}</strong><span>${escapeHtml(goalProgress.summary)}${goalProgressDetail ? ` · ${escapeHtml(goalProgressDetail)}` : ""}</span></div>` : ""}
         ${latestWeekly ? `<div class="planning-weekly-memory"><strong>🧠 Última semana · ${latestWeekly.score}/100</strong><span>${latestWeekly.adherencePercent}% cumplimiento · ${formatNumber(latestWeekly.actualDistanceKm,1)}/${formatNumber(latestWeekly.plannedDistanceKm,1)} km${latestWeekly.feedbackMode ? ` · ${escapeHtml(({build:'progresar',hold:'mantener',consolidate:'consolidar'})[latestWeekly.feedbackMode] || latestWeekly.feedbackMode)}` : latestWeekly.flags?.length ? ` · ${escapeHtml(latestWeekly.flags[0])}` : ""}</span></div>` : ""}
+        ${dailyReview ? `<div class="planning-weekly-memory"><strong>🧭 Ajuste diario · ${escapeHtml(({maintain:"Mantener",protect:"Proteger",reduce:"Recortar",shift:"Desplazar",stop:"Detener"})[dailyReview.mode] || "Revisado")}</strong><span>${escapeHtml(dailyReview.summary || "Plan revisado con los datos actuales.")}</span></div>` : ""}
         <div class="planning-actions ${currentRecord ? "has-current-plan" : ""}">
           <button class="secondary-button" type="button" data-plan-configure>Configurar plan</button>
           ${canAdaptCurrentWeek ? `<button class="secondary-button" type="button" data-plan-adapt ${state.adaptingPlan || state.generatingPlan || state.syncing ? "disabled" : ""}>${state.adaptingPlan ? "Revisando…" : "Revisar semana actual"}</button>` : ""}
@@ -6807,7 +7262,8 @@ function wait(milliseconds) {
         ...roadmap,
         totalWeeks:rows.length,
         weeks:rows,
-        phases:roadmapPhaseSegments(rows)
+        phases:roadmapPhaseSegments(rows),
+        preparationState:snapshot?.preparationState || null
       };
     }
 
@@ -6879,13 +7335,13 @@ function wait(milliseconds) {
       node.innerHTML = `<article class="card preparation-map-card">
         <div class="preparation-map-head">
           <div><p class="eyebrow">Preparación completa</p><h3>${escapeHtml(goalLabel(display.goal))}</h3><p>Hoja de ruta hasta ${escapeHtml(formatDate(display.targetDate,{day:"numeric",month:"long",year:"numeric"}))}</p></div>
-          <div class="preparation-map-meta"><strong>${display.totalWeeks} sem.</strong><span>adaptables</span></div>
+          <div class="preparation-map-meta"><strong>${display.totalWeeks} sem.</strong><span>${escapeHtml(display.preparationState?.label || "adaptables")}</span></div>
         </div>
         <div class="roadmap-phases">${phases}</div>
         <details class="roadmap-details">
           <summary>Ver semanas, fases y competiciones</summary>
           <div class="roadmap-week-scroll">${weeks}</div>
-          <p class="roadmap-note">Las semanas futuras muestran estructura, no entrenamientos cerrados. TɅLOS recalcula su contenido según ejecución, fisiología, recuperación y carga real.</p>
+          <p class="roadmap-note">${escapeHtml(display.preparationState?.summary || "Las semanas futuras muestran estructura, no entrenamientos cerrados.")} Las semanas futuras siguen siendo adaptables y se recalculan con ejecución, fisiología, recuperación y carga real.</p>
         </details>
       </article>`;
 
@@ -7118,11 +7574,12 @@ function wait(milliseconds) {
       await storeApplyAtomic({
         deletes:{
           [DATA_STORES.plans]:removable.map(record => record.weekStart),
-          [DATA_STORES.settings]:["planPreferences"]
+          [DATA_STORES.settings]:["planPreferences","dailyPlanReview"]
         }
       });
       state.plans = state.plans.filter(record => !belongsToCurrentPreparation(record));
       state.planPreferences = null;
+      state.dailyPlanReview = null;
       runtimeIndex.planningUiCache = null;
       state.selectedPlanDraftWeek = null;
       state.roadmapPreviewCache.clear();
@@ -7205,6 +7662,127 @@ function wait(milliseconds) {
       }
     }
 
+    function dailyPlanReviewFingerprint(snapshot, record, referenceDate = todayKey()) {
+      const execution = safeArray(snapshot?.execution?.records)
+        .filter(row => row?.date >= record.weekStart && row?.date <= referenceDate && (row.date < referenceDate || row.completed === true))
+        .map(row => [row.date,Boolean(row.completed),row.executionScore ?? row.compliancePercent ?? null,row.executionVerdict || null,row.physiologicalScore ?? null,row.physiologicalVerdict || null,row.trainingLoad ?? null,row.observedSessionType || null,row.trainingEffectQuality || null,row.learningSignal || null,row.recoveryCostScore ?? null]);
+      const unplanned = safeArray(snapshot?.execution?.unplannedRecords)
+        .filter(row => row?.date >= record.weekStart && row?.date <= referenceDate)
+        .map(row => [row.date,row.activityId || null,row.actualDistanceKm ?? null,row.trainingLoad ?? null,row.observedSessionType || null,row.trainingEffectQuality || null,row.learningSignal || null,row.physiologicalVerdict || null,row.recoveryCostScore ?? null]);
+      const raw = JSON.stringify({
+        date:referenceDate,
+        weekStart:record.weekStart,
+        acceptedAt:record.accepted?.acceptedAt || record.accepted?.generatedAt || null,
+        readiness:[snapshot?.readiness?.score ?? null,snapshot?.readiness?.label || null],
+        recovery:[snapshot?.recovery?.latestDate || null,snapshot?.recovery?.hrvRmssdMs ?? null,snapshot?.recovery?.restingHeartRateBpm ?? null,snapshot?.recovery?.sleepSeconds ?? null,snapshot?.recovery?.sleepScore ?? null],
+        subjective:[snapshot?.subjective?.restriction || "none",snapshot?.subjective?.energy ?? null,snapshot?.subjective?.legs ?? null,snapshot?.subjective?.discomfort ?? null,snapshot?.subjective?.updatedAt || null],
+        load:[snapshot?.load?.ctl ?? null,snapshot?.load?.atl ?? null,snapshot?.load?.form ?? null],
+        preparation:[snapshot?.preparationState?.status || null,snapshot?.preparationState?.forceConsolidation || false],
+        life:[snapshot?.lifeContext?.active || false,snapshot?.lifeContext?.mode || null,snapshot?.lifeContext?.startDate || null,snapshot?.lifeContext?.endDate || null],
+        postRace:[snapshot?.postRaceContext?.active || false,snapshot?.postRaceContext?.recoveryUntilDate || null],
+        execution,unplanned
+      });
+      let h1 = 2166136261, h2 = 2246822519;
+      for (let index = 0; index < raw.length; index += 1) {
+        const code = raw.charCodeAt(index);
+        h1 = Math.imul(h1 ^ code, 16777619);
+        h2 = Math.imul(h2 ^ code, 3266489917);
+      }
+      return `${raw.length}-${(h1>>>0).toString(36)}-${(h2>>>0).toString(36)}`;
+    }
+
+    function scheduleDailyPlanReview(delayMs = 500) {
+      clearTimeout(state.dailyPlanReviewTimer);
+      state.dailyPlanReviewTimer = setTimeout(() => {
+        state.dailyPlanReviewTimer = 0;
+        reviewDailyPlan().catch(error => console.warn("TALOS_DAILY_PLAN_REVIEW", error?.message || String(error)));
+      }, delayMs);
+    }
+
+    async function reviewDailyPlan({ force = false, manual = false } = {}) {
+      if (state.dailyPlanReviewRunning || state.generatingPlan || state.adaptingPlan || state.syncing) return false;
+      if (!navigator.onLine || !state.hasToken || !state.planPreferences) return false;
+      const today = todayKey();
+      const currentWeek = weekBounds(today);
+      const record = state.plans.find(item => item.weekStart === currentWeek.start && item.accepted?.plan);
+      if (!record || today < currentWeek.start || today > currentWeek.end) return false;
+
+      const snapshot = buildPlanningSnapshot(today, state.planPreferences);
+      snapshot.week = { ...currentWeek };
+      snapshot.referenceDate = today;
+      const fingerprint = dailyPlanReviewFingerprint(snapshot, record, today);
+      if (!force && state.dailyPlanReview?.date === today && state.dailyPlanReview?.weekStart === currentWeek.start && state.dailyPlanReview?.fingerprint === fingerprint) return false;
+
+      state.dailyPlanReviewRunning = true;
+      try {
+        const token = await connectionGet("accessToken");
+        const { response, payload } = await workerRequest("/plan/daily", {
+          method:"POST", token,
+          body:{ snapshot, preferences:state.planPreferences, acceptedPlan:record.accepted.plan, asOfDate:today, reviewFingerprint:fingerprint },
+          timeoutMs:18000, retries:1
+        });
+        if (!response.ok || !payload?.ok) throw new Error(payload?.error || `No se pudo revisar el día (HTTP ${response.status}).`);
+
+        const review = {
+          schemaVersion:1,
+          date:today,
+          weekStart:currentWeek.start,
+          checkedAt:payload.generatedAt || new Date().toISOString(),
+          fingerprint,
+          changed:Boolean(payload.changed),
+          mode:payload.decision?.mode || "maintain",
+          summary:payload.message || payload.decision?.summary || "El plan actual sigue siendo adecuado.",
+          confidence:payload.decision?.confidence || null,
+          reasons:safeArray(payload.reasons || payload.decision?.reasons).slice(0,5)
+        };
+
+        if (payload.changed && payload.plan) {
+          const hadDraft = Boolean(record.draft);
+          const history = safeArray(record.accepted.dailyAdaptations).slice(-13);
+          record.accepted = {
+            ...record.accepted,
+            plan:payload.plan,
+            dailyAdaptations:[...history,{
+              date:today,
+              generatedAt:review.checkedAt,
+              mode:review.mode,
+              summary:review.summary,
+              reasons:review.reasons,
+              decision:payload.decision || null
+            }]
+          };
+          record.draft = null;
+          if (state.selectedPlanDraftWeek === record.weekStart) state.selectedPlanDraftWeek = null;
+          await storeApplyAtomic({
+            puts:{
+              [DATA_STORES.plans]:[record],
+              [DATA_STORES.settings]:[{ key:"dailyPlanReview", value:review, updatedAt:new Date().toISOString() }]
+            }
+          });
+          state.plans = [...state.plans.filter(item => item.weekStart !== record.weekStart), record].sort((a,b) => a.weekStart.localeCompare(b.weekStart));
+          state.roadmapPreviewCache.clear();
+          runtimeIndex.planningUiCache = null;
+          state.dailyPlanReview = review;
+          renderChangedViews("today","plan");
+          showToast(`Ajuste diario: ${review.summary}${hadDraft ? " La propuesta pendiente se ha descartado por quedar desactualizada." : ""}`);
+          return true;
+        }
+
+        await settingSet("dailyPlanReview", review);
+        state.dailyPlanReview = review;
+        runtimeIndex.planningUiCache = null;
+        renderChangedViews("plan");
+        if (manual) showToast(review.summary);
+        return false;
+      } catch (error) {
+        if (manual) showToast(error.message || String(error), true);
+        else console.warn("TALOS_DAILY_PLAN_REVIEW", error?.message || String(error));
+        return false;
+      } finally {
+        state.dailyPlanReviewRunning = false;
+      }
+    }
+
     async function adaptCurrentWeek() {
       if (state.adaptingPlan || state.generatingPlan) return;
       if (state.syncing) return showToast("Espera a que termine la actualización antes de revisar la semana.", true);
@@ -7269,12 +7847,17 @@ function wait(milliseconds) {
       record.accepted = { ...record.draft, acceptedAt: new Date().toISOString() };
       record.draft = null;
       if (state.selectedPlanDraftWeek === weekStart) state.selectedPlanDraftWeek = null;
-      await storePut(DATA_STORES.plans, record);
+      await storeApplyAtomic({
+        puts:{ [DATA_STORES.plans]:[record] },
+        deletes:{ [DATA_STORES.settings]:["dailyPlanReview"] }
+      });
       state.roadmapPreviewCache.clear();
       state.monthCursor = dateFromKey(record.weekStart) || state.monthCursor;
       state.selectedPlanDate = record.weekStart;
+      state.dailyPlanReview = null;
       renderPlan();
       showToast("Plan aceptado y añadido al calendario local.");
+      scheduleDailyPlanReview(650);
     }
 
     async function discardDraftPlan(weekStart) {
@@ -8280,6 +8863,7 @@ function renderToday() {
       await storePut(DATA_STORES.subjective, state.subjective);
       renderToday();
       showToast("Sensaciones guardadas en este dispositivo.");
+      scheduleDailyPlanReview(650);
     }
 
 
@@ -9227,6 +9811,100 @@ function evolutionBounds() {
       return rows;
     }
 
+
+    function evolutionForecastPreferences(goal) {
+      const preferences = state.planPreferences || {};
+      const activeGoal = preferences.goal === goal;
+      return {
+        ...preferences,
+        goal,
+        targetTimeSec: activeGoal ? preferences.targetTimeSec : null,
+        targetDate: activeGoal ? preferences.targetDate : null
+      };
+    }
+
+    function evolutionTrendProfile(currentForecast, previousForecast) {
+      if (!currentForecast?.available || !isNumber(currentForecast.predictedTimeSec)) {
+        return {
+          status:"limited",
+          label:"Sin evidencia",
+          deltaSec:null,
+          deltaPercent:null,
+          amountLabel:"Sin referencia",
+          summary:"Aún no hay evidencia suficiente para medir una tendencia de rendimiento."
+        };
+      }
+      if (!previousForecast?.available || !isNumber(previousForecast.predictedTimeSec) || previousForecast.predictedTimeSec <= 0) {
+        return {
+          status:"limited",
+          label:"Referencia inicial",
+          deltaSec:null,
+          deltaPercent:null,
+          amountLabel:"Sin 28 días previos",
+          summary:"Ya existe una referencia actual, pero todavía no una comparación causal de 28 días."
+        };
+      }
+
+      const deltaSec = previousForecast.predictedTimeSec - currentForecast.predictedTimeSec;
+      const deltaPercent = (deltaSec / previousForecast.predictedTimeSec) * 100;
+      const roundedPercent = Math.round(deltaPercent * 10) / 10;
+      const meaningful = Math.abs(deltaPercent) >= .8;
+      const status = meaningful ? (deltaSec > 0 ? "improving" : "declining") : "stable";
+      const label = status === "improving" ? "Mejorando" : status === "declining" ? "Retroceso reciente" : "Estable";
+      const amount = formatTargetTime(Math.abs(deltaSec));
+      const amountLabel = status === "improving"
+        ? `${amount} más rápido`
+        : status === "declining"
+          ? `${amount} más lento`
+          : "Sin cambio relevante";
+      const summary = status === "improving"
+        ? `El pronóstico ha mejorado ${amount} en los últimos 28 días.`
+        : status === "declining"
+          ? `El pronóstico ha empeorado ${amount} en los últimos 28 días; se interpreta como tendencia reciente, no como pérdida definitiva.`
+          : "El pronóstico se mantiene dentro de una banda estable durante los últimos 28 días.";
+
+      return {
+        status,
+        label,
+        deltaSec:Math.round(deltaSec),
+        deltaPercent:roundedPercent,
+        amountLabel,
+        summary
+      };
+    }
+
+    function evolutionGoalAnswer(goalProgress, trajectory) {
+      if (goalProgress) {
+        const answer = ({
+          race_ready:"Sí",
+          on_track:"Sí",
+          building:"En proceso",
+          specificity_gap:"En proceso",
+          finishing:"En proceso",
+          capacity_gap:"Aún no",
+          protect:"En pausa",
+          recovery:"En pausa",
+          limited:"Sin evidencia"
+        })[goalProgress.status] || "En proceso";
+        return {
+          answer,
+          label:goalProgress.label || raceGoalProgressStatusLabel(goalProgress.status),
+          score:isNumber(goalProgress.score) ? goalProgress.score : null
+        };
+      }
+      if (trajectory) {
+        const answer = ["ahead","on_track"].includes(trajectory.status)
+          ? "Sí"
+          : trajectory.status === "reachable"
+            ? "En proceso"
+            : trajectory.status === "unsupported"
+              ? "Aún no"
+              : "Sin evidencia";
+        return { answer, label:trajectory.statusLabel || "Objetivo", score:null };
+      }
+      return { answer:"Sin objetivo", label:"Referencia libre", score:null };
+    }
+
     function historicalForecastSeries(start, end, goal, range = state.evolutionForecastRange || "6m") {
       const totalDays=Math.max(1,daysBetweenKeys(start,end));
       const desired=range==="7d"?8:range==="30d"?18:range==="6m"?32:range==="1y"?44:56;
@@ -9238,7 +9916,7 @@ function evolutionBounds() {
       }
       return dates.map(date=>{
         const memory=cachedPerformanceMemory(date);
-        const forecast=buildPerformanceForecast(memory,{...(state.planPreferences||{}),goal},date,causalWeeklyReviews(state.weeklyReviews,date,4));
+        const forecast=buildPerformanceForecast(memory,evolutionForecastPreferences(goal),date,causalWeeklyReviews(state.weeklyReviews,date,4));
         return {date,timeSec:forecast?.available?forecast.predictedTimeSec:null,paceSecPerKm:forecast?.available?forecast.predictedPaceSecPerKm:null};
       }).filter(row=>isNumber(row.timeSec));
     }
@@ -9307,42 +9985,149 @@ function evolutionBounds() {
     function renderEvolution() {
       const node = $("#evolutionContent");
       if (!node) return;
-      const reference=todayKey();
+
+      const reference = todayKey();
       const allRuns = indexedRunningActivitiesThrough(reference);
-      if (!allRuns.length) { node.innerHTML=emptyState("📈","Evolución pendiente","Necesito carreras sincronizadas para construir tu evolución.","sync","Actualizar"); return; }
-      const {start,end}=evolutionBounds();
-      const runs=indexedRunningActivitiesBetween(start,end);
-      const memory=cachedPerformanceMemory(reference);
-      const preferences=state.planPreferences||{};
-      const forecast=buildPerformanceForecast(memory,preferences,reference,state.weeklyReviews);
-      const pastDate=addDaysToKey(reference,-28);
-      const pastMemory=cachedPerformanceMemory(pastDate);
-      const pastForecast=buildPerformanceForecast(pastMemory,preferences,pastDate,causalWeeklyReviews(state.weeklyReviews,pastDate,4));
-      const trajectory=buildGoalTrajectory(forecast,pastForecast,preferences,reference,goalTrajectoryRunnerProfile(memory));
-      const range=state.evolutionRange||"7d";
-      const buckets=evolutionVolumeBuckets(runs,start,end,range);
-      const totalKm=runs.reduce((sum,a)=>sum+(isNumber(a.distanceM)?a.distanceM/1000:0),0);
-      const weeks=Math.max(1,(daysBetweenKeys(start,end)+1)/7);
-      const goals=["5k","10k","half_marathon","marathon"];
-      const goalLabels={"5k":"5 km","10k":"10 km",half_marathon:"Media maratón",marathon:"Maratón"};
-      const forecasts=goals.map(goal=>buildPerformanceForecast(memory,{...preferences,goal},reference,state.weeklyReviews));
-      const selectedGoal=goals.includes(state.evolutionForecastGoal)?state.evolutionForecastGoal:"5k";
-      const forecastRange=state.evolutionForecastRange||"6m";
-      const forecastBounds=forecastEvolutionBounds(forecastRange);
-      const history=historicalForecastSeries(forecastBounds.start,forecastBounds.end,selectedGoal,forecastRange);
-      const distanceRows=buckets.map(row=>({date:row.start,label:row.label,value:row.km}));
-      node.innerHTML=`<div class="evolution-clean">
-        ${trajectory?`<article class="card evolution-focus"><span class="eyebrow">Objetivo</span><h2>${escapeHtml(trajectory.statusLabel)}</h2><p>${escapeHtml(trajectory.summary)}</p><div class="evolution-goal-line"><strong>${escapeHtml(formatTargetTime(trajectory.predictedTimeSec))}</strong><span>pronóstico · objetivo ${escapeHtml(formatTargetTime(trajectory.targetTimeSec))}</span></div></article>`:""}
+      if (!allRuns.length) {
+        node.innerHTML = emptyState("📈","Evolución pendiente","Necesito carreras sincronizadas para construir tu evolución.","sync","Actualizar");
+        return;
+      }
+
+      const goals = ["5k","10k","half_marathon","marathon"];
+      const goalLabels = {"5k":"5 km","10k":"10 km",half_marathon:"Media maratón",marathon:"Maratón"};
+      const preferences = state.planPreferences || {};
+      const activeGoal = goals.includes(preferences.goal) ? preferences.goal : null;
+      const selectedGoal = goals.includes(state.evolutionForecastGoal)
+        ? state.evolutionForecastGoal
+        : activeGoal || "5k";
+
+      const memory = cachedPerformanceMemory(reference);
+      const selectedPreferences = evolutionForecastPreferences(selectedGoal);
+      const currentForecast = buildPerformanceForecast(memory,selectedPreferences,reference,state.weeklyReviews);
+      const previousDate = addDaysToKey(reference,-28);
+      const previousForecast = buildPerformanceForecast(
+        cachedPerformanceMemory(previousDate),
+        selectedPreferences,
+        previousDate,
+        causalWeeklyReviews(state.weeklyReviews,previousDate,4)
+      );
+      const trend = evolutionTrendProfile(currentForecast,previousForecast);
+
+      let planningSnapshot = null;
+      let trajectory = null;
+      let goalProgress = null;
+      if (activeGoal && selectedGoal === activeGoal) {
+        planningSnapshot = planningSnapshotForUi();
+        trajectory = planningSnapshot?.goalTrajectory || buildGoalTrajectory(
+          currentForecast,
+          previousForecast,
+          selectedPreferences,
+          reference,
+          goalTrajectoryRunnerProfile(memory)
+        );
+        goalProgress = planningSnapshot?.goalProgress || null;
+      }
+      const goalAnswer = evolutionGoalAnswer(goalProgress,trajectory);
+
+      const forecastRange = state.evolutionForecastRange || "6m";
+      const forecastBounds = forecastEvolutionBounds(forecastRange);
+      const history = historicalForecastSeries(forecastBounds.start,forecastBounds.end,selectedGoal,forecastRange);
+
+      const {start,end} = evolutionBounds();
+      const range = state.evolutionRange || "7d";
+      const runs = indexedRunningActivitiesBetween(start,end);
+      const buckets = evolutionVolumeBuckets(runs,start,end,range);
+      const distanceRows = buckets.map(row=>({date:row.start,label:row.label,value:row.km}));
+      const totalKm = runs.reduce((sum,activity)=>sum+(isNumber(activity.distanceM)?activity.distanceM/1000:0),0);
+      const weeks = Math.max(1,(daysBetweenKeys(start,end)+1)/7);
+      const weeklyAverageKm = totalKm / weeks;
+      const longestKm = runs.reduce((maximum,activity)=>Math.max(maximum,isNumber(activity.distanceM)?activity.distanceM/1000:0),0);
+
+      const trendPercentLabel = isNumber(trend.deltaPercent)
+        ? `${trend.deltaPercent > 0 ? "+" : ""}${formatNumber(trend.deltaPercent,1)} %`
+        : "28 días";
+      const currentForecastLabel = currentForecast?.available
+        ? formatTargetTime(currentForecast.predictedTimeSec)
+        : "—";
+      const currentPaceLabel = currentForecast?.available && isNumber(currentForecast.predictedPaceSecPerKm)
+        ? `${formatPace(currentForecast.predictedPaceSecPerKm)} min/km`
+        : "Sin referencia";
+      const goalDetail = goalProgress
+        ? [
+            isNumber(goalProgress.score) ? `${goalProgress.score}/100` : null,
+            isNumber(goalProgress.specificExposurePercent) ? `específico ${goalProgress.specificExposurePercent}%` : null
+          ].filter(Boolean).join(" · ")
+        : trajectory && isNumber(trajectory.gapPercent)
+          ? `${trajectory.gapPercent > 0 ? "+" : ""}${formatNumber(trajectory.gapPercent,1)} % frente al objetivo`
+          : goalAnswer.label;
+
+      const summaryParts = [trend.summary];
+      if (goalProgress?.summary) summaryParts.push(goalProgress.summary);
+      else if (trajectory?.summary) summaryParts.push(trajectory.summary);
+
+      node.innerHTML = `<div class="evolution-clean evolution-v2">
+        <article class="card evolution-focus evolution-answer">
+          <span class="eyebrow">Evolución</span>
+          <h2>${escapeHtml(trend.label)}</h2>
+          <p>${escapeHtml(summaryParts.join(" "))}</p>
+          <div class="evolution-answer-grid">
+            <div class="evolution-answer-item">
+              <span>Tendencia</span>
+              <strong>${escapeHtml(trend.label)}</strong>
+              <small>${escapeHtml(trendPercentLabel)}</small>
+            </div>
+            <div class="evolution-answer-item">
+              <span>Cambio 28 d</span>
+              <strong>${escapeHtml(trend.amountLabel)}</strong>
+              <small>${escapeHtml(currentForecast?.confidence ? `Confianza ${currentForecast.confidence === "high" ? "alta" : currentForecast.confidence === "medium" ? "media" : "limitada"}` : "Sin referencia")}</small>
+            </div>
+            <div class="evolution-answer-item">
+              <span>Objetivo</span>
+              <strong>${escapeHtml(goalAnswer.answer)}</strong>
+              <small>${escapeHtml(goalDetail || goalAnswer.label)}</small>
+            </div>
+          </div>
+          <div class="evolution-goal-line">
+            <strong>${escapeHtml(currentForecastLabel)}</strong>
+            <span>${escapeHtml(goalLabels[selectedGoal])} · ${escapeHtml(currentPaceLabel)}${activeGoal === selectedGoal && preferences.targetTimeSec ? ` · objetivo ${escapeHtml(formatTargetTime(preferences.targetTimeSec))}` : ""}</span>
+          </div>
+        </article>
+
+        <article class="card evolution-clean-card forecast-evolution-card">
+          <div class="evolution-card-head">
+            <strong>Pronóstico</strong>
+            <span class="evolution-card-note">Cómo cambia tu capacidad estimada</span>
+          </div>
+          <div class="forecast-filter-row">
+            <label class="forecast-distance-select">
+              <span>Distancia</span>
+              <select data-forecast-goal-select>
+                ${goals.map(goal=>`<option value="${goal}" ${selectedGoal===goal?"selected":""}>${goalLabels[goal]}</option>`).join("")}
+              </select>
+            </label>
+          </div>
+          <div class="evolution-controls evolution-range-controls forecast-range-controls">
+            ${[["7d","7 días"],["30d","30 días"],["6m","6 meses"],["1y","1 año"],["all","Todo"]].map(([key,label])=>`<button type="button" data-forecast-range="${key}" class="${forecastRange===key?"active":""}">${label}</button>`).join("")}
+          </div>
+          <div class="evolution-chart evolution-metric-chart forecast-history-wrap">${forecastHistorySvg(history)}</div>
+        </article>
+
         <article class="card evolution-clean-card evolution-distance-card">
-          <div class="evolution-card-head"><strong>Kilómetros</strong></div>
-          <div class="evolution-controls evolution-range-controls">${[["7d","7 días"],["30d","30 días"],["6m","6 meses"],["1y","1 año"],["all","Todo"]].map(([key,label])=>`<button type="button" data-evolution-range="${key}" class="${range===key?"active":""}">${label}</button>`).join("")}</div>
-          <div class="evolution-kpis"><div class="evolution-kpi"><span>Total</span><strong>${formatNumber(totalKm,1)} km</strong></div><div class="evolution-kpi"><span>Actividades</span><strong>${formatNumber(runs.length)}</strong></div><div class="evolution-kpi"><span>Distancia más larga</span><strong>${runs.length ? `${formatNumber(Math.max(...runs.map(a=>isNumber(a.distanceM)?a.distanceM/1000:0)),1)} km` : "—"}</strong></div></div>
+          <div class="evolution-card-head">
+            <strong>Volumen</strong>
+            <span class="evolution-card-note">Contexto, no objetivo</span>
+          </div>
+          <div class="evolution-controls evolution-range-controls">
+            ${[["7d","7 días"],["30d","30 días"],["6m","6 meses"],["1y","1 año"],["all","Todo"]].map(([key,label])=>`<button type="button" data-evolution-range="${key}" class="${range===key?"active":""}">${label}</button>`).join("")}
+          </div>
+          <div class="evolution-kpis">
+            <div class="evolution-kpi"><span>Total</span><strong>${formatNumber(totalKm,1)} km</strong></div>
+            <div class="evolution-kpi"><span>Media semanal</span><strong>${formatNumber(weeklyAverageKm,1)} km</strong></div>
+            <div class="evolution-kpi"><span>Tirada más larga</span><strong>${longestKm ? `${formatNumber(longestKm,1)} km` : "—"}</strong></div>
+          </div>
           <div class="evolution-chart evolution-metric-chart">${metricBarChartSvg(distanceRows,{range,kind:"distance"})}</div>
         </article>
-        <article class="card evolution-clean-card"><div class="evolution-card-head"><strong>Pronóstico actual</strong></div><div class="forecast-grid forecast-grid-clean">${forecasts.map((f,i)=>`<div class="forecast-card"><span>${goalLabels[goals[i]]}</span><strong>${f?.available?escapeHtml(formatTargetTime(f.predictedTimeSec)):"—"}</strong><small>${f?.available&&isNumber(f.predictedPaceSecPerKm)?`${escapeHtml(formatPace(f.predictedPaceSecPerKm))} min/km`:"Sin referencia"}</small></div>`).join("")}</div></article>
-        <article class="card evolution-clean-card forecast-evolution-card"><div class="evolution-card-head"><strong>Evolución del pronóstico</strong></div><div class="forecast-filter-row"><label class="forecast-distance-select"><span>Distancia</span><select data-forecast-goal-select>${goals.map(goal=>`<option value="${goal}" ${selectedGoal===goal?"selected":""}>${goalLabels[goal]}</option>`).join("")}</select></label></div><div class="evolution-controls evolution-range-controls forecast-range-controls">${[["7d","7 días"],["30d","30 días"],["6m","6 meses"],["1y","1 año"],["all","Todo"]].map(([key,label])=>`<button type="button" data-forecast-range="${key}" class="${forecastRange===key?"active":""}">${label}</button>`).join("")}</div><div class="evolution-chart evolution-metric-chart forecast-history-wrap">${forecastHistorySvg(history)}</div></article>
       </div>`;
-
     }
 
     async function saveAthleteProfile(event) {
@@ -9670,6 +10455,283 @@ function evolutionBounds() {
       return activity?{activityId:String(activity.id),date:activityDateKey(activity),distanceKm:activity.distanceM/1000}:null;
     }
 
+
+    function dataDiagnosticIssue(code, severity, scopes, title, detail) {
+      return {
+        code,
+        severity,
+        scopes:safeArray(scopes),
+        title:String(title || ""),
+        detail:String(detail || "")
+      };
+    }
+
+    function dataDiagnosticScopeLabel(scopes) {
+      const set = new Set(safeArray(scopes));
+      if (set.has("readiness") && set.has("plan")) return "Estado TɅLOS y Plan";
+      if (set.has("forecast") && set.has("plan")) return "Pronóstico y Plan";
+      if (set.has("forecast")) return "Pronóstico";
+      if (set.has("readiness")) return "Estado TɅLOS";
+      if (set.has("plan")) return "Plan";
+      if (set.has("records")) return "Mejores marcas";
+      return "Datos";
+    }
+
+    function strongNearDuplicateActivities(referenceDate = todayKey()) {
+      const start = addDaysToKey(referenceDate,-89);
+      const rows = indexedActivitiesBetween(start,referenceDate);
+      const byDay = new Map();
+      for (const activity of rows) {
+        const date = activityDateKey(activity);
+        if (!date) continue;
+        if (!byDay.has(date)) byDay.set(date,[]);
+        byDay.get(date).push(activity);
+      }
+
+      const duplicates = [];
+      for (const dayRows of byDay.values()) {
+        for (let i=0;i<dayRows.length;i+=1) {
+          const left = dayRows[i];
+          const leftStart = Date.parse(left.start?.utc || left.start?.local || "");
+          const leftDistance = Number(left.distanceM);
+          const leftDuration = Number(activityDuration(left));
+          if (!Number.isFinite(leftStart) || !Number.isFinite(leftDistance) || !Number.isFinite(leftDuration)) continue;
+
+          for (let j=i+1;j<dayRows.length;j+=1) {
+            const right = dayRows[j];
+            if (String(left.type || "").toLowerCase() !== String(right.type || "").toLowerCase()) continue;
+            const rightStart = Date.parse(right.start?.utc || right.start?.local || "");
+            const rightDistance = Number(right.distanceM);
+            const rightDuration = Number(activityDuration(right));
+            if (!Number.isFinite(rightStart) || !Number.isFinite(rightDistance) || !Number.isFinite(rightDuration)) continue;
+
+            const startDelta = Math.abs(leftStart-rightStart)/1000;
+            const distanceTolerance = Math.max(30,Math.min(leftDistance,rightDistance)*.003);
+            if (
+              startDelta <= 90
+              && Math.abs(leftDistance-rightDistance) <= distanceTolerance
+              && Math.abs(leftDuration-rightDuration) <= 15
+            ) {
+              duplicates.push([left,right]);
+            }
+          }
+        }
+      }
+      return duplicates;
+    }
+
+    function buildDecisionDataDiagnostics(referenceDate = todayKey()) {
+      ensureActivityRuntimeIndex();
+      ensureWellnessRuntimeIndex();
+
+      const issues = [];
+      const now = new Date();
+      const localHour = now.getHours();
+      const activePreparation = Boolean(state.planPreferences);
+      const currentWeek = weekBounds(referenceDate);
+      const currentRecord = state.plans.find(record =>
+        record.weekStart === currentWeek.start && record.accepted?.plan
+      ) || null;
+      const plannedToday = currentRecord?.accepted?.plan?.days?.find(day =>
+        day.date === referenceDate && day.sport !== "rest"
+      ) || null;
+
+      if (state.lastSyncStatus?.complete === false) {
+        const warning = safeArray(state.lastSyncStatus.warnings).find(Boolean);
+        issues.push(dataDiagnosticIssue(
+          "sync_incomplete","warning",["readiness","plan","forecast"],
+          "Actualización incompleta",
+          warning ? String(warning).slice(0,180) : "La última sincronización no confirmó todos los bloques solicitados."
+        ));
+      }
+
+      const futureActivityStart = sortedKeyUpperBound(runtimeIndex.activityDateKeys,referenceDate);
+      const futureActivities = runtimeIndex.datedActivities.slice(futureActivityStart);
+      if (futureActivities.length) {
+        issues.push(dataDiagnosticIssue(
+          "future_activity","warning",["plan","forecast"],
+          "Actividad con fecha futura",
+          `${futureActivities.length} actividad/es aparecen después de ${formatDate(referenceDate,{day:"numeric",month:"short"})}. Se excluyen de los cálculos causales, pero conviene revisar la fecha de origen.`
+        ));
+      }
+
+      const futureWellnessStart = sortedDateUpperBound(state.wellness,referenceDate,true);
+      const futureWellness = state.wellness.slice(futureWellnessStart);
+      if (futureWellness.length) {
+        issues.push(dataDiagnosticIssue(
+          "future_wellness","warning",["readiness","plan"],
+          "Salud con fecha futura",
+          `${futureWellness.length} día/s de bienestar tienen una fecha posterior a hoy y no deben influir en la recuperación actual.`
+        ));
+      }
+
+      const todayWellness = indexedWellnessForDate(referenceDate);
+      if (!todayWellness && localHour >= 6 && (plannedToday || activePreparation)) {
+        issues.push(dataDiagnosticIssue(
+          "today_wellness_missing","limited",["readiness","plan"],
+          "Faltan los datos de salud de hoy",
+          plannedToday
+            ? "Hay entrenamiento previsto hoy; TɅLOS conserva las restricciones existentes, pero la adaptación diaria tiene menos evidencia."
+            : "La preparación está activa, pero el Estado TɅLOS de hoy no dispone todavía de bienestar sincronizado."
+        ));
+      }
+
+      const completedCoverageEnd = todayWellness ? referenceDate : addDaysToKey(referenceDate,-1);
+      const recentSeven = wellnessRange(addDaysToKey(completedCoverageEnd,-6),completedCoverageEnd);
+      if (activePreparation && recentSeven.length < 5) {
+        issues.push(dataDiagnosticIssue(
+          "recent_wellness_sparse","limited",["readiness","plan"],
+          "Cobertura reciente insuficiente",
+          `Sólo hay ${recentSeven.length}/7 días recientes de salud. La carga deportiva sigue disponible, pero la personalización fisiológica pierde precisión.`
+        ));
+      }
+
+      const recent28 = wellnessRange(addDaysToKey(referenceDate,-27),referenceDate);
+      const impossibleWellness = recent28.filter(item => {
+        const sleep = item.recovery?.sleepSeconds;
+        const hrv = item.recovery?.hrvRmssdMs;
+        const rhr = item.recovery?.restingHeartRateBpm;
+        const score = item.recovery?.sleepScore;
+        return (isNumber(sleep) && (sleep < 0 || sleep > 86400))
+          || (isNumber(hrv) && (hrv <= 0 || hrv > 500))
+          || (isNumber(rhr) && (rhr < 25 || rhr > 220))
+          || (isNumber(score) && (score < 0 || score > 100));
+      });
+      if (impossibleWellness.length) {
+        issues.push(dataDiagnosticIssue(
+          "wellness_outlier","warning",["readiness","plan"],
+          "Valor fisiológico incoherente",
+          `${impossibleWellness.length} día/s recientes contienen un valor fuera de los límites fisiológicos aceptados por el diagnóstico.`
+        ));
+      }
+
+      const recentRuns = indexedRunningActivitiesBetween(addDaysToKey(referenceDate,-41),referenceDate);
+      const incompleteRuns = recentRuns.filter(activity =>
+        !isNumber(activity.distanceM)
+        || activity.distanceM <= 0
+        || !isNumber(activityDuration(activity))
+        || activityDuration(activity) <= 0
+      );
+      if (incompleteRuns.length) {
+        issues.push(dataDiagnosticIssue(
+          "run_core_missing","limited",["forecast","plan"],
+          "Carrera reciente incompleta",
+          `${incompleteRuns.length} carrera/s de las últimas 6 semanas no tienen distancia o duración utilizable; se reduce la evidencia de rendimiento.`
+        ));
+      }
+
+      const nearDuplicates = strongNearDuplicateActivities(referenceDate);
+      if (nearDuplicates.length) {
+        issues.push(dataDiagnosticIssue(
+          "near_duplicate_activity","warning",["forecast","plan"],
+          "Posible actividad duplicada",
+          `${nearDuplicates.length} pareja/s reciente/s son casi idénticas en hora, distancia y duración. TɅLOS no las elimina automáticamente porque no son duplicados exactos.`
+        ));
+      }
+
+      const acceptedPlans = state.plans
+        .map(record => record.accepted?.plan)
+        .filter(plan => plan?.weekEnd >= addDaysToKey(referenceDate,-7));
+      let duplicatePlanDates = 0;
+      let planDateErrors = 0;
+      for (const plan of acceptedPlans) {
+        const seen = new Set();
+        for (const day of safeArray(plan.days)) {
+          if (!day?.date) continue;
+          if (day.date < plan.weekStart || day.date > plan.weekEnd) planDateErrors += 1;
+          if (day.sport === "rest") continue;
+          if (seen.has(day.date)) duplicatePlanDates += 1;
+          else seen.add(day.date);
+        }
+      }
+      if (duplicatePlanDates || planDateErrors) {
+        issues.push(dataDiagnosticIssue(
+          "plan_structure","warning",["plan"],
+          "Plan almacenado inconsistente",
+          [
+            duplicatePlanDates ? `${duplicatePlanDates} día/s contienen más de una sesión.` : null,
+            planDateErrors ? `${planDateErrors} sesión/es quedan fuera de los límites de su semana.` : null
+          ].filter(Boolean).join(" ")
+        ));
+      }
+
+      const highestSeverity = issues.some(issue => issue.severity === "warning")
+        ? "warning"
+        : issues.length ? "limited" : "ok";
+      const scopes = {
+        readiness:issues.filter(issue => issue.scopes.includes("readiness")),
+        plan:issues.filter(issue => issue.scopes.includes("plan")),
+        forecast:issues.filter(issue => issue.scopes.includes("forecast")),
+        records:issues.filter(issue => issue.scopes.includes("records"))
+      };
+
+      return {
+        status:highestSeverity,
+        issues,
+        scopes,
+        exactMirrorsIgnored:Object.keys(state.activityAliases || {}).length,
+        affectedCalculations:[...new Set(issues.flatMap(issue => issue.scopes))],
+        checkedAt:new Date().toISOString()
+      };
+    }
+
+    async function refreshStreamDiagnostics() {
+      if (state.streamDiagnostics || state.streamDiagnosticsLoading) return state.streamDiagnostics;
+      state.streamDiagnosticsLoading = true;
+      try {
+        const caches = await storeGetAll(DATA_STORES.streams);
+        let partial = 0;
+        let stale = 0;
+        let malformed = 0;
+        let orphan = 0;
+        for (const cache of caches) {
+          const activity = indexedActivity(cache?.id);
+          if (!activity) orphan += 1;
+          if (!cache?.streams) {
+            malformed += 1;
+            continue;
+          }
+          if (cache.cacheVersion !== STREAM_CACHE_VERSION) stale += 1;
+          const streams = streamMap(cache.streams);
+          if (
+            activity
+            && activity.streamTypes?.includes("latlng")
+            && (!streams.has("latlng") || extractCoordinates(streams.get("latlng")).length < 2)
+          ) partial += 1;
+        }
+        state.streamDiagnostics = {
+          cached:caches.length,
+          partial,
+          stale,
+          malformed,
+          orphan,
+          /* Parciales y versiones antiguas son autocurables al abrir la actividad.
+             No se muestran como incidencia deportiva porque no alteran Plan/Estado/pronóstico. */
+          decisionImpact:false
+        };
+      } catch (error) {
+        console.warn("TALOS_STREAM_DIAGNOSTICS",error?.message || String(error));
+        state.streamDiagnostics = { cached:0,partial:0,stale:0,malformed:0,orphan:0,decisionImpact:false,error:true };
+      } finally {
+        state.streamDiagnosticsLoading = false;
+      }
+      if (state.activeView === "manage") renderManage();
+      return state.streamDiagnostics;
+    }
+
+    function dataDiagnosticsMarkup(diagnostics) {
+      if (!diagnostics?.issues?.length) return "";
+      const rows = diagnostics.issues.map(issue => `
+        <div class="data-subrow">
+          <span>${issue.severity === "warning" ? "⚠️" : "◉"} ${escapeHtml(issue.title)}</span>
+          <strong>${escapeHtml(dataDiagnosticScopeLabel(issue.scopes))}<small>${escapeHtml(issue.detail)}</small></strong>
+        </div>`).join("");
+      return `<details class="data-hub-section data-diagnostic-section">
+        <summary><span>⚠️ Integridad de datos · ${diagnostics.issues.length}</span><b>›</b></summary>
+        <div class="data-hub-body">${rows}</div>
+      </details>`;
+    }
+
     function recordButton(label,record,value) {
       if(!record) return `<div class="data-subrow"><span>${label}</span><strong>—</strong></div>`;
       return `<button class="data-record-button" type="button" data-record-activity="${escapeHtml(record.activityId)}"><span>${label}</span><strong>${value}<small>${escapeHtml(formatDate(record.date,{day:"numeric",month:"short",year:"numeric"}))}</small></strong></button>`;
@@ -9677,6 +10739,8 @@ function evolutionBounds() {
 
     function renderManage() {
       refreshExactBestRecords();
+      if (!state.streamDiagnostics && !state.streamDiagnosticsLoading) refreshStreamDiagnostics();
+      const dataDiagnostics=buildDecisionDataDiagnostics(todayKey());
       const acceptedPlanCount=state.plans.reduce((total,record)=>total+(record.accepted?.plan?.days||[]).filter(day=>day.sport!=="rest").length,0);
       const longest=longestRunRecord();
       const records=[
@@ -9693,6 +10757,7 @@ function evolutionBounds() {
         <details class="data-hub-section"><summary><span>👟 Zapatillas</span><b>›</b></summary><div class="data-hub-body data-shoes-body">${shoeInventoryMarkup()}</div></details>
         <details class="data-hub-section"><summary><span>🎯 Objetivo y contexto</span><b>›</b></summary><div class="data-hub-body"><div class="data-subrow"><span>Objetivo</span><strong>${escapeHtml(goalLabel(state.planPreferences?.goal||"base"))}</strong></div><div class="data-subrow"><span>Zona horaria</span><strong>Automática<small>${escapeHtml(TIME_ZONE)}</small></strong></div></div></details>
         <details class="data-hub-section"><summary><span>🔗 Conexión e IA</span><b>›</b></summary><div class="data-hub-body"><div class="data-subrow"><span>Datos</span><strong>Intervals.icu</strong></div><div class="data-subrow"><span>IA</span><strong>Claude Sonnet 5 · bajo demanda</strong></div>${state.lastAiUsage?.estimatedCostCents?`<div class="data-subrow"><span>Última llamada IA</span><strong>${formatAiCost(state.lastAiUsage.estimatedCostCents)}</strong></div>`:""}<div class="button-row compact-actions"><button class="primary-button compact-button" data-manage-sync>Actualizar</button><button class="secondary-button compact-button" data-configure>Conexión</button><button class="secondary-button compact-button" data-open-chat>Preguntar</button></div></div></details>
+        ${dataDiagnosticsMarkup(dataDiagnostics)}
         <details class="data-hub-section"><summary><span>🗄️ Base de datos</span><b>›</b></summary><div class="data-hub-body"><div class="manage-stats"><div class="manage-stat"><strong>${formatNumber(state.activities.length)}</strong><span>Actividades</span></div><div class="manage-stat"><strong>${formatNumber(state.wellness.length)}</strong><span>Días</span></div><div class="manage-stat"><strong>${formatNumber(state.calendar.length+acceptedPlanCount)}</strong><span>Planes</span></div></div><div class="button-row compact-actions database-actions"><button class="secondary-button compact-button" data-export>⬆️ Exportar</button><button class="secondary-button compact-button" data-import>⬇️ Importar</button><button class="secondary-button compact-button" data-rebuild>🔄 Reconstruir</button></div></div></details>
         <details class="data-hub-section"><summary><span>⚙️ Sistema</span><b>›</b></summary><div class="data-hub-body"><div class="data-subrow"><span>Versión</span><strong>${escapeHtml(APP_VERSION)}</strong></div><div class="button-row compact-actions"><button class="secondary-button compact-button" data-download-worker>Comprobar Worker</button><button class="activity-cancel-button compact-button" data-clear>Vaciar datos locales</button></div></div></details>
       </div>`;
@@ -9776,7 +10841,17 @@ function evolutionBounds() {
         recentRuns,
         relevantHistoricalRuns: talosChatRelevantHistory(query),
         currentPlan: currentPlan ? { weekStart:currentPlan.weekStart, weekEnd:currentPlan.weekEnd, objective:currentPlan.objective, days:currentPlan.days } : null,
-        recentWeeklyReviews: recentWeeklyReviewMemory(today, 4)
+        recentWeeklyReviews: recentWeeklyReviewMemory(today, 4),
+        dataQuality: (() => {
+          const diagnostics = buildDecisionDataDiagnostics(today);
+          return diagnostics.issues.length ? {
+            status:diagnostics.status,
+            issues:diagnostics.issues.slice(0,4).map(issue => ({
+              title:issue.title,
+              affects:dataDiagnosticScopeLabel(issue.scopes)
+            }))
+          } : null;
+        })()
       };
     }
 
@@ -9847,6 +10922,7 @@ function evolutionBounds() {
 
     async function syncNow({ manual = false } = {}) {
       if (state.syncing) return;
+      let syncCompleted = false;
       if (state.generatingPlan || state.adaptingPlan) {
         if (manual) showToast("Espera a que termine la operación del plan antes de actualizar.", true);
         return;
@@ -9871,6 +10947,7 @@ function evolutionBounds() {
         if (!response.ok || !payload.ok) throw new Error(payload.error || (payload.warnings || []).join(" ") || `No se pudo actualizar (HTTP ${response.status}).`);
         const result = await persistSyncPayload(payload);
         state.hasToken = true;
+        syncCompleted = true;
         await hydrateRecentActivityVo2Max(todayKey());
         renderAll();
         const summary = `${result.activityCount} actividades y ${result.wellnessCount} días revisados`;
@@ -9883,6 +10960,7 @@ function evolutionBounds() {
         setSyncing(false);
         syncControlState();
       }
+      if (syncCompleted) await reviewDailyPlan({ manual:false });
     }
 
     function dateKeyUtc(date) {
@@ -10197,16 +11275,47 @@ function evolutionBounds() {
       if (state.activityEditSession?.activityId === id) return state.activityEditSession.analysis || null;
       return state.analyses.find(item => item.activityId === id) || null;
     }
-function activityAnalysisMarkup(activity) {
-      const record=activityAnalysisRecord(activity.id); const analysis=record?.analysis;
-      if (!analysis) return `<div class="activity-analysis-head"><strong>✦ Análisis TɅLOS</strong><span class="analysis-badge">IA opcional</span></div><p>Analiza qué estímulo produjo esta carrera, su utilidad, intensidad, beneficios y qué conviene mejorar. El plan, si existe, es sólo contexto.</p><button class="secondary-button" type="button" data-analyze-activity="${escapeHtml(activity.id)}">Analizar actividad</button>`;
-      const intensity=({muy_suave:"Muy suave",suave:"Suave",moderada:"Moderada",exigente:"Exigente",muy_exigente:"Muy exigente"})[analysis.intensityLabel]||"Analizada";
-      const usefulness=({alta:"Alta",media:"Media",baja:"Baja",incierta:"Incierta"})[analysis.usefulness]||"—";
-      const outdated=(record?.analysisVersion||record?.model)!==ACTIVITY_ANALYSIS_MODEL && !String(record?.model||"").startsWith("claude-sonnet-5");
-      const cost=isNumber(record?.usage?.estimatedCostCents)?` · ${formatAiCost(record.usage.estimatedCostCents)}`:"";
-      return `<div class="activity-analysis-head"><strong>✦ Análisis TɅLOS</strong><span class="analysis-badge">${escapeHtml(intensity)}</span></div><p class="analysis-lead">${escapeHtml(analysis.summary||"Sesión analizada.")}</p><div class="analysis-meaning-grid"><div><span>Estímulo</span><strong>${escapeHtml(analysis.purpose||"—")}</strong></div><div><span>Utilidad</span><strong>${escapeHtml(usefulness)}</strong></div></div>${(analysis.benefits||[]).length?`<div class="analysis-block"><span>Qué te aporta</span>${analysis.benefits.slice(0,3).map(x=>`<p>• ${escapeHtml(x)}</p>`).join("")}</div>`:""}${(analysis.improvements||[]).length?`<div class="analysis-block"><span>Qué mejoraría</span>${analysis.improvements.slice(0,3).map(x=>`<p>• ${escapeHtml(x)}</p>`).join("")}</div>`:""}${analysis.recoveryImpact?`<p class="analysis-next"><strong>Recuperación:</strong> ${escapeHtml(analysis.recoveryImpact)}</p>`:""}${analysis.nextAction?`<p class="analysis-next"><strong>Siguiente paso:</strong> ${escapeHtml(analysis.nextAction)}</p>`:""}${analysis.planContext?`<p class="analysis-plan-context">Plan · ${escapeHtml(analysis.planContext)}</p>`:""}<p class="draft-ai-meta">${record?.provider==="anthropic"?"Claude Sonnet 5":"Motor TɅLOS"}${cost}${outdated?" · análisis anterior":""}</p><button class="secondary-button" type="button" data-analyze-activity="${escapeHtml(activity.id)}">${outdated?"Actualizar análisis":"Reanalizar"}</button>`;
+function activityTrainingEffectLabel(value) {
+      return ({
+        recovery:"Recuperación",
+        base:"Base aeróbica",
+        durability:"Durabilidad",
+        steady_state:"Resistencia sostenida",
+        threshold:"Umbral",
+        high_intensity:"Alta intensidad",
+        hill_strength:"Fuerza en carrera",
+        race_specific:"Específica de competición"
+      })[value] || "Estímulo general";
     }
 
+    function activityRecoveryCostLabel(value) {
+      return ({low:"Bajo",moderate:"Moderado",high:"Alto",very_high:"Muy alto",unknown:"Sin confirmar"})[value] || "Sin confirmar";
+    }
+
+    function activityEffectQualityLabel(value) {
+      return ({
+        productive:"Productiva",
+        productive_costly:"Productiva, costosa",
+        limited:"Estímulo limitado",
+        excessive:"Excesiva",
+        uncertain:"Evidencia limitada"
+      })[value] || "Evidencia limitada";
+    }
+
+function activityAnalysisMarkup(activity) {
+      const record=activityAnalysisRecord(activity.id); const analysis=record?.analysis;
+      if (!analysis) return `<div class="activity-analysis-head"><strong>✦ Análisis TɅLOS</strong><span class="analysis-badge">IA opcional</span></div><p>Analiza qué adaptación produjo realmente esta sesión, cuánto costó recuperarla y qué debe aprender TɅLOS de ella. El plan, si existe, es sólo contexto.</p><button class="secondary-button" type="button" data-analyze-activity="${escapeHtml(activity.id)}">Analizar actividad</button>`;
+      const intensity=({muy_suave:"Muy suave",suave:"Suave",moderada:"Moderada",exigente:"Exigente",muy_exigente:"Muy exigente"})[analysis.intensityLabel]||"Analizada";
+      const usefulness=({alta:"Alta",media:"Media",baja:"Baja",incierta:"Incierta"})[analysis.usefulness]||"—";
+      const effect=analysis.trainingEffect||null;
+      const outdated=String(record?.analysisVersion||"")!==ACTIVITY_ANALYSIS_MODEL;
+      const cost=isNumber(record?.usage?.estimatedCostCents)?` · ${formatAiCost(record.usage.estimatedCostCents)}`:"";
+      const effectGrid=effect?`<div class="analysis-meaning-grid"><div><span>Adaptación</span><strong>${escapeHtml(activityTrainingEffectLabel(effect.primaryAdaptation))}</strong></div><div><span>Coste</span><strong>${escapeHtml(activityRecoveryCostLabel(effect.recoveryCostLabel))}</strong></div></div>`:"";
+      const objectiveContribution=effect&&isNumber(effect.specificContributionPercent)?`<p class="analysis-next"><strong>Aporte al objetivo:</strong> ${Math.round(effect.specificContributionPercent)} % · ${escapeHtml(activityEffectQualityLabel(effect.quality))}</p>`:"";
+      const learningText=analysis.learning||effect?.learningSummary||null;
+      const adaptationText=analysis.adaptation||effect?.adaptationSummary||null;
+      return `<div class="activity-analysis-head"><strong>✦ Análisis TɅLOS</strong><span class="analysis-badge">${escapeHtml(intensity)}</span></div><p class="analysis-lead">${escapeHtml(analysis.summary||"Sesión analizada.")}</p><div class="analysis-meaning-grid"><div><span>Estímulo</span><strong>${escapeHtml(analysis.purpose||"—")}</strong></div><div><span>Utilidad</span><strong>${escapeHtml(usefulness)}</strong></div></div>${effectGrid}${adaptationText?`<div class="analysis-block"><span>Adaptación conseguida</span><p>${escapeHtml(adaptationText)}</p></div>`:""}${(analysis.benefits||[]).length?`<div class="analysis-block"><span>Qué te aporta</span>${analysis.benefits.slice(0,3).map(x=>`<p>• ${escapeHtml(x)}</p>`).join("")}</div>`:""}${(analysis.improvements||[]).length?`<div class="analysis-block"><span>Qué mejoraría</span>${analysis.improvements.slice(0,3).map(x=>`<p>• ${escapeHtml(x)}</p>`).join("")}</div>`:""}${analysis.recoveryImpact?`<p class="analysis-next"><strong>Recuperación:</strong> ${escapeHtml(analysis.recoveryImpact)}</p>`:""}${objectiveContribution}${learningText?`<p class="analysis-next"><strong>Aprendizaje TɅLOS:</strong> ${escapeHtml(learningText)}</p>`:""}${analysis.nextAction?`<p class="analysis-next"><strong>Siguiente paso:</strong> ${escapeHtml(analysis.nextAction)}</p>`:""}${analysis.planContext?`<p class="analysis-plan-context">Plan · ${escapeHtml(analysis.planContext)}</p>`:""}<p class="draft-ai-meta">${record?.provider==="anthropic"?"Claude Sonnet 5":"Motor TɅLOS"}${cost}${outdated?" · análisis anterior":""}</p><button class="secondary-button" type="button" data-analyze-activity="${escapeHtml(activity.id)}">${outdated?"Actualizar análisis":"Reanalizar"}</button>`;
+    }
 
 
     function activityRecoveryContext(date) {
@@ -10233,7 +11342,7 @@ function activityAnalysisMarkup(activity) {
     }
 function buildActivityReviewRequest(activity) {
       const date=activityDateKey(activity); const planned=plannedDayForActivity(activity); const memory=cachedPerformanceMemory(date); const recentStart=addDaysToKey(date,-27); const recentRuns=indexedRunningActivitiesBetween(recentStart,date); const zoneTimes=(activity.heartRate?.zoneTimesSec||[]).filter(isNumber); const zoneTotal=zoneTimes.reduce((s,v)=>s+Math.max(0,v),0); const highZone=zoneTimes.length>=4?zoneTimes.slice(3).reduce((s,v)=>s+Math.max(0,v),0):0;
-      return {schemaVersion:"talos-activity-review-4",athleteId:state.athleteProfile?.id||null,athlete:athleteContext(),activity:{id:String(activity.id),date,sport:isRunningActivity(activity)?"run":String(activity.type||"other").slice(0,24),name:String(activity.name||"Actividad").slice(0,120),distanceKm:isNumber(activity.distanceM)?Math.round(activity.distanceM/100)/10:null,durationMin:isNumber(activityDuration(activity))?Math.round(activityDuration(activity)/6)/10:null,paceSecPerKm:activity.movingPaceSecPerKm??null,averageHeartRateBpm:activity.heartRate?.averageBpm??null,maxHeartRateBpm:activity.heartRate?.maxBpm??null,thresholdHeartRateBpm:activity.heartRate?.thresholdBpm??null,athleteMaxHeartRateBpm:activity.heartRate?.athleteMaxBpm??null,trainingLoad:activity.load?.trainingLoad??null,trimp:activity.load?.trimp??null,intensity:activity.load?.intensity??null,effortRpe:activity.perception?.effortRpe??null,feel:activity.perception?.feel??null,feelLabel:activity.perception?.feelLabel||intervalsFeelText(activity.perception?.feel)||null,race:activityIsCompetition(activity),cadenceSpm:activity.runningDynamics?.averageCadenceSpm??null,averagePowerWatts:activity.power?.averageWatts??null,weightedPowerWatts:activity.power?.weightedAverageWatts??null,temperatureC:activity.temperature?.averageC??null,highZoneShare:zoneTotal>0?highZone/zoneTotal:null,intervals:(activity.intervals||[]).slice(0,60).map(interval=>({label:interval.label||interval.type||null,distanceKm:isNumber(interval.distanceM)?Math.round(interval.distanceM/100)/10:null,durationMin:isNumber(interval.movingSec??interval.elapsedSec)?Math.round((interval.movingSec??interval.elapsedSec)/6)/10:null,paceSecPerKm:interval.paceSecPerKm??null,averageHeartRateBpm:interval.heartRate?.averageBpm??null,maxHeartRateBpm:interval.heartRate?.maxBpm??null,cadenceSpm:interval.cadence?.averageSpm??null,intensity:interval.intensity??null}))},planned:planned?{date:planned.date,sport:planned.sport,sessionType:planned.sessionType,title:planned.title,distanceKm:planned.distanceKm,distanceFlexible:Boolean(planned.distanceFlexible),durationMin:planned.durationMin,intensity:planned.intensity,steps:planned.steps||[]}:null,recovery:activityRecoveryContext(date),performanceMemory:memory,recentContext:{runs28:recentRuns.length,distance28Km:Math.round(recentRuns.reduce((sum,a)=>sum+(isNumber(a.distanceM)?a.distanceM/1000:0),0)*10)/10,medianPace28SecPerKm:median(recentRuns.map(a=>a.movingPaceSecPerKm).filter(isNumber)),medianLoad28:median(recentRuns.map(a=>a.load?.trainingLoad).filter(isNumber)),longest28Km:Math.round(Math.max(0,...recentRuns.map(a=>isNumber(a.distanceM)?a.distanceM/1000:0))*10)/10}};
+      return {schemaVersion:"talos-activity-review-5",athleteId:state.athleteProfile?.id||null,athlete:athleteContext(),activity:{id:String(activity.id),date,sport:isRunningActivity(activity)?"run":String(activity.type||"other").slice(0,24),name:String(activity.name||"Actividad").slice(0,120),distanceKm:isNumber(activity.distanceM)?Math.round(activity.distanceM/100)/10:null,durationMin:isNumber(activityDuration(activity))?Math.round(activityDuration(activity)/6)/10:null,paceSecPerKm:activity.movingPaceSecPerKm??null,averageHeartRateBpm:activity.heartRate?.averageBpm??null,maxHeartRateBpm:activity.heartRate?.maxBpm??null,thresholdHeartRateBpm:activity.heartRate?.thresholdBpm??null,athleteMaxHeartRateBpm:activity.heartRate?.athleteMaxBpm??null,trainingLoad:activity.load?.trainingLoad??null,trimp:activity.load?.trimp??null,intensity:activity.load?.intensity??null,effortRpe:activity.perception?.effortRpe??null,feel:activity.perception?.feel??null,feelLabel:activity.perception?.feelLabel||intervalsFeelText(activity.perception?.feel)||null,race:activityIsCompetition(activity),cadenceSpm:activity.runningDynamics?.averageCadenceSpm??null,averagePowerWatts:activity.power?.averageWatts??null,weightedPowerWatts:activity.power?.weightedAverageWatts??null,temperatureC:activity.temperature?.averageC??null,highZoneShare:zoneTotal>0?highZone/zoneTotal:null,intervals:(activity.intervals||[]).slice(0,60).map(interval=>({label:interval.label||interval.type||null,distanceKm:isNumber(interval.distanceM)?Math.round(interval.distanceM/100)/10:null,durationMin:isNumber(interval.movingSec??interval.elapsedSec)?Math.round((interval.movingSec??interval.elapsedSec)/6)/10:null,paceSecPerKm:interval.paceSecPerKm??null,averageHeartRateBpm:interval.heartRate?.averageBpm??null,maxHeartRateBpm:interval.heartRate?.maxBpm??null,cadenceSpm:interval.cadence?.averageSpm??null,intensity:interval.intensity??null}))},planned:planned?{date:planned.date,sport:planned.sport,sessionType:planned.sessionType,title:planned.title,distanceKm:planned.distanceKm,distanceFlexible:Boolean(planned.distanceFlexible),durationMin:planned.durationMin,intensity:planned.intensity,steps:planned.steps||[]}:null,goalContext:state.planPreferences&&["5k","10k","half_marathon","marathon"].includes(state.planPreferences.goal)?{goal:state.planPreferences.goal,targetDate:state.planPreferences.targetDate||null,targetTimeSec:state.planPreferences.targetTimeSec??null}:null,recovery:activityRecoveryContext(date),performanceMemory:memory,recentContext:{runs28:recentRuns.length,distance28Km:Math.round(recentRuns.reduce((sum,a)=>sum+(isNumber(a.distanceM)?a.distanceM/1000:0),0)*10)/10,medianPace28SecPerKm:median(recentRuns.map(a=>a.movingPaceSecPerKm).filter(isNumber)),medianLoad28:median(recentRuns.map(a=>a.load?.trainingLoad).filter(isNumber)),longest28Km:Math.round(Math.max(0,...recentRuns.map(a=>isNumber(a.distanceM)?a.distanceM/1000:0))*10)/10}};
     }
 
 
@@ -10272,6 +11381,7 @@ function buildActivityReviewRequest(activity) {
           panel.innerHTML = activityAnalysisMarkup(activity);
           }
         if (!silent) showToast("Análisis de la sesión actualizado.");
+        if (!(state.activityEditSession?.activityId === record.activityId && !silent)) scheduleDailyPlanReview(650);
         return true;
       } catch (error) {
         if (!silent) {
@@ -10408,6 +11518,7 @@ function buildActivityReviewRequest(activity) {
       closeDialog($("#activityDialog"));
       renderChangedViews("activities","plan","evolution","manage");
       showToast("Cambios de la actividad guardados.");
+      scheduleDailyPlanReview(650);
     }
 
     function cancelActivityEdits() {
