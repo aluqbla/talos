@@ -1985,6 +1985,283 @@ select option{background:#1c1c1e !important;color:#fff !important;}
   .evolution-answer-item small{font-size:.54rem;}
   .evolution-card-note{display:none;}
 }
+
+/* TɅLOS 2.3.0 · Refinamiento visual
+   Jerarquía más clara, menos cajas anidadas y cabecera adaptable. */
+:root{
+  --type-micro:.58rem;
+  --type-caption:.66rem;
+  --type-body:.76rem;
+  --type-body-strong:.82rem;
+  --type-subtitle:1rem;
+  --type-title:1.28rem;
+  --surface-primary:rgba(28,28,30,.40);
+  --surface-secondary:rgba(255,255,255,.032);
+  --surface-interactive:rgba(10,132,255,.12);
+  --hairline:rgba(255,255,255,.085);
+}
+
+/* Tipografía: menos escalones y menos ruido visual. */
+body{font-size:14px !important;}
+.eyebrow,
+.activity-stat-label,
+.planning-metric span,
+.evolution-kpi span,
+.manage-stat span,
+.detail-item span,
+.hero-stat span,
+.metric-detail-stat span{
+  font-size:var(--type-micro) !important;
+  text-transform:none !important;
+  letter-spacing:0 !important;
+}
+.section-heading h2,
+.planning-head h2,
+.evolution-focus h2{font-size:var(--type-title) !important;font-weight:690 !important;letter-spacing:-.03em !important;}
+.section-heading p,
+.planning-head p,
+.evolution-card-note{font-size:var(--type-caption) !important;line-height:1.38 !important;}
+.planning-weekly-memory,
+.planning-forecast,
+.draft-day-body p,
+.planned-session-body,
+.today-plan-description{font-size:var(--type-body) !important;}
+
+/* Cabecera: conserva identidad al entrar y cede espacio al desplazarse. */
+.topbar{
+  transition:min-height .20s ease,padding .20s ease,margin-bottom .20s ease,border-radius .20s ease,background .20s ease,box-shadow .20s ease !important;
+}
+.brand-mark{
+  transform-origin:center;
+  transition:width .20s ease,height .20s ease,transform .20s ease,opacity .20s ease !important;
+}
+.topbar .icon-button{transition:width .20s ease,min-width .20s ease,min-height .20s ease,transform .16s ease,background .16s ease !important;}
+.topbar.is-compact{
+  min-height:calc(58px + var(--safe-top)) !important;
+  margin-bottom:10px !important;
+  padding:var(--safe-top) 14px 7px !important;
+  border-radius:0 0 21px 21px !important;
+  background:rgba(5,5,7,.76) !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.30),inset 0 -1px 0 rgba(255,255,255,.035) !important;
+}
+.topbar.is-compact .brand-mark{width:min(190px,100%) !important;height:30px !important;transform:translateY(-1px);}
+.topbar.is-compact .icon-button{width:36px !important;min-width:36px !important;min-height:36px !important;}
+.topbar.is-compact::before{opacity:.48;transition:opacity .20s ease;}
+
+/* Superficies: cristal sólo para bloques de primer nivel. */
+#view-today .readiness-card,
+#view-today .upcoming-card,
+#view-today .form-card,
+#planningSummary,
+#planDraft > .card,
+#view-plan .calendar-card,
+#view-evolution .evolution-focus,
+#view-evolution .evolution-clean-card,
+#view-manage .data-hub-section{
+  background:var(--surface-primary) !important;
+  border-color:var(--separator-soft) !important;
+  box-shadow:0 10px 30px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.055) !important;
+}
+
+/* Elementos secundarios: dejan de parecer otra tarjeta completa. */
+.planning-metric,
+.planning-weekly-memory,
+.planning-forecast,
+.evolution-kpi,
+.manage-stat,
+.detail-item,
+.load-item,
+.today-mini-value,
+.draft-day,
+.roadmap-preview-day,
+.reason-chip,
+.planning-reason,
+.perception-card{
+  background:var(--surface-secondary) !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+.planning-weekly-memory,
+.planning-forecast{
+  border-top:1px solid var(--hairline) !important;
+  border-radius:0 !important;
+  margin-top:10px !important;
+  padding:10px 2px 0 !important;
+  background:transparent !important;
+}
+.planning-weekly-memory + .planning-weekly-memory,
+.planning-weekly-memory + .planning-forecast,
+.planning-forecast + .planning-weekly-memory{
+  margin-top:8px !important;
+}
+.planning-weekly-memory strong{font-size:var(--type-body-strong) !important;font-weight:680 !important;}
+.planning-weekly-memory span{font-size:var(--type-caption) !important;line-height:1.35 !important;}
+.planning-forecast{grid-template-columns:minmax(0,1fr) auto !important;}
+.planning-forecast strong{font-size:var(--type-body-strong) !important;}
+.planning-forecast .forecast-time{font-size:1.08rem !important;font-weight:660 !important;}
+
+/* Plan: la respuesta principal domina; el detalle se retira visualmente. */
+#planningSummary{
+  border-color:rgba(10,132,255,.16) !important;
+  box-shadow:0 12px 34px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.065) !important;
+}
+.planning-status{
+  background:rgba(48,209,88,.10) !important;
+  border:1px solid rgba(48,209,88,.16) !important;
+}
+.planning-status.waiting{
+  background:rgba(255,214,10,.09) !important;
+  border-color:rgba(255,214,10,.15) !important;
+}
+.planning-reasons{gap:4px !important;}
+.planning-reason{padding:4px 6px !important;color:var(--muted) !important;}
+#view-plan .calendar-card{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  padding-top:4px !important;
+}
+#view-plan .calendar-toolbar{border-top:1px solid var(--hairline);padding-top:12px !important;}
+
+/* Hoy: lectura vertical clara. */
+#view-today .readiness-card{border-color:rgba(10,132,255,.15) !important;}
+#view-today .today-primary-metric{
+  background:rgba(255,255,255,.032) !important;
+  border-color:rgba(255,255,255,.07) !important;
+  box-shadow:none !important;
+}
+.today-metric-label{font-size:var(--type-body-strong) !important;}
+.today-metric-context{font-size:var(--type-caption) !important;line-height:1.25 !important;}
+.today-plan-card,
+.today-mini-card,
+.today-wide-card{
+  box-shadow:none !important;
+  border-color:rgba(255,255,255,.07) !important;
+}
+
+/* Evolución: una respuesta principal, dos bloques de evidencia. */
+.evolution-v2{gap:10px !important;}
+.evolution-answer{border-color:rgba(10,132,255,.16) !important;}
+.evolution-answer-grid{gap:1px !important;background:var(--hairline);border-radius:15px;overflow:hidden;}
+.evolution-answer-item{
+  border:0 !important;
+  border-radius:0 !important;
+  background:rgba(14,14,17,.84) !important;
+  padding:10px 11px !important;
+}
+.evolution-answer-item strong{font-size:var(--type-body-strong) !important;font-weight:690 !important;}
+.evolution-answer-item span,
+.evolution-answer-item small{font-size:var(--type-micro) !important;}
+.evolution-kpis{gap:1px !important;background:var(--hairline);border-radius:14px;overflow:hidden;}
+.evolution-kpi{border-radius:0 !important;padding:9px 10px !important;background:rgba(14,14,17,.82) !important;}
+.evolution-card-head strong{font-size:var(--type-subtitle) !important;font-weight:680 !important;}
+.evolution-controls button{min-height:32px !important;padding:0 10px !important;}
+.evolution-controls button.active{
+  background:var(--surface-interactive) !important;
+  border-color:rgba(10,132,255,.28) !important;
+  color:#dceeff !important;
+}
+
+/* Actividades: lista más cercana a una lista nativa que a una cuadrícula de tarjetas. */
+#activityList .activity-card{
+  border-color:rgba(255,255,255,.065) !important;
+  box-shadow:none !important;
+  background:rgba(28,28,30,.30) !important;
+}
+#activityList .activity-card:active{background:rgba(255,255,255,.055) !important;}
+.activity-toolbar{margin-bottom:9px !important;}
+.activity-count-compact{color:var(--muted) !important;font-size:var(--type-micro) !important;}
+
+/* Datos: grupos más parecidos a ajustes de iOS. */
+.data-hub-section{box-shadow:none !important;}
+.data-hub-section + .data-hub-section{margin-top:8px !important;}
+.data-subrow{min-height:43px !important;}
+.data-subrow + .data-subrow{border-top:1px solid var(--hairline) !important;}
+.data-subrow span{font-size:var(--type-body) !important;}
+.data-subrow strong{font-size:var(--type-body) !important;}
+
+/* Navegación inferior: selección inequívoca y sin indicador lineal. */
+.bottom-nav{
+  padding:6px 8px !important;
+  border-color:rgba(255,255,255,.16) !important;
+  box-shadow:0 16px 46px rgba(0,0,0,.54),inset 0 1px 0 rgba(255,255,255,.13) !important;
+}
+.nav-button{
+  min-height:52px !important;
+  gap:3px !important;
+  border:1px solid transparent !important;
+  transition:background .17s ease,border-color .17s ease,color .17s ease,transform .14s ease !important;
+}
+.nav-button::after{display:none !important;}
+.nav-button .nav-label{font-size:var(--type-caption) !important;font-weight:570 !important;letter-spacing:-.015em !important;}
+.nav-button .nav-emoji{font-size:1.16rem !important;opacity:.72;transition:opacity .17s ease,filter .17s ease,transform .17s ease;}
+.nav-button.active{
+  color:var(--blue) !important;
+  background:rgba(10,132,255,.13) !important;
+  border-color:rgba(10,132,255,.18) !important;
+}
+.nav-button.active .nav-label{color:#8fc8ff !important;font-weight:650 !important;}
+.nav-button.active .nav-emoji{opacity:1;filter:none !important;transform:translateY(-1px);}
+.nav-button:active{transform:scale(.97) !important;}
+
+/* Color con significado: interacción azul, estado positivo verde, cautela amarilla, restricción roja, IA morado. */
+.talos-chat-trigger{color:#d9b7ff !important;}
+.talos-chat-trigger span{color:var(--purple) !important;}
+.primary-button,
+.segmented-control button.active,
+.activity-save-button{
+  background:#0a84ff !important;
+  border-color:#0a84ff !important;
+}
+.today-plan-status.done,
+.day-item.done{color:#bff6cd !important;background:rgba(48,209,88,.11) !important;}
+.sync-warning,
+.planning-status.waiting{color:#ffe890 !important;}
+.danger-button,
+.activity-cancel-button{color:#ff6961 !important;}
+
+/* Controles: uniformidad de alturas y radios. */
+.icon-button,.primary-button,.secondary-button,.danger-button,
+.glass-control,.glass-select,.glass-date,
+.feeling-field select,.plan-field input,.plan-field select,.plan-field textarea,
+dialog input,dialog select,dialog textarea{
+  border-radius:15px !important;
+}
+.primary-button,.secondary-button,.danger-button{min-height:40px !important;}
+
+/* Movimiento sólo funcional. */
+.card,.activity-card,.data-hub-section,.evolution-clean-card,.planning-card{
+  transition:border-color .16s ease,background .16s ease !important;
+}
+@media (prefers-reduced-motion:reduce){
+  .topbar,.brand-mark,.topbar .icon-button,.nav-button,.nav-button .nav-emoji{
+    transition:none !important;
+  }
+}
+
+/* Ajustes iPhone. */
+@media (max-width:430px){
+  .topbar.is-compact{
+    min-height:calc(54px + var(--safe-top)) !important;
+    padding:var(--safe-top) 12px 6px !important;
+    margin-bottom:8px !important;
+  }
+  .topbar.is-compact .brand-mark{width:min(168px,100%) !important;height:27px !important;}
+  .evolution-answer-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important;}
+  .evolution-answer-item{padding:9px 7px !important;}
+  .evolution-answer-item strong{font-size:.74rem !important;}
+  .evolution-answer-item small{font-size:.53rem !important;}
+  .planning-weekly-memory{align-items:flex-start !important;}
+  .planning-weekly-memory span{max-width:56%;font-size:.61rem !important;}
+  .bottom-nav{padding-inline:6px !important;}
+  .nav-button{min-height:50px !important;border-radius:16px !important;}
+  .nav-button .nav-label{font-size:.59rem !important;}
+}
+
 </style>
 </head>
 <body>
@@ -2396,7 +2673,7 @@ function wait(milliseconds) {
 }
     "use strict";
 
-    const APP_VERSION = "2.2.5";
+    const APP_VERSION = "2.3.0";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-5";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
@@ -11954,6 +12231,20 @@ function buildActivityReviewRequest(activity) {
       showToast("Datos locales eliminados. Se ha creado un nuevo perfil de corredor; la conexión privada se conserva.");
     }
 
+    let topbarChromeFrame = 0;
+
+    function syncTopbarChrome() {
+      topbarChromeFrame = 0;
+      const topbar = $(".topbar");
+      if (!topbar) return;
+      topbar.classList.toggle("is-compact", window.scrollY > 42);
+    }
+
+    function scheduleTopbarChrome() {
+      if (topbarChromeFrame) return;
+      topbarChromeFrame = requestAnimationFrame(syncTopbarChrome);
+    }
+
     function bindEvents() {
       $$(".nav-button").forEach(button => button.addEventListener("click", () => setView(button.dataset.target)));
       $("#activitySearch")?.addEventListener("input", syncActivityFilterState);
@@ -12099,7 +12390,10 @@ function buildActivityReviewRequest(activity) {
         if (accept) return void acceptDraftPlan(accept.dataset.planWeek);
       });
       window.addEventListener("scroll", scheduleActivityVirtualUpdate, { passive: true });
+      window.addEventListener("scroll", scheduleTopbarChrome, { passive: true });
       window.addEventListener("resize", scheduleActivityVirtualUpdate, { passive: true });
+      window.addEventListener("resize", scheduleTopbarChrome, { passive: true });
+      syncTopbarChrome();
       $("#syncTopButton").addEventListener("click", () => syncNow({ manual: true }));
       $("#talosChatButton")?.addEventListener("click", openTalosChat);
       $("#talosChatForm")?.addEventListener("submit", sendTalosChat);
