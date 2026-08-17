@@ -452,19 +452,19 @@
     .manage-card h3 { margin: 0 0 5px; font-size: 16px; }
     .manage-card p { margin: 0 0 14px; color: var(--muted); line-height: 1.4; }
     .shoe-list { display: grid; gap: 8px; margin-top: 12px; }
-    .shoe-card { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 11px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.035); }
+    .shoe-card { display: grid; grid-template-columns: minmax(0,1fr); gap: 8px; align-items: center; padding: 11px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.035); }
     .shoe-card strong, .shoe-card span { display: block; }
-    .shoe-card strong { font-size: 12px; }
-    .shoe-card .shoe-meta { margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.35; }
-    .shoe-km { text-align: right; min-width: 76px; }
-    .shoe-km strong { font-size: 15px; font-variant-numeric: tabular-nums; }
-    .shoe-km span { margin-top: 3px; color: var(--muted); font-size: 9px; }
-    .shoe-progress { grid-column: 1 / -1; height: 5px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.07); }
+    .shoe-card-head { display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0; }
+    .shoe-card-head > strong { min-width:0; font-size: 15px; line-height:1.18; letter-spacing:-.018em; }
+    .shoe-card-head button { flex:0 0 auto; min-height:29px; padding:0 10px; font-size:9.5px; }
+    .shoe-card .shoe-meta { margin-top: -1px; color: var(--muted); font-size: 10px; line-height: 1.35; }
+    .shoe-progress { height: 5px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.07); }
     .shoe-progress > span { height: 100%; border-radius: inherit; background: var(--blue); }
     .shoe-progress.warn > span { background: var(--amber); }
     .shoe-progress.over > span { background: var(--red); }
-    .shoe-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
-    .shoe-actions button { min-height: 31px; padding: 0 10px; font-size: 10px; }
+    .shoe-progress-meta { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-top:-1px; font-variant-numeric:tabular-nums; }
+    .shoe-progress-meta strong { font-size: 12px; font-weight:700; }
+    .shoe-progress-meta span { color:var(--muted); font-size:12px; font-weight:650; text-align:right; }
     .shoe-plan-tip { margin-top: 7px; padding: 7px 9px; border-radius: 11px; color: #cde8ff; background: rgba(90,174,255,.08); font-size: 10px; line-height: 1.35; }
     .shoe-assignment { margin-top: 14px; padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.03); }
     .shoe-assignment label { display: block; margin-bottom: 6px; color: var(--secondary); font-size: 11px; font-weight: 700; }
@@ -5373,7 +5373,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "2.0.12";
+    const APP_VERSION = "2.0.13";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-4";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
@@ -12067,14 +12067,24 @@ function renderToday() {
 
     function shoeInventoryMarkup() {
       if (!state.shoes.length) return `<div class="shoe-empty-compact"><span>Aún no hay zapatillas registradas.</span><button class="primary-button compact-button" type="button" data-add-shoe>Añadir</button></div>`;
-      return `<div class="shoe-list">${state.shoes.map(shoe => {
+      const shoes = [...state.shoes].sort((a,b) => {
+        const firstA = a.firstUse || "9999-12-31";
+        const firstB = b.firstUse || "9999-12-31";
+        return firstA.localeCompare(firstB) || String(a.name || "").localeCompare(String(b.name || ""), "es");
+      });
+      return `<div class="shoe-list">${shoes.map(shoe => {
           const wear = shoeWear(shoe);
           const pct = Math.min(100, Math.max(0, wear.ratio * 100));
+          const firstUse = shoe.firstUse ? formatDate(shoe.firstUse,{day:"numeric",month:"short",year:"numeric"}) : "Sin fecha";
+          const status = shoe.status === "retired" ? " · Retirada" : "";
           return `<div class="shoe-card">
-            <div><strong>${escapeHtml(shoe.name)}</strong><span class="shoe-meta">${escapeHtml(shoeCategoryLabel(shoe.category))} · ${formatNumber(shoeTotalActivities(shoe))} actividades · ${shoe.status === "retired" ? "retirada" : shoe.recommend ? "recomendable" : "sin recomendación automática"}</span></div>
-            <div class="shoe-km"><strong>${formatNumber(wear.total,1)} km</strong><span>de ${formatNumber(shoe.maxKm,0)} km · ${escapeHtml(wear.label)}</span></div>
+            <div class="shoe-card-head">
+              <strong>${escapeHtml(shoe.name)}</strong>
+              <button class="secondary-button" type="button" data-edit-shoe="${escapeHtml(shoe.id)}">Editar</button>
+            </div>
+            <span class="shoe-meta">${escapeHtml(shoeCategoryLabel(shoe.category))} · ${formatNumber(shoeTotalActivities(shoe))} actividades · Primer uso ${escapeHtml(firstUse)}${status}</span>
             <div class="shoe-progress ${wear.className}"><span style="width:${pct}%"></span></div>
-            <div class="shoe-actions"><button class="secondary-button" type="button" data-edit-shoe="${escapeHtml(shoe.id)}">Editar</button></div>
+            <div class="shoe-progress-meta"><strong>${formatNumber(wear.total,1)} km</strong><span>${formatNumber(shoe.maxKm,0)} km</span></div>
           </div>`;
         }).join("")}</div>
         <div class="button-row shoe-add-row"><button class="primary-button compact-button" type="button" data-add-shoe>Añadir zapatillas</button></div>`;
@@ -13502,7 +13512,14 @@ function buildActivityReviewRequest(activity) {
       }
       try {
         let cache = await storeGet(DATA_STORES.streams, activity.id);
-        if (!cache?.streams || cache.cacheVersion !== STREAM_CACHE_VERSION) {
+        const cachedMap = cache?.streams ? streamMap(cache.streams) : new Map();
+        const cachedCoordinates = cachedMap.has("latlng") ? extractCoordinates(cachedMap.get("latlng")) : [];
+        const needsGps = Boolean(mapNode && activity.streamTypes?.includes("latlng") && cachedCoordinates.length < 2);
+        const needsPower = Boolean(powerNode && activity.streamTypes?.includes("watts") && !cachedMap.has("watts"));
+        /* El cálculo de mejores marcas puede haber guardado previamente una caché parcial
+           con sólo distance,time. Al abrir la ficha necesitamos completar esa caché con GPS
+           y el resto de streams en vez de considerarla suficiente. */
+        if (!cache?.streams || cache.cacheVersion !== STREAM_CACHE_VERSION || needsGps || needsPower) {
           const token = await connectionGet("accessToken");
           const types = "latlng,distance,time,altitude,velocity_smooth,heartrate,cadence,watts,respiration";
           const { response, payload } = await workerRequest(`/activity/${encodeURIComponent(activity.id)}/streams?types=${types}`, {
