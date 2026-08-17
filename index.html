@@ -5015,6 +5015,18 @@
       dialog,.metric-detail-popover,.plan-day-popover{background:rgba(28,28,32,.94)!important}
     }
 
+
+    /* v2.0.12 · mejores marcas, zapatillas y sueño histórico */
+    .best-record-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
+    .best-record-grid .data-record-button,.best-record-grid .data-subrow{min-width:0;min-height:70px;padding:10px 11px!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:17px!important;background:rgba(44,44,46,.30)!important;-webkit-backdrop-filter:blur(28px) saturate(185%);backdrop-filter:blur(28px) saturate(185%);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+    .best-record-grid .data-record-button{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+    .best-record-grid .data-record-button span,.best-record-grid .data-subrow span{font-size:.76rem!important;line-height:1.15}
+    .best-record-grid .data-record-button strong,.best-record-grid .data-subrow strong{font-size:.92rem;line-height:1.08;white-space:nowrap}
+    .best-record-grid .data-record-button strong small{margin-top:5px!important;font-size:.62rem;line-height:1.1}
+    .data-shoes-body>.shoe-list{margin-top:0!important}
+    .data-shoes-body>.shoe-add-row{margin-top:8px!important}
+    .today-day-nav-copy strong{overflow:visible!important;line-height:1.18!important;padding:1px 0 3px!important}
+    @media(max-width:360px){.best-record-grid{gap:6px}.best-record-grid .data-record-button,.best-record-grid .data-subrow{min-height:66px;padding:8px!important}.best-record-grid .data-record-button span,.best-record-grid .data-subrow span{font-size:.70rem!important}.best-record-grid .data-record-button strong,.best-record-grid .data-subrow strong{font-size:.84rem}}
 </style>
 </head>
 <body>
@@ -5361,7 +5373,7 @@
   (() => {
     "use strict";
 
-    const APP_VERSION = "2.0.11";
+    const APP_VERSION = "2.0.12";
     const ACTIVITY_ANALYSIS_MODEL = "talos-activity-review-4";
     const DEFAULT_WORKER_URL = "https://intervals.aj-luque.workers.dev";
     const CONNECTION_DB = "talos-connection";
@@ -5831,10 +5843,14 @@
     function assignmentAfterBaseline(assignment, shoe) {
       const activity = state.activities.find(item => item.id === assignment.activityId);
       if (!activity) return false;
+      const activityDate = activityDateKey(activity);
+      /* Si existe fecha de primer uso, TɅLOS cuenta cualquier actividad asignada
+         realizada ese mismo día o después, aunque la zapatilla se haya dado de alta más tarde. */
+      if (shoe.firstUse && activityDate) return activityDate >= shoe.firstUse;
       const activityUtc = activity.start?.utc ? Date.parse(activity.start.utc) : NaN;
       const baselineUtc = Date.parse(shoe.baselineAt);
-      if (Number.isFinite(activityUtc) && Number.isFinite(baselineUtc)) return activityUtc > baselineUtc;
-      return activityDateKey(activity) > String(shoe.baselineAt || "").slice(0,10);
+      if (Number.isFinite(activityUtc) && Number.isFinite(baselineUtc)) return activityUtc >= baselineUtc;
+      return activityDate >= String(shoe.baselineAt || "").slice(0,10);
     }
 
     function shoeLinkedActivities(shoeId) {
@@ -10294,7 +10310,39 @@ function hrvGuidanceForDate(referenceDate) {
         return rows;
       }
 
-      /* Sueño y Pasos: en 6 meses/1 año/Todo, una barra = media mensual. */
+      /* Sueño en Todo: una barra = media anual. */
+      if (metricKey === "sleep" && range === "all") {
+        const buckets = new Map();
+        source.forEach(item => {
+          const value = accessor(item);
+          if (!isNumber(value)) return;
+          const key = String(item.date).slice(0,4);
+          const row = buckets.get(key) || { values:[], qualityRanks:[], sleepScores:[] };
+          row.values.push(value);
+          const rank = sleepQualityRank(item.recovery?.sleepQualityLabel);
+          if (isNumber(rank)) row.qualityRanks.push(rank);
+          if (isNumber(item.recovery?.sleepScore)) row.sleepScores.push(item.recovery.sleepScore);
+          buckets.set(key,row);
+        });
+        const startYear = Number(String(start).slice(0,4));
+        const endYear = Number(String(referenceDate).slice(0,4));
+        const result = [];
+        for (let year=startYear; year<=endYear; year++) {
+          const key=String(year), bucket=buckets.get(key);
+          const quality=bucket?.qualityRanks?.length ? sleepQualityFromRank(average(bucket.qualityRanks)) : null;
+          result.push({
+            key,
+            date:`${year}-01-01`,
+            label:key,
+            value:bucket?.values?.length ? average(bucket.values) : null,
+            quality,
+            sleepScore:bucket?.sleepScores?.length ? average(bucket.sleepScores) : null
+          });
+        }
+        return result;
+      }
+
+      /* Sueño y Pasos: en 6 meses/1 año, una barra = media mensual. */
       const buckets = new Map();
       source.forEach(item => {
         const value = accessor(item);
@@ -10613,7 +10661,7 @@ function hrvGuidanceForDate(referenceDate) {
             metricStat("Máximo del periodo",isNumber(longest)?`${formatSleep(longest)}${longestRow?.date ? ` · ${escapeHtml(formatDate(longestRow.date,{day:"numeric",month:"short",year:"numeric"}))}` : ""}`:"—")
           ].join(""),
           guidance:"",
-          note:`${rangeLabel}. En vistas mensuales o anuales cada barra representa la media del mes. Si no existe calidad histórica para un periodo, la barra se muestra en gris.`
+          note:`${rangeLabel}. ${range === "all" ? "Cada barra representa la media de un año." : ["6m","1y"].includes(range) ? "Cada barra representa la media de un mes." : "Cada barra representa un día."} Si no existe calidad histórica para un periodo, la barra se muestra en gris.`
         };
       }
 
@@ -12019,9 +12067,7 @@ function renderToday() {
 
     function shoeInventoryMarkup() {
       if (!state.shoes.length) return `<div class="shoe-empty-compact"><span>Aún no hay zapatillas registradas.</span><button class="primary-button compact-button" type="button" data-add-shoe>Añadir</button></div>`;
-      return `<article class="evolution-card evolution-shoes">
-        <div class="evolution-card-head"><strong>Zapatillas</strong><span>${state.shoes.filter(shoe=>shoe.status === "active").length} activas</span></div>
-        <div class="shoe-list">${state.shoes.map(shoe => {
+      return `<div class="shoe-list">${state.shoes.map(shoe => {
           const wear = shoeWear(shoe);
           const pct = Math.min(100, Math.max(0, wear.ratio * 100));
           return `<div class="shoe-card">
@@ -12031,8 +12077,7 @@ function renderToday() {
             <div class="shoe-actions"><button class="secondary-button" type="button" data-edit-shoe="${escapeHtml(shoe.id)}">Editar</button></div>
           </div>`;
         }).join("")}</div>
-        <div class="button-row shoe-add-row"><button class="primary-button compact-button" type="button" data-add-shoe>Añadir zapatillas</button></div>
-      </article>`;
+        <div class="button-row shoe-add-row"><button class="primary-button compact-button" type="button" data-add-shoe>Añadir zapatillas</button></div>`;
     }
 
     function bindShoeInventoryActions(root = document) {
@@ -12323,7 +12368,7 @@ function evolutionBounds() {
         }
         if (!node || typeof node !== "object") return inherited;
         const nested = node.activity && typeof node.activity === "object" ? node.activity : null;
-        const candidates = [node.activity_id,node.activityId,node.activity_id_str,node.activity?.id,nested?.activity_id,node.id];
+        const candidates = [node.activity_id,node.activityId,node.activity_id_str,node.activity?.id,nested?.activity_id,node.id,node.activity];
         for (const value of candidates) {
           const match = normalizeActivityId(value);
           if (match) return match;
@@ -12333,49 +12378,82 @@ function evolutionBounds() {
         if (dateRows?.length === 1) return dateRows[0];
         return inherited;
       };
-      const register = (activity, distanceM, timeSec) => {
+      const register = (activity, distanceM, timeSec, source = "intervals-pace-curve") => {
         if (!activity || !isNumber(distanceM) || !isNumber(timeSec) || timeSec <= 0) return;
         for (const targetKm of targets) {
           const targetM = targetKm * 1000, tolerance = Math.max(8, targetM * .006);
           if (Math.abs(distanceM - targetM) > tolerance) continue;
-          const record = candidateRecord(activity,targetKm,timeSec,"intervals-pace-curve");
+          const record = candidateRecord(activity,targetKm,timeSec,source);
           const key = recordTargetKey(targetKm);
           if (record && (!best[key] || record.timeSec < best[key].timeSec)) best[key] = record;
         }
       };
-      const visit = (node, inheritedActivity = null, depth = 0, keyHint = null) => {
-        if (depth > 12 || node === null || node === undefined) return;
-        if (Array.isArray(node)) { node.forEach(item => visit(item,inheritedActivity,depth+1,null)); return; }
+      const genericTime = (value, targetM, key = "") => {
+        const number = Number(value);
+        if (!Number.isFinite(number) || number <= 0 || !Number.isFinite(targetM) || targetM <= 0) return null;
+        const targetKm = targetM / 1000;
+        const normalizedKey = String(key || "").toLowerCase();
+        if (/pace|sec.?per.?km|min.?per.?km/.test(normalizedKey)) return number * targetKm;
+        if (/speed|velocity|mps|meters.?per.?second/.test(normalizedKey)) return number > 0 ? targetM / number : null;
+        /* En llamadas de una sola distancia, Intervals puede devolver un valor sin nombre de unidad.
+           Si es demasiado pequeño para ser el tiempo total físicamente plausible, se interpreta como s/km. */
+        return number < targetKm * 150 ? number * targetKm : number;
+      };
+      const visit = (node, inheritedActivity = null, depth = 0, keyHint = null, inheritedTargetM = null) => {
+        if (depth > 14 || node === null || node === undefined) return;
+        if (typeof node === "number" || (typeof node === "string" && node.trim() !== "" && Number.isFinite(Number(node)))) {
+          const keyedActivity = keyHint ? normalizeActivityId(keyHint) : null;
+          if (keyedActivity && isNumber(inheritedTargetM)) {
+            const timeSec = genericTime(node,inheritedTargetM,keyHint);
+            if (isNumber(timeSec)) register(keyedActivity,inheritedTargetM,timeSec);
+          }
+          return;
+        }
+        if (Array.isArray(node)) { node.forEach(item => visit(item,inheritedActivity,depth+1,null,inheritedTargetM)); return; }
         if (typeof node !== "object") return;
         if (seen.has(node)) return;
         seen.add(node);
+
+        const wrapperTarget = Number(node.distanceM ?? node.distance_m ?? node.targetDistanceM ?? node.target_distance_m);
+        const targetM = Number.isFinite(wrapperTarget) && wrapperTarget >= 100 ? wrapperTarget : inheritedTargetM;
         const activity = resolveActivity(node,inheritedActivity,keyHint);
         const distances = Array.isArray(node.distance) ? node.distance : Array.isArray(node.distances) ? node.distances : null;
         const seconds = Array.isArray(node.secs) ? node.secs : Array.isArray(node.seconds) ? node.seconds : Array.isArray(node.time) ? node.time : Array.isArray(node.times) ? node.times : null;
+        const paces = Array.isArray(node.pace) ? node.pace : Array.isArray(node.paces) ? node.paces : Array.isArray(node.pace_sec_per_km) ? node.pace_sec_per_km : Array.isArray(node.paceSecPerKm) ? node.paceSecPerKm : null;
+        const values = Array.isArray(node.values) ? node.values : Array.isArray(node.value) ? node.value : null;
         const ids = Array.isArray(node.activity_id) ? node.activity_id
           : Array.isArray(node.activity_ids) ? node.activity_ids
             : Array.isArray(node.activityId) ? node.activityId
               : Array.isArray(node.activityIds) ? node.activityIds
                 : Array.isArray(node.ids) ? node.ids : null;
+
         if (distances && seconds) {
           const n = Math.min(distances.length,seconds.length);
           for (let i=0;i<n;i++) {
             const rowActivity = ids ? (normalizeActivityId(ids[i]) || activity) : activity;
             register(rowActivity,Number(distances[i]),Number(seconds[i]));
           }
-        } else if (seconds && ids) {
-          const scalarDistance = Number(node.distance_m ?? node.distanceM ?? node.distance);
-          if (Number.isFinite(scalarDistance)) {
-            const n = Math.min(seconds.length,ids.length);
-            for (let i=0;i<n;i++) register(normalizeActivityId(ids[i]) || activity,scalarDistance,Number(seconds[i]));
+        } else if (isNumber(targetM) && ids && (seconds || paces || values)) {
+          const series = seconds || paces || values;
+          const sourceKey = seconds ? "seconds" : paces ? "pace" : "values";
+          const n = Math.min(series.length,ids.length);
+          for (let i=0;i<n;i++) {
+            const rowActivity = normalizeActivityId(ids[i]) || activity;
+            const timeSec = genericTime(series[i],targetM,sourceKey);
+            if (isNumber(timeSec)) register(rowActivity,targetM,timeSec);
           }
         } else {
-          const distance = Number(node.distance_m ?? node.distanceM ?? node.distance);
-          const secs = Number(node.secs ?? node.seconds ?? node.time_sec ?? node.timeSec ?? node.elapsed_time ?? node.moving_time);
-          if (Number.isFinite(distance) && Number.isFinite(secs)) register(activity,distance,secs);
+          const scalarDistance = Number(node.distance_m ?? node.distanceM ?? node.distance ?? targetM);
+          const directSeconds = node.secs ?? node.seconds ?? node.time_sec ?? node.timeSec ?? node.elapsed_time ?? node.moving_time ?? node.elapsedTime ?? node.movingTime;
+          const directPace = node.pace_sec_per_km ?? node.paceSecPerKm ?? node.pace;
+          const genericValue = node.value ?? node.best ?? node.result;
+          let timeSec = Number.isFinite(Number(directSeconds)) ? Number(directSeconds) : null;
+          if (!isNumber(timeSec) && Number.isFinite(Number(directPace)) && isNumber(scalarDistance)) timeSec = Number(directPace) * scalarDistance / 1000;
+          if (!isNumber(timeSec) && Number.isFinite(Number(genericValue)) && isNumber(scalarDistance)) timeSec = genericTime(genericValue,scalarDistance,"value");
+          if (Number.isFinite(scalarDistance) && isNumber(timeSec)) register(activity,scalarDistance,timeSec);
         }
         Object.entries(node).forEach(([key,value]) => {
-          if (value && typeof value === "object") visit(value,activity,depth+1,key);
+          if (value !== null && value !== undefined) visit(value,activity,depth+1,key,targetM);
         });
       };
       visit(payload);
@@ -12416,6 +12494,53 @@ function evolutionBounds() {
           const intervalsExact=await fetchIntervalsBestRecords(targets);
           Object.entries(intervalsExact).forEach(([key,record])=>{ if(record&&(!exact[key]||record.timeSec<exact[key].timeSec)) exact[key]=record; });
         } catch(error) { console.warn("TALOS_INTERVALS_BEST_RECORDS",error?.message||String(error)); }
+
+        /* Respaldo exacto: si el ritmo medio de una actividad más larga ya es mejor que la marca
+           que TɅLOS tiene para una distancia, matemáticamente existe dentro de ella un tramo de esa
+           distancia igual o más rápido. Descargamos sólo esos candidatos inequívocos y calculamos
+           el parcial sobre sus streams reales. Evita volver a mostrar como PB un 5K aislado cuando
+           un 6K/10K/Media contiene un 5K más rápido. */
+        try {
+          const pending = new Map();
+          for (const targetKm of targets) {
+            const key=recordTargetKey(targetKm), current=exact[key];
+            if (!current || !isNumber(current.timeSec)) continue;
+            const bestPace=current.timeSec/targetKm;
+            state.activities.filter(isRunningActivity).forEach(activity=>{
+              if(!isNumber(activity.distanceM)||activity.distanceM+5<targetKm*1000) return;
+              const duration=activityDuration(activity), km=activity.distanceM/1000;
+              if(!isNumber(duration)||km<=0) return;
+              const overallPace=duration/km;
+              if(overallPace < bestPace - .25 && !cacheById.has(String(activity.id))) {
+                const previous=pending.get(String(activity.id));
+                if(!previous||overallPace<previous.pace) pending.set(String(activity.id),{activity,pace:overallPace});
+              }
+            });
+          }
+          const candidates=[...pending.values()].sort((a,b)=>a.pace-b.pace).slice(0,40);
+          if(candidates.length && navigator.onLine && state.workerUrl) {
+            const token=await connectionGet("accessToken").catch(()=>"");
+            if(token) {
+              for(const item of candidates) {
+                try {
+                  const activity=item.activity;
+                  const {response,payload}=await workerRequest(`/activity/${encodeURIComponent(activity.id)}/streams?types=distance,time`,{token,timeoutMs:18000,retries:1});
+                  if(!response.ok) continue;
+                  const streams=Array.isArray(payload)?payload:payload?.streams??payload;
+                  const cache={id:activity.id,cacheVersion:STREAM_CACHE_VERSION,fetchedAt:new Date().toISOString(),streams};
+                  await storePut(DATA_STORES.streams,cache);
+                  cacheById.set(String(activity.id),cache);
+                  for(const targetKm of targets) {
+                    if(activity.distanceM+5<targetKm*1000) continue;
+                    const candidate=fastestSegmentFromStreamCache(activity,cache,targetKm);
+                    const key=recordTargetKey(targetKm);
+                    if(candidate&&(!exact[key]||candidate.timeSec<exact[key].timeSec)) exact[key]=candidate;
+                  }
+                } catch(error) { console.warn("TALOS_BEST_RECORD_STREAM",item.activity?.id,error?.message||String(error)); }
+              }
+            }
+          }
+        } catch(error) { console.warn("TALOS_BEST_RECORD_FALLBACK",error?.message||String(error)); }
         state.bestRecordsExact=exact;
         state.bestRecordsLoaded=true;
         if(state.activeView==="manage") renderManage();
@@ -12467,7 +12592,7 @@ function evolutionBounds() {
         ["Media maratón",allTimeDistanceRecord(21.0975)],
         ["Maratón",allTimeDistanceRecord(42.195)]
       ];
-      const pbMarkup=records.map(([label,record])=>recordButton(label,record,record?escapeHtml(formatTargetTime(record.timeSec)):"—")).join("") + recordButton("Distancia más larga",longest,longest?`${formatNumber(longest.distanceKm,2)} km`:"—");
+      const pbMarkup=`<div class="best-record-grid">${records.map(([label,record])=>recordButton(label,record,record?escapeHtml(formatTargetTime(record.timeSec)):"—")).join("")}${recordButton("Distancia más larga",longest,longest?`${formatNumber(longest.distanceKm,2)} km`:"—")}</div>`;
       $("#appVersionLabel").textContent=`TɅLOS ${APP_VERSION}`;
       $("#manageContent").innerHTML=`<div class="data-hub">
         <details class="data-hub-section"><summary><span>🏅 Mejores marcas</span><b>›</b></summary><div class="data-hub-body">${pbMarkup}</div></details>
